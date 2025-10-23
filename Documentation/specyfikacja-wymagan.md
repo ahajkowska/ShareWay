@@ -97,8 +97,7 @@ Gość, Użytkownik, Admin
 ### 3.2. Obiekty​ ​biznesowe
 
 ## 4. Wymagania​ ​funkcjonalne
-Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia.
-W celu zwiększenia czytelności diagram został podzielony na kilka części, odpowiadających poszczególnym aktorom systemu: Gość, Użytkownik, Organizator, Admin.
+Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu: Gość, Użytkownik, Admin.
 Niektóre przypadki użycia mogą się powtarzać, ponieważ kolejne role rozszerzają dostępne funkcjonalności.
 
 Zależność między aktorami przedstawia się następująco:
@@ -110,11 +109,7 @@ Zależność między aktorami przedstawia się następująco:
 
 ### 4.1 Przypadki użycia
 
-![Gość](img/4_gosc.png)
-<br>
-![Użytkownik](img/4_uzytkownik.drawio.png)
-<br>
-![Admin](img/4_admin.drawio.png)
+![Diagram użytkowy](img/diagram_uzytkowy_projekt.png)
 
 | ID:                     | **Homepage**      |
 | ------                  | ------------------|
