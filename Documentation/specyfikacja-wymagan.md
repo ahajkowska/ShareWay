@@ -50,6 +50,7 @@
   - [3.1. Aktorzy​ ​i​ ​charakterystyka​ ​użytkowników](#31-aktorzy-i-charakterystyka-użytkowników)
   - [3.2. Obiekty​ ​biznesowe](#32-obiekty-biznesowe)
 - [4. Wymagania​ ​funkcjonalne](#4-wymagania-funkcjonalne)
+  - [4.1 Przypadki użycia](#41-przypadki-użycia)
 - [5. Charakterystyka​ ​interfejsów](#5-charakterystyka-interfejsów)
   - [5.1. Interfejs​ ​użytkownika](#51-interfejs-użytkownika)
   - [5.2. Interfejsy​ ​zewnętrzne](#52-interfejsy-zewnętrzne)
@@ -92,9 +93,206 @@ Wszystkie dane użytkowników oraz grup będą przechowywane w bazie danych, z z
 ## 3. Model procesów biznesowych
 
 ### 3.1. Aktorzy​ ​i​ ​charakterystyka​ ​użytkowników
+Gość, Użytkownik, Admin
 ### 3.2. Obiekty​ ​biznesowe
 
 ## 4. Wymagania​ ​funkcjonalne
+Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu: Gość, Użytkownik, Admin.
+Niektóre przypadki użycia mogą się powtarzać, ponieważ kolejne role rozszerzają dostępne funkcjonalności.
+
+Zależność między aktorami przedstawia się następująco:
+* Użytkownik posiada wszystkie funkcjonalności Gościa,
+* Organizator posiada wszystkie funkcjonalności Użytkownika,
+* Admin posiada wszystkie funkcjonalności Organizatora.
+
+![Aktorzy](img/4_aktorzy.drawio.png)
+
+### 4.1 Przypadki użycia
+
+![Diagram użytkowy](img/diagram_uzytkowy_projekt.png)
+
+| ID:                     | **Homepage**      |
+| ------                  | ------------------|
+| Nazwa:                  | **Strona główna** |
+| **Aktorzy główni:**     | Wszyscy |
+| **Aktorzy pomocniczy:** | brak    |
+| **Poziom:**             | Użytkownika | 
+| **Priorytet:**          | P0 |
+| **Opis:**               | Ekran powitalny aplikacji zawierający opis systemu, jego funkcje oraz opcje do wyboru. |
+| **Wyzwalacze:**         | **1.** Admin uruchamia interfejs systemu. |
+| **Warunki początkowe:** | **1.** Brak |
+| **Warunki końcowe:**    | **1.** Gość widzi zawartość strony głównej |
+| **Scenariusz główny:**  | **1.** Gość uruchamia interfejs systemu. <br> **2.** System wyświetla stronę główną zawierającą: <br> a. Opcję "Zarejestruj się" <br> b. Opcję "Zaloguj się "<br> c. Opis funkcjonalności aplikacji. |
+| **Scenariusze alternatywne:** | Brak |
+| **Wyjątki:**                  | Brak |
+| **Dodatkowe wymagania:**      | Brak |
+
+
+| ID:                     | Register                 |
+| ------                  | ------------------------ |
+| Nazwa:                  | **Rejestracja nowego konta** |
+| **Aktorzy główni:**     | Gość |
+| **Poziom:**             | Użytkownika |
+| **Priorytet:**          | P0 |
+| **Opis:**               | Gość zakłada nowe konto, aby uzyskać dostęp do funkcji aplikacji i móc tworzyć lub dołączać do grup podróżnych. |
+| **Wyzwalacze:**         | **1.** Gość wybiera opcję „Zarejestruj się”. |
+| **Warunki początkowe:** | Brak |
+| **Warunki końcowe:**    | Konto użytkownika zostało zarejestrowane w systemie. |
+| **Scenariusz główny:**  | **1.** Gość wybiera opcję „Zarejestruj się”. <br> **2.** System wyświetla formularz rejestracji konta. <br> **3.** Gość wypełnia formularz następującymi danymi: <br> a. e-mail, <br> b. hasło, <br> c. potwierdzenie hasła, <br> d. pseudonim <br> **4.** Gość zatwierdza formularz. <br> **5.** System tworzy konto. <br> **6.** System wyświetla potwierdzenie rejestracji konta Gościowi. |
+| **Scenariusze alternatywne:** | Brak |
+| **Wyjątki:**                  | **1.** Adres e-mail istnieje już w systemie. <br> a. System wyświetla informację o duplikacie. <br> b. System wyświetla ponownie formularz rejestracji. <br> **2.** Hasło oraz powtórzone hasło nie są identyczne. <br> a. System wyświetla informację o niepasujących hasłach <br> b. System ponownie wyświetla formularz rejestracji. <br> **3.** Hasło nie spełnia wymagań bezpieczeństwa. <br> a. System wyświetla informację o zbyt słabym haśle. <br> b. System ponownie wyświetla formularz rejestracji.|
+| **Dodatkowe wymagania:**     | **1.** Format​ ​adresu​ ​e-mail​ ​musi​ ​być​ ​sprawdzany​ ​pod​ ​względem​ ​zgodności​ ​z​ ​RFC​ ​5322. <br> **2.** Hasło​ ​oraz​ ​powtórzone​ ​hasło​ ​musi​ ​być​ ​sprawdzane​ ​czy​ ​są​ ​identyczne. <br> **3.** Hasło musi być sprawdzane czy zawiera przynajmniej 8 znaków, 1 cyfrę, 1 wielką i 1 małą literę​ ​oraz​ ​znak​ ​specjalny. |
+
+| ID:    | Login                    |
+| ------ | ------------------------ |
+| Nazwa: | **Logowanie do systemu**     |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P0 |
+| **Opis:** | Użytkownik loguje się, aby uzyskać dostęp do swoich grup podróżnych i funkcji aplikacji. |
+| **Wyzwalacze:** | **1.** Użytkownik wybiera „Zaloguj się”. |
+| **Warunki początkowe:** | Konto użytkownika istnieje. |
+| **Warunki końcowe:** | Użytkownik jest zalogowany i ma dostęp do funkcji aplikacji. |
+| **Scenariusz główny:** | **1.** Użytkownik wybiera „Zaloguj się”. <br> **2.** Wprowadza e-mail i hasło. <br> **3.** System weryfikuje dane. <br> **4.** Po poprawnym logowaniu użytkownik zostaje przekierowany do swojego panelu. |
+| **Scenariusze alternatywne:** | Brak. |
+| **Wyjątki:** | **1.** Nieprawidłowy e-mail lub hasło. <br> a. System wyświetla komunikat o błędzie. <br> b. System wyświetla ponownie formularz logowania. |
+| **Dodatkowe wymagania:** | Ze względów bezpieczeństwa, system nie może informować Gościa, które pole formularza zawiera błąd. Komunikat powinien być ogólny np. "Błędny login lub/i hasło".|
+
+
+| ID:    | CreateTrip               |
+| ------ | ------------------------ |
+| Nazwa: | **Utwórz nową podróż**       |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P0 |
+| **Opis:** | Użytkownik tworzy nową podróż i ustala jej podstawowe parametry, takie jak nazwa, termin, lokalizacja. |
+| **Wyzwalacze:** | **1.** Użytkownik klika przycisk "Create".|
+| **Warunki początkowe:** | Użytkownik jest zalogowany. |
+| **Warunki końcowe:** | Nowa grupa podróżna została utworzona. |
+| **Scenariusz główny:** | **1.** Organizator wybiera „Utwórz podróż”. <br> **2.** Wypełnia formularz: nazwa, termin, lokalizacja. <br> **3.** Organizator klika "Zapisz", aby zapisać formularz. <br> **4.** System zapisuje podróż i generuje unikalny kod zaproszenia. |
+| **Scenariusze alternatywne:** | Brak. |
+| **Wyjątki:** | **1.** Brak wymaganych danych. <br> a. System prosi o uzupełnienie pól. |
+| **Dodatkowe wymagania:** | System powinien umożliwiać organizatorowi późniejszą edycję danych podróży. |
+
+
+| ID:    | JoinTrip                      |
+| ------ | ----------------------------- |
+| Nazwa: | **Dołącz do istniejącej podróży** |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P0 |
+| **Opis:** | Użytkownik dołącza do istniejącej grupy podróżnej poprzez wprowadzenie kodu zaproszenia. |
+| **Wyzwalacze:** | **1.** Użytkownik klika przycisk "Join".|
+| **Warunki początkowe:** | Użytkownik jest zalogowany. |
+| **Warunki końcowe:** | Użytkownik pomyślnie dołączył do grupy podróżnej. |
+| **Scenariusz główny:** | **1.** Użytkownik wybiera „Dołącz do podróży”. <br> **2.** Wpisuje kod zaproszenia. <br> **3.** System weryfikuje kod. <br> **4.** Jeśli poprawny, użytkownik zostaje dodany do grupy. |
+| **Wyjątki:** | **1.** Kod niepoprawny. <br> a. System wyświetla komunikat o błędzie. |
+| **Dodatkowe wymagania:** | Kod zaproszenia powinien być unikalny. |
+
+| ID:    | ViewTrip               |
+| ------ | ------------------------ |
+| Nazwa: | **Panel podróży**     |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P0 |
+| **Opis:** | Podgląd podróży. |
+| **Wyzwalacze:** | Użytkownik został zalogowany do systemu i znajduje się w panelu podróży. |
+| **Warunki początkowe:** | Użytkownik jest zalogowany. |
+| **Warunki końcowe:** | Użytkownik widzi aktualną listę grup podróżowych, których jest uczestnikiem. |
+| **Scenariusz główny:** | **1.** Użytkownik loguje się do systemu. <br> **2.** Użytkownik widzi listę grup podróżnych. |
+| **Scenariusz alternatywny** | **1.** Użytkownik nie należy do żadnej grupy. <br> a. System wyświetla informację "Nie należysz do żadnej grupy podróżnej". |
+| **Scenariusz alternatywny** | **1.** Użytkownik znajduje się w module podróży. <br> a. Użytkownik klika "Powróć". <br> b. Użytkownik znajduje się w panelu podglądu podróży. |
+| **Scenariusz alternatywny** | **1.** Użytkownik, który stworzył podróż klika ikonę edycji. <br> **2.** Edytuje dane wybranej podróży. <br> **3.** Zapisuje zmiany. <br> **4.** Dane podróży zostały zmienione. |
+| **Wyjątki:**           | Brak |
+| **Dodatkowe wymagania:** | **1.** Użytkownik może kliknąć na daną grupę podróżną, aby zyskać dostęp do modułów dotyczących danej podróży. <br> **2.** Użytkownik, który stworzył podróż ma uprawnienia do jej edycji. |
+
+| ID:    | AdminPanel               |
+| ------ | ------------------------ |
+| Nazwa: | **Panel admina**     |
+| **Aktorzy główni:** | Admin |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P1 |
+| **Opis:** | Admin zarządza danymi użytkowników oraz grup podróżnych. |
+| **Wyzwalacze:** | **1.** Użytkownik z rolą admina loguje się do systemu i wybiera opcję przejścia do panelu administracyjnego. |
+| **Warunki początkowe:** | **1.** Użytkownik posiada uprawnienia administracyjne (rola admin).<br>**2.** Użytkownik jest zalogowany w systemie. |
+| **Warunki końcowe:** | Zmiany dokonane przez administratora zostały zapisane i są widoczne dla pozostałych użytkowników. |
+| **Scenariusz główny:** | **1.** Administrator wybiera sekcję (lista użytkowników, lista grup).<br>**2.** Dokonuje wymaganych zmian administracyjnych, np. edytuje dane użytkownika lub grupy.<br>**3.** Zapisuje zmiany.<br>**4.** System potwierdza zapis zmian. |
+| **Wyjątki:** |  **1.** Brak uprawnień administratora <br> a. System nie umożliwia dostępu do listy użytkowników i wyświetla komunikat o braku uprawnień.<br>**2.** Błąd zapisu zmian <br>a. System wyświetla komunikat o niepowodzeniu operacji (razem z ewentualnym wytłumaczeniem, np. hasło nie spełnia wymogów bezpieczeństwa).|
+| **Dodatkowe wymagania:** | **1.** Dostęp wyłącznie dla użytkowników z rolą admina. <br>**2.** Panel powinien umożliwiać szybkie wyszukiwanie i filtrowanie użytkowników oraz grup.|
+
+| ID:    | Settings                 |
+| ------ | ------------------------ |
+| Nazwa: | **Zarządzanie ustawieniami** |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P1 |
+| **Opis:** | Użytkownik edytuje dane dotyczące jego konta. |
+| **Wyzwalacze:** | Użytkownik klika "Ustawienia". |
+| **Warunki początkowe:** | Użytkownik jest zalogowany. |
+| **Warunki końcowe:** | Użytkownik zmienił ustawienia. |
+| **Scenariusz główny:** | **1.** Użytkownik otwiera ustawienia konta. <br> **2.** Edytuje dane i zapisuje zmiany. <br> 3. System aktualizuje profil i zapisuje konfigurację. |
+| **Wyjątki:**             | **1.** Użytkownik chce zmienić e-mail na już istniejący w systemie. <br> a. System wyświetla informację o duplikacie. <br> **2.** Użytkownik podczas zmiany hasła, niepoprawnie wpisał powtórzenie hasła. <br> a. System wyświetla informację o niepasujących hasłach. <br> **3.** Użytkownik chce zmienić hasło na niespełniające wymagań bezpieczeństwa. <br> a. System wyświetla informację  o zbyt słabym haśle. <br> 
+| **Dodatkowe wymagania:** | Zmiana adresu e-mail lub hasła wymaga potwierdzenia aktualnych danych. |
+
+| ID:    | VotingModule             |
+| ------ | ------------------------ |
+| Nazwa: | **Głosowanie**              |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P1 |
+| **Opis:** | Moduł umożliwia użytkownikom grupy przeprowadzanie głosowań. |
+| **Wyzwalacze:** | Użytkownik przechodzi do modułu "Głosowanie". |
+| **Warunki początkowe:** | Użytkownik jest zalogowany i jest członkiem co najmniej jednej grupy. |
+| **Warunki końcowe:** | Użytkownik korzysta z modułu głosowania. |
+| **Scenariusz główny:** | **1.** Użytkownik tworzy głosowanie, dodając propozycje. <br> **2.** Członkowie grupy oddają głosy. <br> **3.** System aktualizuje wyniki. |
+| **Wyjątki:**                  | Brak |
+| **Dodatkowe wymagania:** | **1.** Możliwość dodawania nowych opcji głosowania w trakcie trwania ankiety. <br> **2.** W danym głosowaniu, można oddać głos tylko raz. <br> **3.** W danym głosowaniu można zmienić swój głos.|
+
+
+| ID:    | PlanningModule           |
+| ------ | ------------------------ |
+| Nazwa: | **Planowanie wyjazdu**       |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P1 |
+| **Opis:** | Moduł umożliwia planowanie harmonogramu podróży – dodawanie dni, aktywności, godzin i lokalizacji. |
+| **Wyzwalacze:** | Użytkownik przechodzi do modułu "Planowanie" |
+| **Warunki początkowe:** | Użytkownik jest zalogowany i jest członkiem co najmniej jednej grupy. |
+| **Warunki końcowe:** | Użytkownik korzysta z modułu planowania. |
+| **Scenariusz główny:** | **1.** Użytkownik otwiera moduł planowania. <br> **2.** Dodaje kolejne dni i aktywności. <br> **3.** System zapisuje plan i udostępnia go wszystkim uczestnikom grupy. |
+| **Wyjątki:**                  | Brak |
+| **Dodatkowe wymagania:** | System powinien umożliwiać edycję planu wszystkim użytkownikom. |
+
+
+| ID:    | CostSharingModule        |
+| ------ | ------------------------ |
+| Nazwa: | **Podział kosztów**          |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P1 |
+| **Opis:** | Moduł umożliwia użytkownikom wprowadzanie wydatków oraz automatyczne podsumowuje koszty i rozliczenia. |
+| **Wyzwalacze:** | Użytkownik przechodzi do modułu "Podział kosztów" |
+| **Warunki początkowe:** | Użytkownik jest zalogowany i jest członkiem co najmniej jednej grupy. |
+| **Warunki końcowe:** | Użytkownik korzysta z modułu podziału kosztów. |
+| **Scenariusz główny:** | **1.** Użytkownik dodaje nowy wydatek (kwota, opis, kto zapłacił). <br> **2.** System aktualizuje bilans dla każdego uczestnika. <br> **3.** Użytkownicy widzą podsumowanie kosztów i rozliczeń. |
+| **Wyjątki:**                  | Brak |
+| **Dodatkowe wymagania:** | Każdy użytkownik powinien widzieć swoje osobne rozliczenia. (co i ile jest komu winien.) |
+
+
+| ID:    | ChecklistModule          |
+| ------ | ------------------------ |
+| Nazwa: | **Lista kontrolna**          |
+| **Aktorzy główni:** | Użytkownik |
+| **Poziom:** | Użytkownika |
+| **Priorytet:** | P1 |
+| **Opis:** | Moduł pozwala uczestnikom tworzyć wspólną listę rzeczy do zabrania lub zadań do wykonania przed podróżą. |
+| **Wyzwalacze:** | Użytkownik przechodzi do modułu "Lista kontrolna" |
+| **Warunki początkowe:** | Użytkownik jest zalogowany i jest członkiem co najmniej jednej grupy. |
+| **Warunki końcowe:** | Użytkownik korzysta z modułu listy kontrolnej. |
+| **Scenariusz główny:** | **1.** Użytkownik otwiera listę kontrolną. <br> **2.** Dodaje nowe pozycje (np. „ładowarka”, „namiot”). <br> **3.** Członkowie grupy mogą odznaczać wykonane pozycje. |
+| **Wyjątki:**                  | Brak |
+| **Dodatkowe wymagania:** | **1.** Każdy użytkownik może dodawać nowe pozycje do listy. <br> **2.** Odznaczenie wykonanych pozycji jest widoczne tylko dla danego użytkownika, nie dla wszystkich. |
+
 
 ## 5. Charakterystyka​ ​interfejsów
 
