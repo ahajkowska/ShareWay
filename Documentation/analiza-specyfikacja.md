@@ -36,39 +36,25 @@
 <div class="page-break"></div>
 
 <!-- TOC -->
-- [1. Wprowadzenie](#1-wprowadzenie)
-  - [1.1. Cel dokumentu](#11-cel-dokumentu)
-  - [1.2. Zakres​ ​produktu](#12-zakres-produktu)
-  - [1.3. Literatura](#13-literatura)
-- [2. Opis ogólny](#2-opis-ogólny)
-  - [2.1 Perspektywa​ ​produktu](#21-perspektywa-produktu)
-  - [2.2. Funkcje​ ​produktu](#22-funkcje-produktu)
-  - [2.3. Ograniczenia](#23-ograniczenia)
-  - [2.4. Dokumentacja​ ​użytkownika](#24-dokumentacja-użytkownika)
-  - [2.5. Założenia​ ​i​ ​zależności](#25-założenia-i-zależności)
-- [3. Model procesów biznesowych](#3-model-procesów-biznesowych)
-  - [3.1. Aktorzy​ ​i​ ​charakterystyka​ ​użytkowników](#31-aktorzy-i-charakterystyka-użytkowników)
-  - [3.2. Obiekty​ ​biznesowe](#32-obiekty-biznesowe)
-- [4. Wymagania​ ​funkcjonalne](#4-wymagania-funkcjonalne)
-  - [4.1 Przypadki użycia](#41-przypadki-użycia)
-- [5. Charakterystyka​ ​interfejsów](#5-charakterystyka-interfejsów)
-  - [5.1. Interfejs​ ​użytkownika](#51-interfejs-użytkownika)
-  - [5.2. Interfejsy​ ​zewnętrzne](#52-interfejsy-zewnętrzne)
-    - [5.2.1. Interfejsy​ ​komunikacyjne](#521-interfejsy-komunikacyjne)
-- [6. Wymagania​ ​pozafunkcjonalne](#6-wymagania-pozafunkcjonalne)
+- [1. Temat projektu](#1-temat-projektu)
+- [2. Cel projektu](#2-cel-projektu)
+- [3. Założenia pracy (systemu do realizacji)](#3-założenia-pracy-systemu-do-realizacji)
+- [4. Wymagania​ ​funkcjonalne i niefunkcjonalne](#4-wymagania-funkcjonalne-i-niefunkcjonalne)
+  - [5.1 Wymagania niefunkcjonalne](#51-wymagania-niefunkcjonalne)
+    - [Wymagania dotyczące wydajności](#wymagania-dotyczące-wydajności)
+  - [5.2 Wymagania funkcjonalne](#52-wymagania-funkcjonalne)
+- [6. Dokumentacja przypadków użycia](#6-dokumentacja-przypadków-użycia)
+- [7. Przypisanie aktorów, nadanie im działań, powiązania](#7-przypisanie-aktorów-nadanie-im-działań-powiązania)
+- [8. Omówienie położeń diagramu](#8-omówienie-położeń-diagramu)
 
 <!-- /TOC -->
 
 <div class="page-break"></div>
 
-## 1. Wprowadzenie
+## 1. Temat projektu
+System wspomagający organizację podróży.
 
-### 1.1. Cel dokumentu
-Dokument stanowi jedyne źródło wymagań aplikacji ShareWay. Stanowi podstawę dla specyfikacji​ ​oprogramowania. <br>
-Dokument przeznaczony głównie dla zespołu deweloperskiego zajmującego się 
-wytwarzaniem​ ​oprogramowania​ ShareWay. 
-
-### 1.2. Zakres​ ​produktu
+## 2. Cel projektu
 
 Celem projektu jest stworzenie systemu informatycznego ShareWay, którego zadaniem będzie ułatwienie organizacji wyjazdów grupowych — od etapu planowania podróży, aż po rozliczanie kosztów między uczestnikami.
 
@@ -76,27 +62,54 @@ System zostanie zaprojektowany w sposób modułowy, co umożliwi jego ciągły r
 
 Wszystkie dane użytkowników oraz grup będą przechowywane w bazie danych, z zachowaniem zasad bezpieczeństwa i ochrony prywatności.
 
-### 1.3. Literatura
+## 3. Założenia pracy (systemu do realizacji)
 
-1. Ustawa z dnia 29 sierpnia 1997 r. o ochronie danych osobowych (Dz.U. 1997 nr 133 poz. 883, z późn. zm.).
+**3.1. Założenia ogólne**
 
-2. Rozporządzenie Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. (RODO) w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych.
+System będzie działał w architekturze klient-serwer z wykorzystaniem nowoczesnych technologii webowych.
 
-## 2. Opis ogólny
+Komunikacja między klientem a serwerem odbywać się będzie przy pomocy protokołu HTTPS i wymiany danych w formacie JSON.
 
-### 2.1 Perspektywa​ ​produktu
-### 2.2. Funkcje​ ​produktu 
-### 2.3. Ograniczenia 
-### 2.4. Dokumentacja​ ​użytkownika
-### 2.5. Założenia​ ​i​ ​zależności
+System przechowuje dane użytkowników, podróży oraz grup w relacyjnej bazie danych.
 
-## 3. Model procesów biznesowych
+Każdy użytkownik systemu musi posiadać konto użytkownika (rejestracja, logowanie).
 
-### 3.1. Aktorzy​ ​i​ ​charakterystyka​ ​użytkowników
-Gość, Użytkownik, Admin
-### 3.2. Obiekty​ ​biznesowe
+System umożliwia tworzenie grup podróżnych, do których można dołączać za pomocą unikalnego kodu zaproszenia.
 
-## 4. Wymagania​ ​funkcjonalne
+Użytkownicy mogą planować podróż, dzielić koszty, głosować i tworzyć listy kontrolne.
+
+Administrator posiada dostęp do panelu zarządzania użytkownikami i grupami.
+
+System ma być responsywny — działać poprawnie na komputerach, tabletach i urządzeniach mobilnych.
+
+Wersja 1.0 systemu obejmuje wdrożenie kluczowych modułów: Rejestracja, Logowanie, Zarządzanie podróżą, Głosowanie, Planowanie, Podział kosztów, Lista kontrolna, Ustawienia i Panel administratora.
+
+**3.2. Założenia techniczne**
+
+Frontend – technologia React (lub równoważna biblioteka SPA).
+
+Backend – środowisko Node.js / Express (lub równoważne frameworki).
+
+Baza danych – PostgreSQL lub MySQL.
+
+Architektura – REST API.
+
+Autoryzacja – JWT (JSON Web Token).
+
+**3.3. Założenia projektowe**
+
+System ma być modułowy, z możliwością rozbudowy o kolejne funkcje.
+
+Moduły powinny być niezależne funkcjonalnie, ale współpracujące przez wspólny system logowania i grup.
+
+Projekt interfejsu ma być czytelny i spójny graficznie (jednolita kolorystyka, intuicyjna nawigacja).
+
+Kod źródłowy powinien być napisany zgodnie ze standardami Clean Code i SOLID.
+
+Dokumentacja techniczna i użytkowa ma być częścią końcowego produktu.
+
+## 4. Wymagania​ ​funkcjonalne i niefunkcjonalne 
+
 Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu: Gość, Użytkownik, Admin.
 Niektóre przypadki użycia mogą się powtarzać, ponieważ kolejne role rozszerzają dostępne funkcjonalności.
 
@@ -107,11 +120,133 @@ Zależność między aktorami przedstawia się następująco:
 
 ![Aktorzy](img/4_aktorzy.drawio.png)
 
-### 4.1 Przypadki użycia
+### 5.1 Wymagania niefunkcjonalne
+
+Wymagania niefunkcjonalne określają właściwości jakościowe systemu ShareWay, które nie opisują jego bezpośrednich funkcji, lecz definiują sposób ich realizacji. Mają one kluczowe znaczenie dla wydajności, bezpieczeństwa, niezawodności i użyteczności aplikacji.
+
+#### Wymagania dotyczące wydajności
+
+**Czas odpowiedzi systemu**
+* Średni czas odpowiedzi interfejsu użytkownika nie powinien przekraczać 2 sekund.
+* Dla operacji obciążających bazę danych (np. tworzenie podróży, dodawanie wydatków) – maksymalnie 5 sekund.
+
+**Obsługa wielu użytkowników**
+* System powinien umożliwiać jednoczesne korzystanie z aplikacji przez wielu użytkowników bez zauważalnego spadku wydajności.
+
+**Wymagania dotyczące bezpieczeństwa**
+* Uwierzytelnianie i autoryzacja
+
+Dostęp do zasobów systemu powinien być zabezpieczony poprzez mechanizm JWT (JSON Web Token) lub inny równoważny standard.
+
+Wszelkie działania użytkowników powinny być ograniczone przez przypisane role (Gość, Użytkownik, Admin).
+
+**Przechowywanie haseł**
+* Hasła muszą być przechowywane w formie zaszyfrowanej przy użyciu algorytmu np. bcrypt.
+
+**Odporność na błędy**
+
+* System musi obsługiwać błędy w sposób kontrolowany – komunikaty o błędach nie mogą ujawniać szczegółów technicznych aplikacji.
+* W przypadku awarii modułu, aplikacja powinna zachować podstawową funkcjonalność.
+
+**Wymagania dotyczące użyteczności (UX/UI)**
+
+* Intuicyjny interfejs
+* System powinien być czytelny i prosty w obsłudze.
+* Aplikacja musi być w pełni responsywna — poprawnie wyświetlać się na urządzeniach mobilnych, tabletach i komputerach.
+
+**Wymagania dotyczące utrzymania i rozwoju**
+* Modularność - System powinien być zbudowany w architekturze modułowej, umożliwiającej łatwe dodawanie nowych funkcji.
+
+### 5.2 Wymagania funkcjonalne
+
+**Use Case 1: Homepage**
+* WF1: System wyświetla stronę główną po uruchomieniu.
+* WF2: Strona główna zawiera przyciski „Zarejestruj się” i „Zaloguj się”.
+* WF3: Strona główna pokazuje opis funkcjonalności aplikacji.
+
+**Use Case 2: Register**
+* WF4: System umożliwia wprowadzenie e-maila, hasła, potwierdzenia hasła i pseudonimu.
+* WF5: System weryfikuje unikalność adresu e-mail.
+* WF6: System weryfikuje zgodność hasła i potwierdzenia hasła.
+* WF7: System sprawdza wymagania bezpieczeństwa hasła.
+* WF8: System tworzy konto i potwierdza rejestrację.
+
+**Use Case 3: Login**
+* WF9: System pozwala na wprowadzenie e-maila i hasła.
+* WF10: System weryfikuje dane logowania i pozwala zalogować użytkownika.
+* WF11: System wyświetla ogólny komunikat o błędzie, jeśli dane są nieprawidłowe.
+
+**Use Case 4: CreateTrip**
+* WF12: System umożliwia utworzenie nowej podróży poprzez formularz z nazwą, terminem i lokalizacją.
+* WF13: System generuje unikalny kod zaproszenia dla nowej podróży.
+* WF14: System umożliwia późniejszą edycję danych podróży przez organizatora.
+
+**Use Case 5: JoinTrip**
+* WF15: System pozwala użytkownikowi wprowadzić kod zaproszenia, aby dołączyć do istniejącej podróży.
+* WF16: System weryfikuje poprawność kodu zaproszenia.
+* WF17: System dodaje użytkownika do grupy, jeśli kod jest poprawny.
+* WF18: System wyświetla komunikat o błędzie, jeśli kod jest niepoprawny.
+
+**Use Case 6: ViewTrip**
+* WF19: System wyświetla listę grup podróżnych, do których należy użytkownik.
+* WF20: System wyświetla komunikat, jeśli użytkownik nie należy do żadnej grupy.
+* WF21: System pozwala użytkownikowi kliknąć grupę, aby uzyskać dostęp do modułów podróży.
+* WF22: System umożliwia edycję danych podróży tworzonych przez użytkownika.
+
+**Use Case 7: AdminPanel**
+* WF23: System umożliwia dostęp do panelu administracyjnego tylko użytkownikom z rolą admina.
+* WF24: System umożliwia wyszukiwanie i filtrowanie użytkowników oraz grup.
+* WF25: System umożliwia edycję danych użytkowników i grup.
+* WF26: System zapisuje zmiany dokonane przez administratora i potwierdza zapis.
+* WF27: System wyświetla komunikat o braku uprawnień, jeśli użytkownik nie jest administratorem.
+* WF28: System obsługuje błędy zapisu danych w panelu administracyjnym.
+
+**Use Case 8: Settings**
+* WF29: System pozwala użytkownikowi otworzyć ustawienia konta.
+* WF30: System umożliwia edycję danych konta (e-mail, hasło, inne dane).
+* WF31: System weryfikuje, czy nowy e-mail nie jest już w systemie.
+* WF32: System weryfikuje poprawność powtórzonego hasła.
+* WF33: System sprawdza wymagania bezpieczeństwa dla nowego hasła.
+* WF34: System aktualizuje profil użytkownika po zapisaniu zmian.
+* WF35: System wymaga potwierdzenia aktualnych danych przy zmianie e-maila lub hasła.
+
+**Use Case 9: VotingModule**
+* WF36: System umożliwia utworzenie głosowania przez użytkownika.
+* WF37: System pozwala członkom grupy oddać głos.
+* WF38: System aktualizuje i wyświetla wyniki głosowania.
+* WF39: System pozwala dodać nowe opcje głosowania w trakcie trwania ankiety.
+* WF40: System uniemożliwia oddanie głosu więcej niż raz w danym głosowaniu.
+* WF41: System pozwala użytkownikowi zmienić swój głos.
+
+**Use Case 10: PlanningModule**
+* WF42: System umożliwia dodawanie dni i aktywności do planu podróży.
+* WF43: System zapisuje plan podróży i udostępnia go wszystkim uczestnikom.
+* WF44: System pozwala na edycję planu wszystkim użytkownikom grupy.
+
+**Use Case 11: CostSharingModule**
+* WF45: System umożliwia dodanie wydatku (kwota, opis, kto zapłacił).
+* WF46: System automatycznie aktualizuje bilans uczestników.
+* WF47: System wyświetla podsumowanie kosztów i rozliczeń dla wszystkich użytkowników.
+* WF48: System pokazuje indywidualne rozliczenia dla każdego użytkownika.
+
+**Use Case 12: ChecklistModule**
+* WF49: System pozwala dodawać nowe pozycje do listy kontrolnej.
+* WF50: System umożliwia odznaczanie wykonanych pozycji przez członków grupy.
+* WF51: System synchronizuje zmiany listy kontrolnej dla wszystkich uczestników grupy.
+
+## 6. Dokumentacja przypadków użycia
+
+Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu: Gość, Użytkownik, Admin.
+Niektóre przypadki użycia mogą się powtarzać, ponieważ kolejne role rozszerzają dostępne funkcjonalności.
+
+Zależność między aktorami przedstawia się następująco:
+* Użytkownik posiada wszystkie funkcjonalności Gościa,
+* Organizator posiada wszystkie funkcjonalności Użytkownika,
+* Admin posiada wszystkie funkcjonalności Organizatora.
 
 ![Diagram użytkowy](img/4_diagram_uzytkowy_projekt.png)
 
-| ID:                     | **Homepage**      |
+| ID:                     | 1 **Homepage**      |
 | ------                  | ------------------|
 | Nazwa:                  | **Strona główna** |
 | **Aktorzy główni:**     | Wszyscy |
@@ -128,7 +263,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Dodatkowe wymagania:**      | Brak |
 
 
-| ID:                     | Register                 |
+| ID:                     | 2 Register                 |
 | ------                  | ------------------------ |
 | Nazwa:                  | **Rejestracja nowego konta** |
 | **Aktorzy główni:**     | Gość |
@@ -143,7 +278,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyjątki:**                  | **1.** Adres e-mail istnieje już w systemie. <br> a. System wyświetla informację o duplikacie. <br> b. System wyświetla ponownie formularz rejestracji. <br> **2.** Hasło oraz powtórzone hasło nie są identyczne. <br> a. System wyświetla informację o niepasujących hasłach <br> b. System ponownie wyświetla formularz rejestracji. <br> **3.** Hasło nie spełnia wymagań bezpieczeństwa. <br> a. System wyświetla informację o zbyt słabym haśle. <br> b. System ponownie wyświetla formularz rejestracji.|
 | **Dodatkowe wymagania:**     | **1.** Format​ ​adresu​ ​e-mail​ ​musi​ ​być​ ​sprawdzany​ ​pod​ ​względem​ ​zgodności​ ​z​ ​RFC​ ​5322. <br> **2.** Hasło​ ​oraz​ ​powtórzone​ ​hasło​ ​musi​ ​być​ ​sprawdzane​ ​czy​ ​są​ ​identyczne. <br> **3.** Hasło musi być sprawdzane czy zawiera przynajmniej 8 znaków, 1 cyfrę, 1 wielką i 1 małą literę​ ​oraz​ ​znak​ ​specjalny. |
 
-| ID:    | Login                    |
+| ID:    | 3 Login                    |
 | ------ | ------------------------ |
 | Nazwa: | **Logowanie do systemu**     |
 | **Aktorzy główni:** | Użytkownik |
@@ -159,7 +294,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Dodatkowe wymagania:** | Ze względów bezpieczeństwa, system nie może informować Gościa, które pole formularza zawiera błąd. Komunikat powinien być ogólny np. "Błędny login lub/i hasło".|
 
 
-| ID:    | CreateTrip               |
+| ID:    | 4 CreateTrip               |
 | ------ | ------------------------ |
 | Nazwa: | **Utwórz nową podróż**       |
 | **Aktorzy główni:** | Użytkownik |
@@ -175,7 +310,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Dodatkowe wymagania:** | System powinien umożliwiać organizatorowi późniejszą edycję danych podróży. |
 
 
-| ID:    | JoinTrip                      |
+| ID:    | 5 JoinTrip                      |
 | ------ | ----------------------------- |
 | Nazwa: | **Dołącz do istniejącej podróży** |
 | **Aktorzy główni:** | Użytkownik |
@@ -189,7 +324,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyjątki:** | **1.** Kod niepoprawny. <br> a. System wyświetla komunikat o błędzie. |
 | **Dodatkowe wymagania:** | Kod zaproszenia powinien być unikalny. |
 
-| ID:    | ViewTrip               |
+| ID:    | 6 ViewTrip               |
 | ------ | ------------------------ |
 | Nazwa: | **Panel podróży**     |
 | **Aktorzy główni:** | Użytkownik |
@@ -206,7 +341,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyjątki:**           | Brak |
 | **Dodatkowe wymagania:** | **1.** Użytkownik może kliknąć na daną grupę podróżną, aby zyskać dostęp do modułów dotyczących danej podróży. <br> **2.** Użytkownik, który stworzył podróż ma uprawnienia do jej edycji. |
 
-| ID:    | AdminPanel               |
+| ID:    | 7 AdminPanel               |
 | ------ | ------------------------ |
 | Nazwa: | **Panel admina**     |
 | **Aktorzy główni:** | Admin |
@@ -220,7 +355,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyjątki:** |  **1.** Brak uprawnień administratora <br> a. System nie umożliwia dostępu do listy użytkowników i wyświetla komunikat o braku uprawnień.<br>**2.** Błąd zapisu zmian <br>a. System wyświetla komunikat o niepowodzeniu operacji (razem z ewentualnym wytłumaczeniem, np. hasło nie spełnia wymogów bezpieczeństwa).|
 | **Dodatkowe wymagania:** | **1.** Dostęp wyłącznie dla użytkowników z rolą admina. <br>**2.** Panel powinien umożliwiać szybkie wyszukiwanie i filtrowanie użytkowników oraz grup.|
 
-| ID:    | Settings                 |
+| ID:    | 8 Settings                 |
 | ------ | ------------------------ |
 | Nazwa: | **Zarządzanie ustawieniami** |
 | **Aktorzy główni:** | Użytkownik |
@@ -234,7 +369,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyjątki:**             | **1.** Użytkownik chce zmienić e-mail na już istniejący w systemie. <br> a. System wyświetla informację o duplikacie. <br> **2.** Użytkownik podczas zmiany hasła, niepoprawnie wpisał powtórzenie hasła. <br> a. System wyświetla informację o niepasujących hasłach. <br> **3.** Użytkownik chce zmienić hasło na niespełniające wymagań bezpieczeństwa. <br> a. System wyświetla informację  o zbyt słabym haśle. <br> 
 | **Dodatkowe wymagania:** | Zmiana adresu e-mail lub hasła wymaga potwierdzenia aktualnych danych. |
 
-| ID:    | VotingModule             |
+| ID:    | 9 VotingModule             |
 | ------ | ------------------------ |
 | Nazwa: | **Głosowanie**              |
 | **Aktorzy główni:** | Użytkownik |
@@ -249,7 +384,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Dodatkowe wymagania:** | **1.** Możliwość dodawania nowych opcji głosowania w trakcie trwania ankiety. <br> **2.** W danym głosowaniu, można oddać głos tylko raz. <br> **3.** W danym głosowaniu można zmienić swój głos.|
 
 
-| ID:    | PlanningModule           |
+| ID:    | 10 PlanningModule           |
 | ------ | ------------------------ |
 | Nazwa: | **Planowanie wyjazdu**       |
 | **Aktorzy główni:** | Użytkownik |
@@ -264,7 +399,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Dodatkowe wymagania:** | System powinien umożliwiać edycję planu wszystkim użytkownikom. |
 
 
-| ID:    | CostSharingModule        |
+| ID:    | 11 CostSharingModule        |
 | ------ | ------------------------ |
 | Nazwa: | **Podział kosztów**          |
 | **Aktorzy główni:** | Użytkownik |
@@ -279,7 +414,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Dodatkowe wymagania:** | Każdy użytkownik powinien widzieć swoje osobne rozliczenia. (co i ile jest komu winien.) |
 
 
-| ID:    | ChecklistModule          |
+| ID:    | 12 ChecklistModule          |
 | ------ | ------------------------ |
 | Nazwa: | **Lista kontrolna**          |
 | **Aktorzy główni:** | Użytkownik |
@@ -293,11 +428,46 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyjątki:**                  | Brak |
 | **Dodatkowe wymagania:** | **1.** Każdy użytkownik może dodawać nowe pozycje do listy. <br> **2.** Odznaczenie wykonanych pozycji jest widoczne tylko dla danego użytkownika, nie dla wszystkich. |
 
+## 7. Przypisanie aktorów, nadanie im działań, powiązania
 
-## 5. Charakterystyka​ ​interfejsów
+W systemie ShareWay wyróżniono trzech głównych aktorów:
+Gość, Użytkownik oraz Administrator.
+Każdy z nich posiada określony zakres uprawnień i funkcjonalności.
 
-### 5.1. Interfejs​ ​użytkownika 
-### 5.2. Interfejsy​ ​zewnętrzne 
-#### 5.2.1. Interfejsy​ ​komunikacyjne 
+**7.1. Aktorzy systemu**
 
-## 6. Wymagania​ ​pozafunkcjonalne
+**Gość**
+* Osoba niezalogowana, korzystająca z systemu w ograniczonym zakresie.
+* Może: przeglądać stronę główną, zarejestrować się i zalogować.
+Powiązane przypadki użycia (PU) i wymagania funkcjonalne (WF):
+* PU1 – Homepage (WF1–WF3)
+
+PU2 – Register (WF4–WF8)
+
+PU3 – Login (WF9–WF11)
+
+Użytkownik
+* Osoba zalogowana w systemie, uczestnicząca w podróżach.
+* Może: dołączać do podróży, przeglądać swoje grupy, korzystać z modułów planowania, głosowania, podziału kosztów i listy kontrolnej.
+* Powiązane przypadki użycia: PU5 (Dołączanie do podróży), PU5 (Planowanie), PU6 (Podział kosztów), PU7 (Głosowanie), PU3 (Tworzenie podróży – jeśli jest organizatorem), PU6–PU7.
+* Powiązane wymagania funkcjonalne: WF5–WF13, WF16–WF17, WF5, WF6, WF11–WF13.
+
+Administrator (Admin)
+* Osoba zarządzająca całym systemem, posiada pełne prawa administracyjne.
+* Może: przeglądać, edytować i usuwać konta użytkowników oraz podróże, monitorować system i wykonywać operacje administracyjne.
+* Powiązane przypadki użycia: PU8 (Zarządzanie użytkownikami i podróżami), PU2 (Logowanie).
+* Powiązane wymagania funkcjonalne: WF14, WF15, WF18.
+
+## 8. Omówienie położeń diagramu
+
+Diagram przypadków użycia ilustruje relacje między aktorami a funkcjami systemu.
+Każdy owal reprezentuje przypadek użycia, a linie łączące wskazują, który aktor korzysta z danej funkcji.
+
+Podział na obszary funkcjonalne:
+
+| Obszar |	Opis	| Powiązane przypadki użycia |
+| ------ | -------- | -------------------------- |
+| Autoryzacja i rejestracja |	Moduł wejściowy systemu pozwalający użytkownikom na logowanie i rejestrację. |	Homepage, Register, Login |
+| Zarządzanie podróżami	| Funkcje związane z tworzeniem i dołączaniem do grup podróżnych. |	CreateTrip, JoinTrip, ViewTrip |
+| Moduły grupowe	| Rozszerzenia umożliwiające wspólne planowanie i współpracę uczestników. |	VotingModule, PlanningModule, CostSharingModule, ChecklistModule |
+| Administracja i ustawienia | Funkcje związane z zarządzaniem kontem i systemem. |	Settings, AdminPanel |
