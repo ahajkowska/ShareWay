@@ -292,12 +292,25 @@ Zależność między aktorami przedstawia się następująco:
 | **Scenariusz główny:** | **1.** Użytkownik otwiera listę kontrolną. <br> **2.** Dodaje nowe pozycje (np. „ładowarka”, „namiot”). <br> **3.** Członkowie grupy mogą odznaczać wykonane pozycje. |
 | **Wyjątki:**                  | Brak |
 | **Dodatkowe wymagania:** | **1.** Każdy użytkownik może dodawać nowe pozycje do listy. <br> **2.** Odznaczenie wykonanych pozycji jest widoczne tylko dla danego użytkownika, nie dla wszystkich. |
+## 5. Charakterystyka interfejsów
 
+### 5.1. Interfejs użytkownika
 
-## 5. Charakterystyka​ ​interfejsów
+| ID | Wymaganie | Priorytet |
+| :--- | :--- | :--- |
+| **UI1** | System musi posiadać interfejs w języku polskim i angielskim. | **P0** |
+| **UI2** | Interfejs aplikacji musi być responsywny (RWD - Responsive Web Design), umożliwiając ergonomiczne korzystanie z systemu zarówno na urządzeniach mobilnych (smartfony, tablety), jak i komputerach stacjonarnych. | **P0** |
+| **UI3** | Interfejs powinien weryfikować poprawność danych wprowadzanych w formularzach w czasie rzeczywistym (walidacja po stronie klienta), przed wysłaniem ich do serwera (np. format adresu e-mail, zgodność haseł, poprawność formatu kwot w module kosztów). | **P0** |
+| **UI4** | Kluczowe moduły interaktywne (Głosowanie, Lista kontrolna, Czat/Planowanie) powinny działać asynchronicznie, aktualizując wyświetlane dane dynamicznie bez konieczności pełnego przeładowania strony. | **P1** |
+| **UI5** | W module "Podział kosztów" każdy użytkownik powinien wyraźnie widzieć, ile pieniędzy ma do oddania innym, a ile inni mają do oddania jemu (np. "Jesteś winien: 50 zł", "Tobie winni: 120 zł"). |**P1** || **UI6** | System powinien wyświetlać czytelne komunikaty błędów oraz potwierdzenia wykonania akcji (np. "Podróż została utworzona pomyślnie"). | **P1** |
 
-### 5.1. Interfejs​ ​użytkownika 
-### 5.2. Interfejsy​ ​zewnętrzne 
-#### 5.2.1. Interfejsy​ ​komunikacyjne 
+### 5.2. Interfejsy zewnętrzne
+
+#### 5.2.1. Interfejsy komunikacyjne
+
+System udostępnia interfejs programistyczny aplikacji (API), który stanowi warstwę pośredniczącą między frontendem (interfejsem użytkownika) a bazą danych i logiką biznesową po stronie serwera.
+
+1.  **API Aplikacji:** System musi wystawiać spójne API pozwalające na realizację wszystkich funkcjonalności opisanych w rozdziale 4 (tworzenie podróży, dołączanie do grup, zarządzanie kosztami, głosowania).
+2.  **Format danych:** Podstawowym formatem wymiany danych w interfejsach komunikacyjnych powinien być JSON.
 
 ## 6. Wymagania​ ​pozafunkcjonalne
