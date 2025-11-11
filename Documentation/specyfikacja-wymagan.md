@@ -85,10 +85,54 @@ Wszystkie dane użytkowników oraz grup będą przechowywane w bazie danych, z z
 ## 2. Opis ogólny
 
 ### 2.1 Perspektywa​ ​produktu
-### 2.2. Funkcje​ ​produktu 
-### 2.3. Ograniczenia 
+
+System ShareWay to **aplikacja webowa** stworzona, aby wspierać **organizację wyjazdów grupowych**. Jej głównym zadaniem jest **ułatwienie planowania podróży, ustalania harmonogramu, dzielenia kosztów oraz przygotowań** przed wyjazdem. Dzięki temu użytkownicy mają **jedno miejsce** do wspólnego zarządzania wszystkimi informacjami związanymi z podróżą.
+
+Aplikacja **działa w przeglądarce** i **nie wymaga instalacji** dodatkowego oprogramowania. Interfejs został zaprojektowany z myślą o **prostocie i wygodzie**. Dane użytkowników, podróży oraz grup są **zapisywane w bazie danych**, co zapewnia **bezpieczeństwo i spójność** informacji.
+
+System ma **budowę modułową**, co pozwala rozwijać go o nowe funkcje bez zakłócania działania już istniejących elementów. W aplikacji występują role o różnych uprawnieniach: **Gość** (przegląd i rejestracja), **Zalogowany użytkownik** (dostęp do podróży i modułów), **Organizator** (zarządzanie grupą i planem wyjazdu) oraz **Administrator** (nadzór nad całym systemem i dostęp do danych wszystkich użytkowników).
+
+Celem aplikacji jest **ułatwienie współpracy** między uczestnikami wyjazdu — **uporządkowanie komunikacji, organizacji i rozliczeń**, dzięki czemu planowanie staje się prostsze i bardziej przejrzyste.
+
+### 2.2. Funkcje​ ​produktu
+
+Aplikacja wspiera użytkowników na każdym etapie planowania podróży. Po wejściu na stronę główną można się **zarejestrować lub zalogować**. Po zalogowaniu użytkownik przechodzi do panelu, gdzie **tworzy nową podróż** albo **dołącza do istniejącej grupy przy użyciu kodu zaproszenia**.
+
+Każda podróż ma **własny harmonogram**. Użytkownicy dodają **dni, aktywności, godziny i lokalizacje**. Wprowadzone **zmiany są widoczne dla wszystkich uczestników**, co ułatwia wspólne planowanie.
+
+System zawiera **moduł rozliczeń**, który umożliwia **dodawanie wydatków** i **automatycznie oblicza bilans kosztów między członkami** grupy — użytkownik widzi, **kto komu i ile** powinien zwrócić.
+
+Dostępny jest **moduł głosowania** (decyzje dotyczące trasy, atrakcji czy noclegu) oraz **lista kontrolna**, która ułatwia przygotowania do wyjazdu dzięki możliwości dopisywania pozycji i odznaczania wykonanych zadań.
+
+Użytkownik ma dostęp do **ustawień konta** (zmiana danych logowania i informacji profilowych). **Administrator** korzysta z **oddzielnego panelu** do zarządzania użytkownikami, grupami i działaniem systemu. **Moduły są zintegrowane**, co zapewnia **spójność danych i płynność pracy**.
+
+### 2.3. Ograniczenia
+
+System działa **wyłącznie w środowisku przeglądarkowym** i **wymaga stałego połączenia z internetem**. Aplikacja **nie jest dostępna w trybie offline** ani jako **aplikacja mobilna lub desktopowa**.
+
+System jest przeznaczony do użytku w **nowoczesnych przeglądarkach** obsługujących aktualne standardy sieciowe — korzystanie ze starszych wersji może powodować nieprawidłowe wyświetlanie niektórych elementów interfejsu.
+
+**Wydajność aplikacji zależy od szybkości połączenia i mocy urządzenia** — przy wolnym internecie lub starszym sprzęcie mogą występować opóźnienia.
+
+Dostęp do **pełnej funkcjonalności wymaga konta użytkownika**; osoby niezalogowane mają dostęp jedynie do strony głównej i formularza rejestracji.
+
 ### 2.4. Dokumentacja​ ​użytkownika
+
+| **Nazwa dokumentu** | **Opis zawartości** | **Format** | **Język** |
+|---|---|---|---|
+| **Instrukcja użytkownika** | Opis **interfejsu, logowania, tworzenia podróży** i korzystania z funkcji systemu. | PDF | **Polski, Angielski** |
+| **Specyfikacja interfejsu komunikacyjnego** | Zasady **wymiany danych (API)** oraz opis zasobów i akcji. | HTML, PDF | **Polski, Angielski** |
+| **Regulamin systemu** | Zasady **korzystania z aplikacji**, prawa i obowiązki użytkowników. | PDF | **Polski, Angielski** |
+
 ### 2.5. Założenia​ ​i​ ​zależności
+
+System ShareWay został zaprojektowany w **architekturze klient–serwer**. Dane użytkowników, grup i podróży są **przechowywane w bazie danych** i dostępne wyłącznie dla **osób uprawnionych**. Każdy użytkownik posiada **indywidualne konto** dające dostęp do pełnego zakresu funkcji.
+
+Założono korzystanie z aplikacji przez przeglądarki internetowe na różnych urządzeniach — interfejs jest **responsywny** i dostosowuje się do rozdzielczości ekranu.
+
+Moduły systemu współpracują w ramach **wspólnego mechanizmu logowania i pracy w grupach**. Dołączanie do podróży odbywa się przy użyciu **unikalnego kodu zaproszenia**, co pozwala kontrolować dostęp.
+
+Przewidziano **dalszy rozwój i integracje z zewnętrznymi narzędziami** (np. **kalendarze** oraz **mapy**). **Dokumentacja użytkownika i techniczna** stanowi integralną część systemu i jest **aktualizowana wraz z jego rozwojem**.
 
 ## 3. Model procesów biznesowych
 
