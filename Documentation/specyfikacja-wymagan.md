@@ -65,8 +65,8 @@
 
 ### 1.1. Cel dokumentu
 Dokument stanowi jedyne źródło wymagań aplikacji ShareWay. Stanowi podstawę dla specyfikacji​ ​oprogramowania. <br>
-Dokument przeznaczony głównie dla zespołu deweloperskiego zajmującego się 
-wytwarzaniem​ ​oprogramowania​ ShareWay. 
+Dokument przeznaczony głównie dla zespołu deweloperskiego zajmującego się
+wytwarzaniem​ ​oprogramowania​ ShareWay.
 
 ### 1.2. Zakres​ ​produktu
 
@@ -136,9 +136,141 @@ Przewidziano **dalszy rozwój i integracje z zewnętrznymi narzędziami** (np. *
 
 ## 3. Model procesów biznesowych
 
-### 3.1. Aktorzy​ ​i​ ​charakterystyka​ ​użytkowników
-Gość, Użytkownik, Admin
-### 3.2. Obiekty​ ​biznesowe
+### 3.1. Aktorzy i charakterystyka użytkowników
+
+**Gość**
+
+| Pole             | Wartość                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **ID**           | GUEST                                                                                                            |
+| **Nazwa**        | Gość                                                                                                             |
+| **Opis**         | Osoba nieposiadająca konta lub niezalogowana. Może przeglądać stronę główną i rozpocząć rejestrację / logowanie. |
+| **Uprawnienia**  | Podgląd strony głównej; dostęp do formularzy rejestracji i logowania.                                            |
+| **Główne akcje** | • Wyświetl stronę główną<br>• Rozpocznij rejestrację<br>• Przejdź do logowania                                   |
+
+**Użytkownik**
+
+| Pole             | Wartość                                                                                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **ID**           | USER                                                                                                                                                                                             |
+| **Nazwa**        | Użytkownik                                                                                                                                                                                       |
+| **Opis**         | Osoba z aktywnym kontem po zalogowaniu. Korzysta z funkcji podróży i modułów współdzielonych w grupie.                                                                                           |
+| **Uprawnienia**  | Dostęp do panelu podróży; tworzenie/dołączanie do podróży; edycja profilu.                                                                                                                       |
+| **Główne akcje** | • Utwórz podróż<br>• Dołącz do podróży (kod zaproszenia)<br>• Planowanie harmonogramu<br>• Dodawanie wydatków i podgląd rozliczeń<br>• Udział w głosowaniach<br>• Korzystanie z listy kontrolnej |
+
+**Organizator**
+
+| Pole             | Wartość                                                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | ORGANIZER                                                                                                                          |
+| **Nazwa**        | Organizator                                                                                                                        |
+| **Opis**         | Właściciel/administrator konkretnej podróży. Zarządza danymi podróży, kodami zaproszeń i polityką edycji modułów.                  |
+| **Uprawnienia**  | Wszystko, co Użytkownik + edycja metadanych podróży; generowanie/odwołanie kodów; moderacja treści w planie.                       |
+| **Główne akcje** | • Konfiguruj podróż (nazwa, termin, lokalizacja)<br>• Generuj/odwołuj kod zaproszenia<br>• Ustalaj zasady edycji planu i rozliczeń |
+
+**Administrator systemu**
+
+| Pole             | Wartość                                                                                                    |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| **ID**           | ADMIN                                                                                                      |
+| **Nazwa**        | Administrator systemu                                                                                      |
+| **Opis**         | Nadzór nad systemem: użytkownicy, grupy, bezpieczeństwo, interwencje.                                      |
+| **Uprawnienia**  | Wgląd i edycja danych administracyjnych, blokady kont, działania naprawcze.                                |
+| **Główne akcje** | • Zarządzaj listą użytkowników i grup<br>• Wymuszaj polityki bezpieczeństwa<br>• Rozwiązuj spory/incydenty |
+
+**Usługi systemowe**
+
+| Pole             | Wartość                                                                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**           | SYSTEM                                                                                                                                                              |
+| **Nazwa**        | Usługi systemowe                                                                                                                                                    |
+| **Opis**         | Automatyczne działania backendu: walidacje, generowanie kodów, powiadomienia, obliczenia rozliczeń.                                                                 |
+| **Uprawnienia**  | Operacje serwisowe w ramach logiki biznesowej, bez udziału użytkownika.                                                                                             |
+| **Główne akcje** | • Walidacja danych (np. e-mail RFC 5322, siła hasła)<br>• Generowanie i weryfikacja kodów zaproszeń<br>• Aktualizacja bilansów i rozliczeń<br>• Wysyłka powiadomień |
+
+
+### 3.2. Obiekty biznesowe
+
+**Podróż**
+
+| Pole                         | Wartość                                                                                                                                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nazwa**                    | Podróż                                                                                                                                                                                   |
+| **Opis**                     | Centralny obiekt wyjazdu grupowego: metadane, uczestnicy, moduły i zasoby powiązane.                                                                                                     |
+| **Kluczowe pola (przykład)** | ID podróży, nazwa, opis; termin (od–do), lokalizacja(e), status (aktywna/archiwalna); organizator, uczestnicy; powiązania: kody zaproszeń, harmonogram, wydatki, głosowania, checklisty. |
+| **Powiązane procesy**        | Utwórz podróż; Edytuj podróż; Dołącz do podróży; Przeglądaj panel podróży.                                                                                                               |
+
+**Grupa podróżna**
+
+| Pole                  | Wartość                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| **Nazwa**             | Grupa podróżna                                                                               |
+| **Opis**              | Zbiór użytkowników przypisanych do konkretnej podróży wraz z rolami (uczestnik/organizator). |
+| **Kluczowe pola**     | Lista uczestników (ID użytkownika, rola); uprawnienia edycji (np. plan, koszty).             |
+| **Powiązane procesy** | Dołącz do podróży; Zarządzaj członkami; Ustal zasady edycji.                                 |
+
+**Zaproszenie**
+
+| Pole                  | Wartość                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| **Nazwa**             | Zaproszenie                                                                                       |
+| **Opis**              | Kod umożliwiający dołączenie do istniejącej podróży; kontrola dostępu do grupy.                   |
+| **Kluczowe pola**     | Kod (unikalny), status (aktywne/wygasłe), data utworzenia, TTL/liczba użyć, powiązanie z podróżą. |
+| **Powiązane procesy** | Generuj kod; Weryfikuj kod; Dołącz do podróży.                                                    |
+
+**Harmonogram (Plan)**
+
+| Pole                  | Wartość                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------- |
+| **Nazwa**             | Harmonogram (Plan)                                                                            |
+| **Opis**              | Struktura dni i aktywności wyjazdu (czas, miejsce, opis), współdzielona w grupie.             |
+| **Kluczowe pola**     | Lista dni → lista aktywności (tytuł, data/godzina, lokalizacja); autor; ostatnia modyfikacja. |
+| **Powiązane procesy** | Dodaj/edytuj dzień; Dodaj/edytuj aktywność; Synchronizacja widoków u uczestników.             |
+
+**Wydatek**
+
+| Pole                  | Wartość                                                                          |
+| --------------------- | -------------------------------------------------------------------------------- |
+| **Nazwa**             | Wydatek                                                                          |
+| **Opis**              | Pozycja kosztowa wprowadzana przez użytkownika; podstawa rozliczeń.              |
+| **Kluczowe pola**     | Kwota, waluta, opis, kategoria, data; płacący; przypisanie udziałów uczestnikom. |
+| **Powiązane procesy** | Dodaj wydatek; Edytuj/usuń wydatek; Przelicz bilans.                             |
+
+**Rozliczenie**
+
+| Pole                  | Wartość                                                                                |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| **Nazwa**             | Rozliczenie                                                                            |
+| **Opis**              | Wynik bilansowania wydatków: lista transferów „kto → komu → ile” i statusy spłat.      |
+| **Kluczowe pola**     | Zobowiązania (dłużnik, wierzyciel, kwota); status (otwarta/zamknięta); historia zmian. |
+| **Powiązane procesy** | Oblicz rozliczenia; Oznacz spłatę; Generuj podsumowanie.                               |
+
+**Głosowanie (Ankieta)**
+
+| Pole                  | Wartość                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| **Nazwa**             | Głosowanie (Ankieta)                                                               |
+| **Opis**              | Mechanizm podejmowania decyzji w grupie: propozycje, głosy, wyniki.                |
+| **Kluczowe pola**     | Tytuł, lista opcji; zasady (1 głos/osoba, możliwość zmiany, okno czasowe); wyniki. |
+| **Powiązane procesy** | Utwórz głosowanie; Głosuj; Zlicz wyniki.                                           |
+
+**Pozycja listy kontrolnej**
+
+| Pole                  | Wartość                                                                                |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| **Nazwa**             | Pozycja listy kontrolnej                                                               |
+| **Opis**              | Element wspólnej checklisty; status odhaczenia jest lokalny dla użytkownika.           |
+| **Kluczowe pola**     | Tytuł, opis (opcjonalnie); autor; data utworzenia; status odhaczenia (per użytkownik). |
+| **Powiązane procesy** | Dodaj pozycję; Odhacz/odznacz; Przeglądaj listę.                                       |
+
+**Profil użytkownika**
+
+| Pole                  | Wartość                                                                                            |
+| --------------------- | -------------------------------------------------------------------------------------------------- |
+| **Nazwa**             | Profil użytkownika                                                                                 |
+| **Opis**              | Dane konta i preferencje (np. język UI, avatar); używane w ustawieniach i identyfikacji w grupach. |
+| **Kluczowe pola**     | E-mail (unikalny), hasło (hash), pseudonim; preferencje (język, strefa czasu).                     |
+| **Powiązane procesy** | Rejestracja; Logowanie; Edycja profilu; Zmiana hasła/e-maila.                                      |
 
 ## 4. Wymagania​ ​funkcjonalne
 Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu: Gość, Użytkownik, Admin.
@@ -160,7 +292,7 @@ Zależność między aktorami przedstawia się następująco:
 | Nazwa:                  | **Strona główna** |
 | **Aktorzy główni:**     | Wszyscy |
 | **Aktorzy pomocniczy:** | brak    |
-| **Poziom:**             | Użytkownika | 
+| **Poziom:**             | Użytkownika |
 | **Priorytet:**          | P0 |
 | **Opis:**               | Ekran powitalny aplikacji zawierający opis systemu, jego funkcje oraz opcje do wyboru. |
 | **Wyzwalacze:**         | **1.** Admin uruchamia interfejs systemu. |
@@ -275,7 +407,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Warunki początkowe:** | Użytkownik jest zalogowany. |
 | **Warunki końcowe:** | Użytkownik zmienił ustawienia. |
 | **Scenariusz główny:** | **1.** Użytkownik otwiera ustawienia konta. <br> **2.** Edytuje dane i zapisuje zmiany. <br> 3. System aktualizuje profil i zapisuje konfigurację. |
-| **Wyjątki:**             | **1.** Użytkownik chce zmienić e-mail na już istniejący w systemie. <br> a. System wyświetla informację o duplikacie. <br> **2.** Użytkownik podczas zmiany hasła, niepoprawnie wpisał powtórzenie hasła. <br> a. System wyświetla informację o niepasujących hasłach. <br> **3.** Użytkownik chce zmienić hasło na niespełniające wymagań bezpieczeństwa. <br> a. System wyświetla informację  o zbyt słabym haśle. <br> 
+| **Wyjątki:**             | **1.** Użytkownik chce zmienić e-mail na już istniejący w systemie. <br> a. System wyświetla informację o duplikacie. <br> **2.** Użytkownik podczas zmiany hasła, niepoprawnie wpisał powtórzenie hasła. <br> a. System wyświetla informację o niepasujących hasłach. <br> **3.** Użytkownik chce zmienić hasło na niespełniające wymagań bezpieczeństwa. <br> a. System wyświetla informację  o zbyt słabym haśle. <br>
 | **Dodatkowe wymagania:** | Zmiana adresu e-mail lub hasła wymaga potwierdzenia aktualnych danych. |
 
 | ID:    | VotingModule             |
