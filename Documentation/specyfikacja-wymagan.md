@@ -490,3 +490,13 @@ System udostępnia interfejs programistyczny aplikacji (API), który stanowi war
 2.  **Format danych:** Podstawowym formatem wymiany danych w interfejsach komunikacyjnych powinien być JSON.
 
 ## 6. Wymagania​ ​pozafunkcjonalne
+
+| Nazwa | Priorytet | Opis |
+| :--- | :--- | :--- |
+| **Bezpieczeństwo haseł** | **P0** | Hasła użytkowników muszą być przechowywane w bazie danych wyłącznie w postaci zaszyfrowanej. Niedopuszczalne jest przechowywanie haseł jako tekst jawny. |
+| **Ochrona danych i prywatność** | **P0** | System musi być zaprojektowany zgodnie z zasadami RODO. Dane jednej grupy podróżnej (plany, koszty, dyskusje) не mogą być w żaden sposób dostępne dla użytkowników spoza tej grupy. |
+| **Wydajność modułów asynchronicznych** | **P1** | Aktualizacje w modułach współdzielonych (Głosowanie, Lista kontrolna) powinny pojawiać się u innych członków grupy niemal natychmiastowo (opóźnienie nie większe niż 10 sekund) bez konieczności ręcznego odświeżania strony. |
+| **Kompatybilność przeglądarek** | **P0** | Aplikacja musi poprawnie funkcjonować i wyświetlać się w dwóch ostatnich stabilnych wersjach głównych przeglądarek: Google Chrome, Mozilla Firefox, Safari oraz Microsoft Edge. |
+| **Skalowalność i obciążenie** | **P1** | System musi być zaprojektowany tak, aby efektywnie obsłużyć dużą liczbę aktywnych użytkowników jednocześnie bez degradacji wydajności. |
+| **Dostępność systemu (Uptime)** | **P1** | System powinien zapewniać dostępność usług na poziomie 99.5% czasu, z wyłączeniem planowanych okien serwisowych przeznaczonych na aktualizacje. |
+| **Powiadomienia systemowe** | **P2** | System powinien wysyłać powiadomienia e-mail o kluczowych zdarzeniach dotyczących konta (np. potwierdzenie rejestracji, zmiana hasła). |
