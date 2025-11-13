@@ -290,7 +290,8 @@ Zależność między aktorami przedstawia się następująco:
 
 ### 4.1 Przypadki użycia
 
-![Diagram użytkowy](img/4_diagram_uzytkowy_projekt.png)
+<img src="img/4_diagram_uzytkowy_projekt.png" alt="Diagram użytkowy" style="max-width:74%;height:auto;display:block;margin:0 auto;" />
+
 
 | ID:                     | **Homepage**      |
 | ------                  | ------------------|
