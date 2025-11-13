@@ -47,14 +47,14 @@
   - [2.4. Dokumentacja​ ​użytkownika](#24-dokumentacja-użytkownika)
   - [2.5. Założenia​ ​i​ ​zależności](#25-założenia-i-zależności)
 - [3. Model procesów biznesowych](#3-model-procesów-biznesowych)
-  - [3.1. Aktorzy​ ​i​ ​charakterystyka​ ​użytkowników](#31-aktorzy-i-charakterystyka-użytkowników)
-  - [3.2. Obiekty​ ​biznesowe](#32-obiekty-biznesowe)
+  - [3.1. Aktorzy i charakterystyka użytkowników](#31-aktorzy-i-charakterystyka-użytkowników)
+  - [3.2. Obiekty biznesowe](#32-obiekty-biznesowe)
 - [4. Wymagania​ ​funkcjonalne](#4-wymagania-funkcjonalne)
   - [4.1 Przypadki użycia](#41-przypadki-użycia)
-- [5. Charakterystyka​ ​interfejsów](#5-charakterystyka-interfejsów)
-  - [5.1. Interfejs​ ​użytkownika](#51-interfejs-użytkownika)
-  - [5.2. Interfejsy​ ​zewnętrzne](#52-interfejsy-zewnętrzne)
-    - [5.2.1. Interfejsy​ ​komunikacyjne](#521-interfejsy-komunikacyjne)
+- [5. Charakterystyka interfejsów](#5-charakterystyka-interfejsów)
+  - [5.1. Interfejs użytkownika](#51-interfejs-użytkownika)
+  - [5.2. Interfejsy zewnętrzne](#52-interfejsy-zewnętrzne)
+    - [5.2.1. Interfejsy komunikacyjne](#521-interfejsy-komunikacyjne)
 - [6. Wymagania​ ​pozafunkcjonalne](#6-wymagania-pozafunkcjonalne)
 
 <!-- /TOC -->
@@ -65,12 +65,11 @@
 
 ### 1.1. Cel dokumentu
 Dokument stanowi jedyne źródło wymagań aplikacji ShareWay. Stanowi podstawę dla specyfikacji​ ​oprogramowania. <br>
-Dokument przeznaczony głównie dla zespołu deweloperskiego zajmującego się
-wytwarzaniem​ ​oprogramowania​ ShareWay.
+Dokument przeznaczony głównie dla zespołu deweloperskiego zajmującego się wytwarzaniem​ ​oprogramowania​ ShareWay.
 
 ### 1.2. Zakres​ ​produktu
 
-Celem projektu jest stworzenie systemu informatycznego ShareWay, którego zadaniem będzie ułatwienie organizacji wyjazdów grupowych — od etapu planowania podróży, aż po rozliczanie kosztów między uczestnikami.
+Celem projektu jest stworzenie systemu informatycznego ShareWay, którego zadaniem będzie **ułatwienie organizacji wyjazdów grupowych** — od etapu planowania podróży, aż po rozliczanie kosztów między uczestnikami.
 
 System zostanie zaprojektowany w sposób modułowy, co umożliwi jego ciągły rozwój i rozbudowę o kolejne funkcjonalności.
 
@@ -273,15 +272,21 @@ Przewidziano **dalszy rozwój i integracje z zewnętrznymi narzędziami** (np. *
 | **Powiązane procesy** | Rejestracja; Logowanie; Edycja profilu; Zmiana hasła/e-maila.                                      |
 
 ## 4. Wymagania​ ​funkcjonalne
-Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu: Gość, Użytkownik, Admin.
-Niektóre przypadki użycia mogą się powtarzać, ponieważ kolejne role rozszerzają dostępne funkcjonalności.
+
+Wymagania funkcjonalne zostały przedstawione na diagramie przypadków użycia. Są na nim przedstawione funkcjonalności, odpowiadające poszczególnym aktorom systemu. W systemie zdefiniowano następujących aktorów (patrz sekcja 3.1): Gość, Użytkownik, Organizator oraz Administrator systemu.
 
 Zależność między aktorami przedstawia się następująco:
-* Użytkownik posiada wszystkie funkcjonalności Gościa,
-* Organizator posiada wszystkie funkcjonalności Użytkownika,
-* Admin posiada wszystkie funkcjonalności Organizatora.
 
-![Aktorzy](img/4_aktorzy.drawio.png)
+* Użytkownik posiada wszystkie funkcjonalności Gościa,
+* Organizator posiada wszystkie funkcjonalności Użytkownika.
+* Administrator systemu (Admin) jest odrębną rolą z osobnym zestawem uprawnień. Jego zadania koncentrują się na zarządzaniu całym serwisem.
+
+**Aktorzy główni:**
+
+* Gość 
+* Użytkownik  (w tym rola Organizatora jako specjalizacja Użytkownika w kontekście podróży)
+* Admin
+
 
 ### 4.1 Przypadki użycia
 
@@ -345,7 +350,7 @@ Zależność między aktorami przedstawia się następująco:
 | **Wyzwalacze:** | **1.** Użytkownik klika przycisk "Create".|
 | **Warunki początkowe:** | Użytkownik jest zalogowany. |
 | **Warunki końcowe:** | Nowa grupa podróżna została utworzona. |
-| **Scenariusz główny:** | **1.** Organizator wybiera „Utwórz podróż”. <br> **2.** Wypełnia formularz: nazwa, termin, lokalizacja. <br> **3.** Organizator klika "Zapisz", aby zapisać formularz. <br> **4.** System zapisuje podróż i generuje unikalny kod zaproszenia. |
+| **Scenariusz główny:** | **1.** Użytkownik wybiera „Utwórz podróż”. <br> **2.** Wypełnia formularz: nazwa, termin, lokalizacja. <br> **3.** Użytkownik klika "Zapisz", aby zapisać formularz. <br> **4.** System zapisuje podróż i generuje unikalny kod zaproszenia. |
 | **Scenariusze alternatywne:** | Brak. |
 | **Wyjątki:** | **1.** Brak wymaganych danych. <br> a. System prosi o uzupełnienie pól. |
 | **Dodatkowe wymagania:** | System powinien umożliwiać organizatorowi późniejszą edycję danych podróży. |
@@ -477,7 +482,7 @@ Zależność między aktorami przedstawia się następująco:
 | **UI1** | System musi posiadać interfejs w języku polskim i angielskim. | **P0** |
 | **UI2** | Interfejs aplikacji musi być responsywny (RWD - Responsive Web Design), umożliwiając ergonomiczne korzystanie z systemu zarówno na urządzeniach mobilnych (smartfony, tablety), jak i komputerach stacjonarnych. | **P0** |
 | **UI3** | Interfejs powinien weryfikować poprawność danych wprowadzanych w formularzach w czasie rzeczywistym (walidacja po stronie klienta), przed wysłaniem ich do serwera (np. format adresu e-mail, zgodność haseł, poprawność formatu kwot w module kosztów). | **P0** |
-| **UI4** | Kluczowe moduły interaktywne (Głosowanie, Lista kontrolna, Czat/Planowanie) powinny działać asynchronicznie, aktualizując wyświetlane dane dynamicznie bez konieczności pełnego przeładowania strony. | **P1** |
+| **UI4** | Kluczowe moduły interaktywne (Głosowanie, Lista kontrolna, Planowanie) powinny działać asynchronicznie, aktualizując wyświetlane dane dynamicznie bez konieczności pełnego przeładowania strony. | **P1** |
 | **UI5** | W module "Podział kosztów" każdy użytkownik powinien wyraźnie widzieć, ile pieniędzy ma do oddania innym, a ile inni mają do oddania jemu (np. "Jesteś winien: 50 zł", "Tobie winni: 120 zł"). |**P1** || **UI6** | System powinien wyświetlać czytelne komunikaty błędów oraz potwierdzenia wykonania akcji (np. "Podróż została utworzona pomyślnie"). | **P1** |
 
 ### 5.2. Interfejsy zewnętrzne
@@ -494,7 +499,7 @@ System udostępnia interfejs programistyczny aplikacji (API), który stanowi war
 | Nazwa | Priorytet | Opis |
 | :--- | :--- | :--- |
 | **Bezpieczeństwo haseł** | **P0** | Hasła użytkowników muszą być przechowywane w bazie danych wyłącznie w postaci zaszyfrowanej. Niedopuszczalne jest przechowywanie haseł jako tekst jawny. |
-| **Ochrona danych i prywatność** | **P0** | System musi być zaprojektowany zgodnie z zasadami RODO. Dane jednej grupy podróżnej (plany, koszty, dyskusje) не mogą być w żaden sposób dostępne dla użytkowników spoza tej grupy. |
+| **Ochrona danych i prywatność** | **P0** | System musi być zaprojektowany zgodnie z zasadami RODO. Dane jednej grupy podróżnej (plany, koszty, dyskusje) niе mogą być w żaden sposób dostępne dla użytkowników spoza tej grupy. |
 | **Wydajność modułów asynchronicznych** | **P1** | Aktualizacje w modułach współdzielonych (Głosowanie, Lista kontrolna) powinny pojawiać się u innych członków grupy niemal natychmiastowo (opóźnienie nie większe niż 10 sekund) bez konieczności ręcznego odświeżania strony. |
 | **Kompatybilność przeglądarek** | **P0** | Aplikacja musi poprawnie funkcjonować i wyświetlać się w dwóch ostatnich stabilnych wersjach głównych przeglądarek: Google Chrome, Mozilla Firefox, Safari oraz Microsoft Edge. |
 | **Skalowalność i obciążenie** | **P1** | System musi być zaprojektowany tak, aby efektywnie obsłużyć dużą liczbę aktywnych użytkowników jednocześnie bez degradacji wydajności. |
