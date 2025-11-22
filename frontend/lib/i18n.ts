@@ -112,37 +112,37 @@ export const dict: Record<Lang, Translations> = {
 
     features: {
       heading: "Wszystko, czego potrzebuje Twoja wyprawa",
-      sub: "ShareWay łączy planowanie, inspiracje i rozliczenia — w jednej zachwycającej aplikacji",
+      sub: "ShareWay łączy planowanie, współpracę i rozliczenia — w jednej przejrzystej aplikacji",
       items: [
         {
           title: "Wspólne tworzenie planu",
           description:
-            "Zapraszaj znajomych, głosujcie na propozycje i twórzcie harmonogram razem w czasie rzeczywistym.",
+            "Zapraszaj znajomych, zbieraj propozycje i układaj harmonogram podróży w jednym miejscu, czytelnie dla całej grupy.",
         },
         {
-          title: "Podział kosztów bez bólu",
+          title: "Przejrzysty podział kosztów",
           description:
-            "Automatyczne rozliczenia, wielowalutowość i eksport do CSV. Po równo lub według uczestników.",
+            "Dodawaj wydatki w trakcie wyjazdu, a ShareWay pomoże policzyć, kto komu i ile powinien zwrócić — bez arkuszy i ręcznych podsumowań.",
         },
         {
-          title: "Śledzenie wydatków i miejsc",
+          title: "Miejsca i harmonogram w jednym widoku",
           description:
-            "Oznaczaj miejsca na mapie, zapisuj ulubione lokalizacje i buduj własną bazę miejsc do odwiedzenia.",
+            "Zapisuj kluczowe punkty podróży, godziny i lokalizacje, aby każdy uczestnik miał dostęp do aktualnego planu.",
         },
         {
-          title: "Tablice zadań i rezerwacje",
+          title: "Lista kontrolna przed wyjazdem",
           description:
-            "Plan dzień po dniu, przypomnienia o rezerwacjach i automatyczne powiadomienia dla całej grupy.",
+            "Twórz wspólne checklisty rzeczy do zabrania i zadań do wykonania przed podróżą, żeby nikt nie zapomniał o najważniejszych rzeczach.",
         },
         {
-          title: "Tryb offline",
+          title: "Głosowania w grupie",
           description:
-            "Dostęp do planów i wydatków nawet bez internetu. Synchronizacja automatyczna po powrocie online.",
+            "Głosujcie nad terminami, noclegami czy atrakcjami i podejmujcie decyzje szybko, zamiast przedzierać się przez długie konwersacje.",
         },
         {
           title: "Bezpieczne dane",
           description:
-            "Twoje plany podróży i dane finansowe chronione najwyższymi standardami bezpieczeństwa.",
+            "Plany podróży i dane dotyczące kosztów są przechowywane z zachowaniem zasad bezpieczeństwa i ochrony prywatności.",
         },
       ],
     },
@@ -211,37 +211,37 @@ export const dict: Record<Lang, Translations> = {
 
     features: {
       heading: "Everything your trip needs",
-      sub: "ShareWay blends planning, inspiration and settlements — in a single delightful app",
+      sub: "ShareWay brings planning, collaboration and cost sharing together — in a single clear app",
       items: [
         {
-          title: "Co-create your plan",
+          title: "Plan together in one place",
           description:
-            "Invite friends, vote on ideas and build the schedule together in real time.",
+            "Invite friends, collect ideas and keep your trip schedule in one shared space that everyone can access.",
         },
         {
-          title: "Painless cost splitting",
+          title: "Clear cost sharing",
           description:
-            "Automatic settlements, multi-currency support and CSV export. Split evenly or per participant.",
+            "Add expenses during the trip and let ShareWay help you see who owes what to whom — no spreadsheets needed.",
         },
         {
-          title: "Expense & places tracking",
+          title: "Itinerary and places in one view",
           description:
-            "Pin places on the map, save favorites and build your own list of spots to visit.",
+            "Save key stops, times and locations so the whole group follows the same, always up-to-date plan.",
         },
         {
-          title: "Boards & reservations",
+          title: "Trip checklist",
           description:
-            "Day-by-day plan, reservation reminders and automatic notifications for the whole group.",
+            "Create a shared checklist of things to pack and tasks to do before you leave, so nobody forgets the essentials.",
         },
         {
-          title: "Offline mode",
+          title: "Group voting",
           description:
-            "Access plans and expenses without internet. Sync automatically when back online.",
+            "Run quick polls to choose dates, stays or activities instead of endless back-and-forth in chat apps.",
         },
         {
           title: "Secure data",
           description:
-            "Your trip plans and financial data protected with top-notch security.",
+            "Your trip plans and cost data are stored with attention to security and privacy best practices.",
         },
       ],
     },
