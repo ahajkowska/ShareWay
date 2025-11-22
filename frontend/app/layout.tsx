@@ -20,8 +20,13 @@ export default function RootLayout({
 
   return (
     <html lang={initialLang} suppressHydrationWarning>
-      <body>
-        <ThemeProvider>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          storageKey="shareway-theme"
+        >
           <LanguageProvider initialLang={initialLang}>
             {children}
           </LanguageProvider>

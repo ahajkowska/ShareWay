@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
-export default {
+const config: Config = {
   darkMode: "class",
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -9,7 +10,6 @@ export default {
     "./src/**/*.{ts,tsx}",
   ],
   theme: {
-    container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
       colors: {
         border: "hsl(var(--border))",
@@ -91,8 +91,12 @@ export default {
         "gradient-hero": "var(--gradient-hero)",
         "gradient-soft": "var(--gradient-soft)",
       },
-      boxShadow: { glow: "var(--shadow-glow)" },
+      boxShadow: {
+        glow: "var(--shadow-glow)",
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+  plugins: [tailwindcssAnimate],
+};
+
+export default config;

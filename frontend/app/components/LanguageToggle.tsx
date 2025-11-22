@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./ui/button";
@@ -66,9 +65,9 @@ function LangFlag({ code, size = 22 }: { code: LangCode; size?: number }) {
 
 export default function LanguageToggle({
   mode = "button",
-  radius = 34,
+  radius = 42,
   spread = 22,
-  offsetX = -18,
+  offsetX = 0,
   size = 40,
 }: Props) {
   const { lang, setLang } = useI18n();
@@ -88,7 +87,6 @@ export default function LanguageToggle({
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
-
     if (open) {
       document.addEventListener("mousedown", onDocClick);
       document.addEventListener("keydown", onKey);
@@ -150,7 +148,11 @@ export default function LanguageToggle({
   }`;
 
   return (
-    <div className="relative" ref={wrapRef} style={{ overflow: "visible" }}>
+    <div
+      className="relative inline-flex"
+      ref={wrapRef}
+      style={{ overflow: "visible" }}
+    >
       <Button
         variant="outline"
         size="icon"
