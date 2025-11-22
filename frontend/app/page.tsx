@@ -1,4 +1,5 @@
 import FeatureGrid from "./components/FeatureGrid";
+import FinalCTA from "./components/FinalCTA";
 import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
 import Navbar from "./components/Navbar";
@@ -12,6 +13,7 @@ export default function Home() {
       <FeatureGrid />
       <HowItWorks />
       <ShowcasePreview />
+      <FinalCTA />
     </main>
   );
 }
