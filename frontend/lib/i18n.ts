@@ -201,7 +201,7 @@ export const dict: Record<Lang, Translations> = {
     showcase: {
       heading: "See ShareWay in action",
       sub: "Clear costs and itinerary always at hand",
-      expensesTitle: "Expenses",
+      expensesTitle: "Trip expenses",
       paidBy: "Paid by",
       total: "Total",
       perPerson: "Per person",
