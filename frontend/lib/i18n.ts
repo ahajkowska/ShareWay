@@ -44,6 +44,21 @@ export interface Translations {
     sub: string;
     items: { title: string; description: string }[];
   };
+  footer: {
+    description: string;
+    productTitle: string;
+    productItems: string[];
+    companyTitle: string;
+    companyItems: string[];
+    legalTitle: string;
+    legalItems: string[];
+    social: {
+      facebook: string;
+      instagram: string;
+      twitter: string;
+    };
+    rights: string;
+  };
 }
 
 export const dict: Record<Lang, Translations> = {
@@ -146,6 +161,23 @@ export const dict: Record<Lang, Translations> = {
         },
       ],
     },
+
+    footer: {
+      description:
+        "Wspólne planowanie i rozliczanie podróży grupowych. Razem łatwiej dotrzeć tam, gdzie chcesz.",
+      productTitle: "Produkt",
+      productItems: ["Funkcje", "Cennik", "FAQ"],
+      companyTitle: "Firma",
+      companyItems: ["O nas", "Blog", "Kontakt"],
+      legalTitle: "Prawne",
+      legalItems: ["Polityka prywatności", "Regulamin", "Cookies"],
+      social: {
+        facebook: "Facebook",
+        instagram: "Instagram",
+        twitter: "Twitter",
+      },
+      rights: "Wszystkie prawa zastrzeżone.",
+    },
   },
 
   en: {
@@ -244,6 +276,23 @@ export const dict: Record<Lang, Translations> = {
             "Your trip plans and cost data are stored with attention to security and privacy best practices.",
         },
       ],
+    },
+
+    footer: {
+      description:
+        "Group trip planning and cost sharing made simple. It’s easier to get where you want when you travel together.",
+      productTitle: "Product",
+      productItems: ["Features", "Pricing", "FAQ"],
+      companyTitle: "Company",
+      companyItems: ["About", "Blog", "Contact"],
+      legalTitle: "Legal",
+      legalItems: ["Privacy policy", "Terms of use", "Cookies"],
+      social: {
+        facebook: "Facebook",
+        instagram: "Instagram",
+        twitter: "Twitter",
+      },
+      rights: "All rights reserved.",
     },
   },
 };

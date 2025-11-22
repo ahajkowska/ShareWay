@@ -1,5 +1,6 @@
 import FeatureGrid from "./components/FeatureGrid";
 import FinalCTA from "./components/FinalCTA";
+import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import HowItWorks from "./components/HowItWorks";
 import Navbar from "./components/Navbar";
@@ -14,6 +15,7 @@ export default function Home() {
       <HowItWorks />
       <ShowcasePreview />
       <FinalCTA />
+      <Footer />
     </main>
   );
 }
