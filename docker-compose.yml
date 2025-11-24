@@ -26,11 +26,12 @@ services:
       - shareway-network
 
   # Dodamy później:
-  # auth:
-  # cost-split:
-  # schedule:
-  # checklist:
-  # voting:
+  # auth-service:
+  # cost-split-service:
+  # schedule-service:
+  # checklist-service:
+  # poll-service:
+  # trip-service:
 
 networks:
   shareway-network:
