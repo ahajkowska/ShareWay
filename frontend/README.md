@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zbudowanie obrazu Dockera:
+```cd frontend```
+```docker build -t shareway-frontend .```
 
-## Getting Started
+# Uruchomienie kontenera 
+```docker run -p 3000:3000 --name test-frontend shareway-frontend```
 
-First, run the development server:
+Powinno działać w przeglądarce na: ```http://localhost:3000```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Zobacz logi
+```docker logs test-frontend```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Zatrzymaj
+```docker stop test-frontend```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Usuń
+```docker rm test-frontend```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Zatrzymaj i usuń jedną komendą
+```docker rm -f test-frontend```
 
-## Learn More
+# Jeśli build się nie powiedzie:
 
-To learn more about Next.js, take a look at the following resources:
+## Zobacz szczegóły błędu
+```docker build -t shareway-frontend . --progress=plain```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usuń nieudany obraz
+```docker rmi shareway-frontend```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+# Usuń cache Dockera
+docker builder prune -a
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Przebuduj
+docker build -t shareway-frontend . --no-cache
