@@ -6,11 +6,12 @@ import { motion } from "framer-motion";
 import { Plus, Vote as VoteIcon, ArrowLeft } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
+import { fetchAuth, apiUrl } from "@/lib/api";
 import VotingList from "./components/VotingList";
 import CreateVotingDialog from "./components/CreateVotingDialog";
 import VotingDetailsDialog from "./components/VotingDetailsDialog";
 import Navbar from "@/app/components/Navbar";
-import type { Voting, VotingFormData, Vote, VotingOption } from "./types";
+import type { Voting, VotingFormData } from "./types";
 
 export default function GroupVotingPage() {
     const { t } = useI18n();
@@ -45,224 +46,85 @@ export default function GroupVotingPage() {
         }
     };
 
-    const fetchVotings = async () => {
-        try {
+  const fetchVotings = async () => {
+    try {
       setLoading(true);
-      // TODO: Fetch votings for THIS GROUP
-      // const response = await fetch(`/api/groups/${groupId}/votings`);
-      // const data = await response.json();
-      // setVotings(data);
-      
-      // Mock data - usuń to gdy będzie prawdziwe API
-      setVotings([
-        {
-          id: "1",
-          groupId: groupId,
-          title: "Dokąd jedziemy?",
-          description: "Wybierzmy razem miejsce docelowe",
-          createdAt: new Date("2024-11-20"),
-          endsAt: new Date("2024-12-01"),
-          createdBy: "user-1",
-          createdByName: "Jan Kowalski",
-          isActive: true,
-          allowAddingOptions: true,
-          allowMultipleVotes: false,
-          showResultsBeforeVoting: true,
-          options: [
-            { 
-              id: "opt-1", 
-              text: "Santorini", 
-              description: "Piękne widoki i spokój", 
-              addedBy: "user-1",
-              addedByName: "Jan Kowalski",
-              addedAt: new Date("2024-11-20"),
-              votes: [
-                {
-                  id: "vote-1",
-                  userId: "user-2",
-                  userName: "Anna Nowak",
-                  optionId: "opt-1",
-                  votedAt: new Date("2024-11-21"),
-                }
-              ] 
-            },
-            { 
-              id: "opt-2", 
-              text: "Ateny", 
-              description: "Historia i kultura", 
-              addedBy: "user-1",
-              addedByName: "Jan Kowalski",
-              addedAt: new Date("2024-11-20"),
-              votes: [
-                {
-                  id: "vote-2",
-                  userId: "user-3",
-                  userName: "Piotr Wiśniewski",
-                  optionId: "opt-2",
-                  votedAt: new Date("2024-11-22"),
-                },
-                {
-                  id: "vote-3",
-                  userId: "user-4",
-                  userName: "Maria Kowalczyk",
-                  optionId: "opt-2",
-                  votedAt: new Date("2024-11-22"),
-                }
-              ] 
-            },
-            { 
-              id: "opt-3", 
-              text: "Kreta", 
-              description: "Plaże i przygoda", 
-              addedBy: "user-1",
-              addedByName: "Jan Kowalski",
-              addedAt: new Date("2024-11-20"),
-              votes: [] 
-            },
-          ],
-        },
-        {
-          id: "2",
-          groupId: groupId,
-          title: "Kiedy wyjeżdżamy?",
-          description: "Wybierzmy najlepszy termin dla wszystkich",
-          createdAt: new Date("2024-11-21"),
-          endsAt: new Date("2024-11-30"),
-          createdBy: "user-2",
-          createdByName: "Anna Nowak",
-          isActive: true,
-          allowAddingOptions: false,
-          allowMultipleVotes: true,
-          showResultsBeforeVoting: true,
-          options: [
-            { 
-              id: "opt-4", 
-              text: "1-7 czerwca", 
-              addedBy: "user-2",
-              addedByName: "Anna Nowak",
-              addedAt: new Date("2024-11-21"),
-              votes: [
-                {
-                  id: "vote-4",
-                  userId: "user-1",
-                  userName: "Jan Kowalski",
-                  optionId: "opt-4",
-                  votedAt: new Date("2024-11-22"),
-                }
-              ] 
-            },
-            { 
-              id: "opt-5", 
-              text: "15-22 czerwca", 
-              addedBy: "user-2",
-              addedByName: "Anna Nowak",
-              addedAt: new Date("2024-11-21"),
-              votes: [] 
-            },
-          ],
-        },
-      ]);
+      const data = await fetchAuth<Voting[]>(apiUrl(`/api/trips/${groupId}/votes`), {});
+      setVotings(data);
     } catch (error) {
       console.error("Error fetching votings:", error);
+      setVotings([]); // Pusta tablica w przypadku błędu
     } finally {
       setLoading(false);
     }
-};
-
-    const handleCreateVoting = async (data: VotingFormData) => {
+  };    const handleCreateVoting = async (data: VotingFormData) => {
         try {
-        // TODO: POST to API with groupId
-        // const response = await fetch(`/api/groups/${groupId}/votings`, {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(data),
-        // });
-        
-        await fetchVotings();
-        setIsCreateDialogOpen(false);
+          const payload = {
+            title: data.title,
+            description: data.description,
+            allowAddingOptions: data.allowAddingOptions,
+            allowMultipleVotes: data.allowMultipleVotes,
+            showResultsBeforeVoting: data.showResultsBeforeVoting,
+            endsAt: data.endsAt?.toISOString(),
+            options: data.initialOptions.map(text => ({ text })),
+          };
+
+      await fetchAuth(apiUrl(`/api/trips/${groupId}/votes`), {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+          
+          await fetchVotings();
+          setIsCreateDialogOpen(false);
         } catch (error) {
-        console.error("Error creating voting:", error);
+          console.error("Error creating voting:", error);
+          alert("Nie udało się utworzyć głosowania. Spróbuj ponownie.");
         }
     };
 
-    // Funkcja do głosowania (mock)
+    // Funkcja do głosowania
     const handleVote = async (votingId: string, optionId: string) => {
       try {
-        // TODO: POST /api/groups/${groupId}/votings/${votingId}/vote
+      await fetchAuth(apiUrl(`/api/votes/${votingId}/cast`), {
+        method: 'POST',
+        body: JSON.stringify({ optionIds: [optionId] }),
+      });
         
-        // Mock - dodaj głos lokalnie
-        setVotings(votings.map(voting => {
-          if (voting.id === votingId) {
-            return {
-              ...voting,
-              options: voting.options.map(opt => {
-                if (opt.id === optionId) {
-                  // Dodaj głos
-                  const newVote: Vote = {
-                    id: `vote-${Date.now()}`,
-                    userId: "current-user",
-                    userName: "Ty",
-                    optionId: optionId,
-                    votedAt: new Date(),
-                  };
-                  return {
-                    ...opt,
-                    votes: [...opt.votes, newVote],
-                  };
-                }
-                return opt;
-              }),
-            };
-          }
-          return voting;
-        }));
+        // Odśwież dane po zagłosowaniu
+        await fetchVotings();
       } catch (error) {
         console.error("Error voting:", error);
+        alert("Nie udało się oddać głosu. Spróbuj ponownie.");
       }
-    };
-
-    // Funkcja do dodawania opcji (mock)
+    };    // Funkcja do dodawania opcji
     const handleAddOption = async (votingId: string, optionText: string, description?: string) => {
       try {
-        // TODO: POST /api/groups/${groupId}/votings/${votingId}/options
+      await fetchAuth(apiUrl(`/api/votes/${votingId}/options`), {
+        method: 'POST',
+        body: JSON.stringify({ text: optionText, description }),
+      });
         
-        // Mock - dodaj opcję lokalnie
-        setVotings(votings.map(voting => {
-          if (voting.id === votingId) {
-            const newOption: VotingOption = {
-              id: `opt-${Date.now()}`,
-              text: optionText,
-              description,
-              addedBy: "current-user",
-              addedByName: "Ty",
-              addedAt: new Date(),
-              votes: [],
-            };
-            return {
-              ...voting,
-              options: [...voting.options, newOption],
-            };
-          }
-          return voting;
-        }));
+        // Odśwież dane po dodaniu opcji
+        await fetchVotings();
       } catch (error) {
         console.error("Error adding option:", error);
+        alert("Nie udało się dodać opcji. Spróbuj ponownie.");
       }
-    };
+    };    // Funkcja do usuwania głosowania (mock)
+  const handleDeleteVoting = async (votingId: string) => {
+    try {
+      if (!confirm('Czy na pewno chcesz usunąć to głosowanie?')) return;
 
-    // Funkcja do usuwania głosowania (mock)
-    const handleDeleteVoting = async (votingId: string) => {
-      try {
-        // TODO: DELETE /api/groups/${groupId}/votings/${votingId}
-        
-        // Mock - usuń lokalnie
-        setVotings(votings.filter(v => v.id !== votingId));
-      } catch (error) {
-        console.error("Error deleting voting:", error);
-      }
-    };
+      await fetchAuth(apiUrl(`/api/votes/${votingId}`), {
+        method: 'DELETE',
+      });
 
-    const handleViewDetails = (voting: Voting) => {
+      setVotings(votings.filter(v => v.id !== votingId));
+    } catch (error) {
+      console.error("Error deleting voting:", error);
+      alert("Nie udało się usunąć głosowania. Spróbuj ponownie.");
+    }
+  };    const handleViewDetails = (voting: Voting) => {
       setSelectedVoting(voting);
       setIsDetailsOpen(true);
     };
@@ -338,13 +200,3 @@ export default function GroupVotingPage() {
         </>
     );
 }
-
-// Wszystkie endpointy zawierają groupId w ścieżce:
-
-// GET    /api/groups/:groupId/votings           - lista głosowań w grupie
-// POST   /api/groups/:groupId/votings           - nowe głosowanie w grupie
-// GET    /api/groups/:groupId/votings/:votingId - szczegóły
-// POST   /api/groups/:groupId/votings/:votingId/vote    - głosuj
-// PUT    /api/groups/:groupId/votings/:votingId/vote    - zmień głos
-// POST   /api/groups/:groupId/votings/:votingId/options - dodaj opcję
-// DELETE /api/groups/:groupId/votings/:votingId         - usuń głosowanie (tylko creator)
