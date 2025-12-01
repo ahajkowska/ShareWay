@@ -59,6 +59,58 @@ export interface Translations {
     };
     rights: string;
   };
+  auth: {
+    login: {
+      title: string;
+      subtitle: string;
+      submit: string;
+      noAccount: string;
+      createOne: string;
+      errors: {
+        network: string;
+        invalidCredentials: string;
+      };
+    };
+    register: {
+      title: string;
+      subtitle: string;
+      submit: string;
+      haveAccount: string;
+      signIn: string;
+    };
+    common: {
+      emailLabel: string;
+      passwordLabel: string;
+      confirmPasswordLabel: string;
+      nameLabel: string;
+      rememberMe: string;
+      forgotPassword: string;
+      showPassword: string;
+      hidePassword: string;
+      termsPrefix: string;
+      terms: string;
+      privacy: string;
+      and: string;
+    };
+    toast: {
+      loginSuccess: string;
+      registerSuccess: string;
+    };
+    validation: {
+      name: { required: string; min: (n: number) => string };
+      email: { required: string; invalid: string };
+      password: {
+        required: string;
+        min: (n: number) => string;
+        lowercase: string;
+        uppercase: string;
+        number: string;
+        special: string;
+      };
+      confirm: { required: string; mismatch: string };
+      terms: { required: string };
+    };
+  };
 }
 
 export const dict: Record<Lang, Translations> = {
@@ -178,6 +230,69 @@ export const dict: Record<Lang, Translations> = {
       },
       rights: "Wszystkie prawa zastrzeżone.",
     },
+    auth: {
+      login: {
+        title: "Zaloguj się",
+        subtitle: "Ciesz się wspólnym planowaniem podróży z ShareWay",
+        submit: "Zaloguj się",
+        noAccount: "Nie masz konta?",
+        createOne: "Załóż konto",
+        errors: {
+          network: "Błąd sieci. Spróbuj ponownie.",
+          invalidCredentials: "Nieprawidłowy e-mail lub hasło.",
+        },
+      },
+      register: {
+        title: "Załóż konto",
+        subtitle: "Dołącz do społeczności podróżników",
+        submit: "Zarejestruj się",
+        haveAccount: "Masz już konto?",
+        signIn: "Zaloguj się",
+      },
+      common: {
+        emailLabel: "E-mail",
+        passwordLabel: "Hasło",
+        confirmPasswordLabel: "Potwierdź hasło",
+        nameLabel: "Imię",
+        rememberMe: "Zapamiętaj mnie",
+        forgotPassword: "Zapomniałeś hasła?",
+        showPassword: "Pokaż hasło",
+        hidePassword: "Ukryj hasło",
+        termsPrefix: "Akceptuję",
+        terms: "regulamin",
+        privacy: "politykę prywatności",
+        and: "oraz",
+      },
+      toast: {
+        loginSuccess: "Zalogowano pomyślnie!",
+        registerSuccess: "Konto utworzone pomyślnie!",
+      },
+      validation: {
+        name: {
+          required: "Imię jest wymagane",
+          min: (n: number) => `Imię musi mieć co najmniej ${n} znaki`,
+        },
+        email: {
+          required: "E-mail jest wymagany",
+          invalid: "Nieprawidłowy format adresu e-mail",
+        },
+        password: {
+          required: "Hasło jest wymagane",
+          min: (n: number) => `Hasło musi mieć co najmniej ${n} znaków`,
+          lowercase: "Hasło musi zawierać małą literę",
+          uppercase: "Hasło musi zawierać dużą literę",
+          number: "Hasło musi zawierać cyfrę",
+          special: "Hasło musi zawierać znak specjalny",
+        },
+        confirm: {
+          required: "Potwierdź hasło",
+          mismatch: "Hasła nie są identyczne",
+        },
+        terms: {
+          required: "Musisz zaakceptować regulamin",
+        },
+      },
+    },
   },
 
   en: {
@@ -293,6 +408,69 @@ export const dict: Record<Lang, Translations> = {
         twitter: "Twitter",
       },
       rights: "All rights reserved.",
+    },
+    auth: {
+      login: {
+        title: "Log in",
+        subtitle: "Enjoy trip planning together with ShareWay",
+        submit: "Log in",
+        noAccount: "Don't have an account?",
+        createOne: "Create one",
+        errors: {
+          network: "Network error. Please try again.",
+          invalidCredentials: "Invalid email or password.",
+        },
+      },
+      register: {
+        title: "Sign up",
+        subtitle: "Join our community of travelers",
+        submit: "Sign up",
+        haveAccount: "Already have an account?",
+        signIn: "Log in",
+      },
+      common: {
+        emailLabel: "Email",
+        passwordLabel: "Password",
+        confirmPasswordLabel: "Confirm password",
+        nameLabel: "Name",
+        rememberMe: "Remember me",
+        forgotPassword: "Forgot password?",
+        showPassword: "Show password",
+        hidePassword: "Hide password",
+        termsPrefix: "I accept the",
+        terms: "terms",
+        privacy: "privacy policy",
+        and: "and",
+      },
+      toast: {
+        loginSuccess: "Logged in successfully!",
+        registerSuccess: "Account created successfully!",
+      },
+      validation: {
+        name: {
+          required: "Name is required",
+          min: (n: number) => `Name must be at least ${n} characters long`,
+        },
+        email: {
+          required: "Email is required",
+          invalid: "Invalid email format",
+        },
+        password: {
+          required: "Password is required",
+          min: (n: number) => `Password must be at least ${n} characters long`,
+          lowercase: "Password must contain a lowercase letter",
+          uppercase: "Password must contain an uppercase letter",
+          number: "Password must contain a number",
+          special: "Password must contain a special character",
+        },
+        confirm: {
+          required: "Please confirm your password",
+          mismatch: "Passwords do not match",
+        },
+        terms: {
+          required: "You must accept the terms",
+        },
+      },
     },
   },
 };
