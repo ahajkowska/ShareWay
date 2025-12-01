@@ -63,6 +63,9 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      height: {
+        "screen-dvh": "100dvh",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

@@ -25,7 +25,7 @@ export default function AuthSplitLayout({
   children,
 }: Props) {
   return (
-    <section className="relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-dvh w-full flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
           src={bgSrcLight}
