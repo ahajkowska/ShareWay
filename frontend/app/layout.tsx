@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { LanguageProvider } from "@/app/context/LanguageContext";
 import type { Lang } from "@/lib/i18n";
+import { AppToaster } from "./components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "ShareWay",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 const DEFAULT_LANG: Lang = "pl";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export default function RootLayout({
         >
           <LanguageProvider initialLang={initialLang}>
             {children}
+            <AppToaster />
           </LanguageProvider>
         </ThemeProvider>
       </body>
