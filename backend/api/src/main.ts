@@ -26,7 +26,7 @@ async function bootstrap() {
   app.enableCors({ corsConf });
   app.useGlobalPipes(new ValidationPipe());
 
-  const PORT = process.env.PORT ?? 3000;
+  const PORT = process.env.API_PORT ?? 3000;
   await app.listen(PORT);
 
   Logger.log(`Server up on :${PORT} [${process.env.NODE_ENV}]`);
