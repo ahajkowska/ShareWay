@@ -145,3 +145,101 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost
 export function apiUrl(path: string): string {
     return `${API_BASE_URL}${path}`;
 }
+
+// ============================================
+// VOTING API
+// ============================================
+
+/**
+ * Fetch all votings for a trip
+ */
+export async function fetchVotings(tripId: string) {
+  return fetchAuth(apiUrl(`/trips/${tripId}/votes`), {
+    method: "GET",
+  });
+}
+
+/**
+ * Create a new voting
+ */
+export async function createVoting(tripId: string, data: any) {
+  return fetchAuth(apiUrl(`/trips/${tripId}/votes`), {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Cast vote(s) on a voting
+ */
+export async function castVote(voteId: string, optionIds: string[]) {
+  return fetchAuth(apiUrl(`/votes/${voteId}/cast`), {
+    method: "POST",
+    body: JSON.stringify({ optionIds }),
+  });
+}
+
+/**
+ * Delete a voting
+ */
+export async function deleteVoting(voteId: string) {
+  return fetchAuth(apiUrl(`/votes/${voteId}`), {
+    method: "DELETE",
+  });
+}
+
+/**
+ * Add option to existing voting
+ */
+export async function addVotingOption(
+  voteId: string, 
+  text: string, 
+  description?: string
+) {
+  return fetchAuth(apiUrl(`/votes/${voteId}/options`), {
+    method: "POST",
+    body: JSON.stringify({ text, description }),
+  });
+}
+
+// ============================================
+// CHECKLIST API
+// ============================================
+
+/**
+ * Fetch checklist for a trip
+ */
+export async function fetchChecklist(tripId: string) {
+  return fetchAuth(apiUrl(`/trips/${tripId}/checklist`), {
+    method: "GET",
+  });
+}
+
+/**
+ * Add item to checklist
+ */
+export async function addChecklistItem(tripId: string, text: string) {
+  return fetchAuth(apiUrl(`/trips/${tripId}/checklist`), {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  });
+}
+
+/**
+ * Toggle checklist item status
+ */
+export async function toggleChecklistItemStatus(itemId: string, isChecked: boolean) {
+  return fetchAuth(apiUrl(`/checklist/${itemId}/status`), {
+    method: "PATCH",
+    body: JSON.stringify({ isChecked }),
+  });
+}
+
+/**
+ * Delete checklist item
+ */
+export async function deleteChecklistItem(itemId: string) {
+  return fetchAuth(apiUrl(`/checklist/${itemId}`), {
+    method: "DELETE",
+  });
+}
