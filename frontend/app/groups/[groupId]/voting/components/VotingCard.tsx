@@ -6,6 +6,7 @@ import { Button } from "@/app/components/ui/button";
 import { Progress } from "@/app/components/ui/progress";
 import { Calendar, Users, TrendingUp, Trash2 } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
+import { getVotingTranslations } from "../translations";
 import type { Voting } from "../types";
 
 interface VotingCardProps {
@@ -25,7 +26,8 @@ export default function VotingCard({
   onDelete,
   onViewDetails,
 }: VotingCardProps) {
-  const { t } = useI18n();
+  const { lang } = useI18n();
+  const t = getVotingTranslations(lang);
   const totalVotes = voting.options.reduce((sum, opt) => sum + opt.votes.length, 0);
   const uniqueVoters = new Set(voting.options.flatMap(opt => opt.votes.map(v => v.userId)));
   const sortedOptions = [...voting.options].sort((a, b) => b.votes.length - a.votes.length);
@@ -66,16 +68,16 @@ export default function VotingCard({
               <Users className="h-4 w-4 text-muted-foreground" />
               <span>
                 {uniqueVoters.size} {uniqueVoters.size === 1 
-                  ? t.voting.participant 
-                  : t.voting.participants}
+                  ? t.participant 
+                  : t.participants}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <span>
                 {totalVotes} {totalVotes === 1 
-                  ? t.voting.vote 
-                  : t.voting.votes}
+                  ? t.vote 
+                  : t.votes}
               </span>
             </div>
           </div>
@@ -83,7 +85,7 @@ export default function VotingCard({
           {/* Top opcja */}
           {topOption && topOption.votes.length > 0 && (
             <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
-              <p className="text-xs text-muted-foreground mb-1">{t.voting.leading || "Prowadzi"}:</p>
+              <p className="text-xs text-muted-foreground mb-1">{t.leading}:</p>
               <p className="font-semibold">{topOption.text}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Progress 
@@ -105,7 +107,7 @@ export default function VotingCard({
               onClick={() => onViewDetails(voting)}
               className="flex-1"
             >
-              {t.voting.viewDetails}
+              {t.viewDetails}
             </Button>
           </div>
 
@@ -114,9 +116,7 @@ export default function VotingCard({
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t">
               <Calendar className="h-3 w-3" />
               <span>
-                {t.voting.endsOn || "Kończy się"}: {new Date(voting.endsAt).toLocaleDateString(
-                  t.voting.locale || "pl-PL"
-                )}
+                {t.endsOn}: {new Date(voting.endsAt).toLocaleDateString(t.locale)}
               </span>
             </div>
           )}

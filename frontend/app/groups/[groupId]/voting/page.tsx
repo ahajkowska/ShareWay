@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Plus, Vote as VoteIcon, ArrowLeft } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
+import { getVotingTranslations } from "./translations";
 import { fetchAuth, apiUrl } from "@/lib/api";
 import VotingList from "./components/VotingList";
 import CreateVotingDialog from "./components/CreateVotingDialog";
@@ -14,7 +15,8 @@ import Navbar from "@/app/components/Navbar";
 import type { Voting, VotingFormData } from "./types";
 
 export default function GroupVotingPage() {
-    const { t } = useI18n();
+    const { lang } = useI18n();
+    const t = getVotingTranslations(lang);
     const params = useParams();
     const router = useRouter();
     const groupId = params.groupId as string;
@@ -80,7 +82,7 @@ export default function GroupVotingPage() {
             setIsCreateDialogOpen(false);
         } catch (error) {
             console.error("Error creating voting:", error);
-            alert(t.voting.createError || "Nie udało się utworzyć głosowania. Spróbuj ponownie.");
+            alert(t.createError);
         }
     };
 
@@ -94,7 +96,7 @@ export default function GroupVotingPage() {
             await fetchVotings();
         } catch (error) {
             console.error("Error voting:", error);
-            alert(t.voting.voteError || "Nie udało się oddać głosu. Spróbuj ponownie.");
+            alert(t.voteError);
         }
     };
 
@@ -108,13 +110,13 @@ export default function GroupVotingPage() {
             await fetchVotings();
         } catch (error) {
             console.error("Error adding option:", error);
-            alert(t.voting.addOptionError || "Nie udało się dodać opcji. Spróbuj ponownie.");
+            alert(t.addOptionError);
         }
     };
 
     const handleDeleteVoting = async (votingId: string) => {
         try {
-            if (!confirm(t.voting.deleteConfirm || 'Czy na pewno chcesz usunąć to głosowanie?')) return;
+            if (!confirm(t.deleteConfirm)) return;
 
             await fetchAuth(apiUrl(`/api/votes/${votingId}`), {
                 method: 'DELETE',
@@ -123,7 +125,7 @@ export default function GroupVotingPage() {
             setVotings(votings.filter(v => v.id !== votingId));
         } catch (error) {
             console.error("Error deleting voting:", error);
-            alert(t.voting.deleteError || "Nie udało się usunąć głosowania. Spróbuj ponownie.");
+            alert(t.deleteError);
         }
     };
 
@@ -144,7 +146,7 @@ export default function GroupVotingPage() {
                         className="mb-6 gap-2"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        {t.voting.backToGroup || "Powrót do grupy"}: {groupName}
+                        {t.backToGroup}: {groupName}
                     </Button>
 
                     <motion.div
@@ -157,10 +159,10 @@ export default function GroupVotingPage() {
                             <div>
                                 <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 flex items-center gap-3">
                                     <VoteIcon className="w-10 h-10 text-primary" />
-                                    {t.voting.voting}
+                                    {t.voting}
                                 </h1>
                                 <p className="text-xl text-muted-foreground">
-                                    {t.voting.subtitle || "Podejmujcie decyzje wspólnie w grupie"}: <strong>{groupName}</strong>
+                                    {t.subtitle}: <strong>{groupName}</strong>
                                 </p>
                             </div>
                             
@@ -170,7 +172,7 @@ export default function GroupVotingPage() {
                                 className="gap-2"
                             >
                                 <Plus className="w-5 h-5" />
-                                {t.voting.createPoll}
+                                {t.createPoll}
                             </Button>
                         </div>
                     </motion.div>

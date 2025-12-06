@@ -10,6 +10,7 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Textarea } from "@/app/components/ui/textarea";
 import { useI18n } from "@/app/context/LanguageContext";
+import { getVotingTranslations } from "../translations";
 import type { Voting } from "../types";
 
 interface VotingDetailsDialogProps {
@@ -27,7 +28,8 @@ export default function VotingDetailsDialog({
   onVote,
   onAddOption 
 }: VotingDetailsDialogProps) {
-  const { t } = useI18n();
+  const { lang } = useI18n();
+  const t = getVotingTranslations(lang);
   const [showAddOption, setShowAddOption] = useState(false);
   const [newOptionText, setNewOptionText] = useState("");
   const [newOptionDescription, setNewOptionDescription] = useState("");
@@ -100,13 +102,13 @@ export default function VotingDetailsDialog({
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      {t.voting.participants}
+                      {t.participants}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-3xl font-bold">{uniqueVoters.size}</p>
                     <p className="text-xs text-muted-foreground">
-                      {t.voting.peopleVoted || "osób zagłosowało"}
+                      {t.peopleVoted}
                     </p>
                   </CardContent>
                 </Card>
@@ -115,13 +117,13 @@ export default function VotingDetailsDialog({
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
-                      {t.voting.votes}
+                      {t.votes}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-3xl font-bold">{totalVotes}</p>
                     <p className="text-xs text-muted-foreground">
-                      {t.voting.totalVotesCast || "łącznie oddanych głosów"}
+                      {t.totalVotesCast}
                     </p>
                   </CardContent>
                 </Card>
@@ -130,16 +132,16 @@ export default function VotingDetailsDialog({
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      {t.voting.status || "Status"}
+                      {t.status}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-lg font-semibold text-green-600">
-                      {voting.isActive ? t.voting.active : t.voting.closed}
+                      {voting.isActive ? t.active : t.closed}
                     </p>
                     {voting.endsAt && (
                       <p className="text-xs text-muted-foreground">
-                        {t.voting.until || "do"} {new Date(voting.endsAt).toLocaleDateString(t.voting.locale)}
+                        {t.until} {new Date(voting.endsAt).toLocaleDateString(t.locale)}
                       </p>
                     )}
                   </CardContent>
@@ -151,7 +153,7 @@ export default function VotingDetailsDialog({
                 <Card className="border-primary/50 bg-primary/5">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      🏆 {t.voting.winner || "Zwycięzca"}
+                      🏆 {t.winner}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -160,7 +162,7 @@ export default function VotingDetailsDialog({
                       <p className="text-sm text-muted-foreground">{mostPopular.description}</p>
                     )}
                     <p className="text-sm mt-2">
-                      <strong>{mostPopular.votes.length}</strong> {t.voting.votes}
+                      <strong>{mostPopular.votes.length}</strong> {t.votes}
                       ({totalVotes > 0 ? ((mostPopular.votes.length / totalVotes) * 100).toFixed(0) : 0}%)
                     </p>
                   </CardContent>
@@ -170,7 +172,7 @@ export default function VotingDetailsDialog({
               {/* Ranking wszystkich opcji */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>{t.voting.allOptions || "Wszystkie opcje"}</CardTitle>
+                  <CardTitle>{t.allOptions}</CardTitle>
                   {voting.allowAddingOptions && !showAddOption && (
                     <Button
                       size="sm"
@@ -179,7 +181,7 @@ export default function VotingDetailsDialog({
                       className="gap-2"
                     >
                       <Plus className="w-4 h-4" />
-                      {t.voting.addOption}
+                      {t.addOption}
                     </Button>
                   )}
                 </CardHeader>
@@ -189,13 +191,13 @@ export default function VotingDetailsDialog({
                     <form onSubmit={handleAddOption} className="p-4 bg-muted/50 rounded-lg space-y-3">
                       <div>
                         <Label htmlFor="optionText">
-                          {t.voting.optionName || "Nazwa opcji"} *
+                          {t.optionName} *
                         </Label>
                         <Input
                           id="optionText"
                           value={newOptionText}
                           onChange={(e) => setNewOptionText(e.target.value)}
-                          placeholder={t.voting.optionPlaceholder || "np. Mykonos"}
+                          placeholder={t.optionPlaceholder}
                           required
                           disabled={submitting}
                           autoFocus
@@ -203,20 +205,20 @@ export default function VotingDetailsDialog({
                       </div>
                       <div>
                         <Label htmlFor="optionDescription">
-                          {t.voting.description} ({t.voting.optional})
+                          {t.description} ({t.optional})
                         </Label>
                         <Textarea
                           id="optionDescription"
                           value={newOptionDescription}
                           onChange={(e) => setNewOptionDescription(e.target.value)}
-                          placeholder={t.voting.additionalInfo || "Dodatkowe informacje..."}
+                          placeholder={t.additionalInfo}
                           rows={2}
                           disabled={submitting}
                         />
                       </div>
                       <div className="flex gap-2">
                         <Button type="submit" disabled={submitting} size="sm">
-                          {submitting ? t.voting.adding || "Dodawanie..." : t.voting.add || "Dodaj"}
+                          {submitting ? t.adding : t.add}
                         </Button>
                         <Button
                           type="button"
@@ -229,7 +231,7 @@ export default function VotingDetailsDialog({
                           disabled={submitting}
                           size="sm"
                         >
-                          {t.voting.cancel}
+                          {t.cancel}
                         </Button>
                       </div>
                     </form>
@@ -264,7 +266,7 @@ export default function VotingDetailsDialog({
                               size="sm"
                               onClick={() => onVote(voting.id, option.id)}
                             >
-                              {t.voting.voteButton || "Głosuj"}
+                              {t.voteButton}
                             </Button>
                           </div>
                         </div>
@@ -274,12 +276,12 @@ export default function VotingDetailsDialog({
                         {option.votes.length > 0 && (
                           <details className="text-sm">
                             <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                              {t.voting.whoVoted || "Kto głosował?"} ({option.votes.length})
+                              {t.whoVoted} ({option.votes.length})
                             </summary>
                             <ul className="mt-2 space-y-1 pl-4">
                               {option.votes.map((vote) => (
                                 <li key={vote.id} className="text-xs">
-                                  • {vote.userName} - {new Date(vote.votedAt).toLocaleDateString(t.voting.locale)}
+                                  • {vote.userName} - {new Date(vote.votedAt).toLocaleDateString(t.locale)}
                                 </li>
                               ))}
                             </ul>
@@ -295,14 +297,14 @@ export default function VotingDetailsDialog({
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm">
-                    {t.voting.pollInfo || "Informacje o głosowaniu"}
+                    {t.pollInfo}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <p>{t.voting.createdBy || "Utworzone przez"}: <strong>{voting.createdByName}</strong></p>
-                  <p>{t.voting.creationDate || "Data utworzenia"}: <strong>{new Date(voting.createdAt).toLocaleDateString(t.voting.locale)}</strong></p>
-                  <p>{t.voting.allowAddingOptions}: <strong>{voting.allowAddingOptions ? t.voting.yes || "Tak" : t.voting.no || "Nie"}</strong></p>
-                  <p>{t.voting.allowMultipleVotes}: <strong>{voting.allowMultipleVotes ? t.voting.yes || "Tak" : t.voting.no || "Nie"}</strong></p>
+                  <p>{t.createdBy}: <strong>{voting.createdByName}</strong></p>
+                  <p>{t.creationDate}: <strong>{new Date(voting.createdAt).toLocaleDateString(t.locale)}</strong></p>
+                  <p>{t.allowAddingOptions}: <strong>{voting.allowAddingOptions ? t.yes : t.no}</strong></p>
+                  <p>{t.allowMultipleVotes}: <strong>{voting.allowMultipleVotes ? t.yes : t.no}</strong></p>
                 </CardContent>
               </Card>
             </div>

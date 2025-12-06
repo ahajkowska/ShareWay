@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/app/components/ui/card";
 import { useI18n } from "@/app/context/LanguageContext";
+import { getVotingTranslations } from "../translations";
 import type { Voting } from "../types";
 import VotingCard from "./VotingCard";
 
@@ -24,14 +25,15 @@ export default function VotingList({
   onDelete,
   onViewDetails
 }: VotingListProps) {
-  const { t } = useI18n();
+  const { lang } = useI18n();
+  const t = getVotingTranslations(lang);
 
   if (loading) {
     return (
       <Card>
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">
-            {t.voting.loadingPolls || "Ładowanie głosowań..."}
+            {t.loadingPolls}
           </p>
         </CardContent>
       </Card>
@@ -43,7 +45,7 @@ export default function VotingList({
       <Card>
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">
-            {t.voting.noPolls}
+            {t.noPolls}
           </p>
         </CardContent>
       </Card>
@@ -68,7 +70,7 @@ export default function VotingList({
         <div>
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-            {t.voting.activePolls || "Aktywne głosowania"} ({activeVotings.length})
+            {t.activePolls} ({activeVotings.length})
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeVotings.map((voting, index) => (
@@ -90,7 +92,7 @@ export default function VotingList({
       {closedVotings.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold mb-4 text-muted-foreground">
-            {t.voting.closedPolls || "Zakończone głosowania"} ({closedVotings.length})
+            {t.closedPolls} ({closedVotings.length})
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {closedVotings.map((voting, index) => (
