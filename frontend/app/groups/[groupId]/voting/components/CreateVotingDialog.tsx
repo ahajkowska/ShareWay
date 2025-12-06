@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2, Calendar } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { useI18n } from "@/app/context/LanguageContext";
 import type { VotingFormData } from "../types";
 
 interface CreateVotingDialogProps {
@@ -17,6 +18,7 @@ export default function CreateVotingDialog({
   onOpenChange,
   onSubmit,
 }: CreateVotingDialogProps) {
+  const { t } = useI18n();
   const [formData, setFormData] = useState<VotingFormData>({
     title: "",
     description: "",
@@ -28,25 +30,25 @@ export default function CreateVotingDialog({
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React. FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Walidacja
-    if (!formData.title. trim()) {
-      alert("Tytuł jest wymagany");
+    if (!formData.title.trim()) {
+      alert(t.voting.titleRequired || "Tytuł jest wymagany");
       return;
     }
 
     const validOptions = formData.initialOptions.filter(opt => opt.trim());
     if (validOptions.length < 2) {
-      alert("Dodaj przynajmniej 2 opcje");
+      alert(t.voting.minOptionsRequired || "Dodaj przynajmniej 2 opcje");
       return;
     }
 
     try {
       setSubmitting(true);
       await onSubmit({
-        ... formData,
+        ...formData,
         initialOptions: validOptions,
       });
       
@@ -62,7 +64,7 @@ export default function CreateVotingDialog({
       });
     } catch (error) {
       console.error("Error creating voting:", error);
-      alert("Wystąpił błąd podczas tworzenia głosowania");
+      alert(t.voting.createError || "Wystąpił błąd podczas tworzenia głosowania");
     } finally {
       setSubmitting(false);
     }
@@ -113,7 +115,7 @@ export default function CreateVotingDialog({
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b">
-            <h2 className="text-2xl font-bold">Nowe głosowanie</h2>
+            <h2 className="text-2xl font-bold">{t.voting.createPoll}</h2>
             <button
               onClick={() => onOpenChange(false)}
               className="p-2 hover:bg-muted rounded-lg transition-colors"
@@ -129,13 +131,13 @@ export default function CreateVotingDialog({
               {/* Title */}
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Tytuł głosowania *
+                  {t.voting.pollTitle} *
                 </label>
                 <input
                   type="text"
-                  value={formData. title}
+                  value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="np. Która wyspa odwiedzamy najpierw?"
+                  placeholder={t.voting.pollTitlePlaceholder || "np. Która wyspa odwiedzamy najpierw?"}
                   className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                   maxLength={200}
                 />
@@ -144,12 +146,12 @@ export default function CreateVotingDialog({
               {/* Description */}
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Opis (opcjonalnie)
+                  {t.voting.description} ({t.voting.optional})
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Dodaj dodatkowe informacje..."
+                  placeholder={t.voting.descriptionPlaceholder || "Dodaj dodatkowe informacje..."}
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                   maxLength={500}
@@ -160,14 +162,14 @@ export default function CreateVotingDialog({
               <div>
                 <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  Data zakończenia (opcjonalnie)
+                  {t.voting.deadline} ({t.voting.optional})
                 </label>
                 <input
                   type="datetime-local"
-                  value={formData.endsAt ?  new Date(formData.endsAt).toISOString().slice(0, 16) : ""}
+                  value={formData.endsAt ? new Date(formData.endsAt).toISOString().slice(0, 16) : ""}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
-                    endsAt: e.target.value ?  new Date(e.target.value) : undefined,
+                    endsAt: e.target.value ? new Date(e.target.value) : undefined,
                   }))}
                   className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 />
@@ -176,16 +178,16 @@ export default function CreateVotingDialog({
               {/* Options */}
               <div>
                 <label className="block text-sm font-semibold mb-3">
-                  Opcje do wyboru (min. 2) *
+                  {t.voting.options} ({t.voting.minOptions || "min. 2"}) *
                 </label>
                 <div className="space-y-3">
-                  {formData. initialOptions.map((option, index) => (
+                  {formData.initialOptions.map((option, index) => (
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
                         value={option}
                         onChange={(e) => updateOption(index, e.target.value)}
-                        placeholder={`Opcja ${index + 1}`}
+                        placeholder={`${t.voting.option} ${index + 1}`}
                         className="flex-1 px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                         maxLength={200}
                       />
@@ -210,14 +212,14 @@ export default function CreateVotingDialog({
                     className="w-full gap-2"
                   >
                     <Plus className="w-4 h-4" />
-                    Dodaj opcję
+                    {t.voting.addOption}
                   </Button>
                 </div>
               </div>
 
               {/* Settings */}
               <div className="space-y-3 pt-4 border-t">
-                <h3 className="font-semibold mb-3">Ustawienia</h3>
+                <h3 className="font-semibold mb-3">{t.voting.settings || "Ustawienia"}</h3>
                 
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <input
@@ -225,16 +227,16 @@ export default function CreateVotingDialog({
                     checked={formData.allowAddingOptions}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
-                      allowAddingOptions: e. target.checked,
+                      allowAddingOptions: e.target.checked,
                     }))}
                     className="mt-1 w-5 h-5 rounded border-input"
                   />
                   <div>
                     <div className="font-medium group-hover:text-primary transition-colors">
-                      Pozwól dodawać nowe opcje
+                      {t.voting.allowNewOptions}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Uczestnicy będą mogli proponować własne opcje
+                      {t.voting.allowNewOptionsDesc || "Uczestnicy będą mogli proponować własne opcje"}
                     </div>
                   </div>
                 </label>
@@ -251,10 +253,10 @@ export default function CreateVotingDialog({
                   />
                   <div>
                     <div className="font-medium group-hover:text-primary transition-colors">
-                      Pozwól na wiele głosów
+                      {t.voting.allowMultipleVotes || "Pozwól na wiele głosów"}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Każdy może zagłosować na więcej niż jedną opcję
+                      {t.voting.multipleChoiceInfo}
                     </div>
                   </div>
                 </label>
@@ -271,10 +273,10 @@ export default function CreateVotingDialog({
                   />
                   <div>
                     <div className="font-medium group-hover:text-primary transition-colors">
-                      Pokazuj wyniki przed głosowaniem
+                      {t.voting.showResultsBeforeVoting || "Pokazuj wyniki przed głosowaniem"}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Uczestnicy zobaczą aktualne wyniki przed oddaniem głosu
+                      {t.voting.showResultsBeforeVotingDesc || "Uczestnicy zobaczą aktualne wyniki przed oddaniem głosu"}
                     </div>
                   </div>
                 </label>
@@ -290,10 +292,10 @@ export default function CreateVotingDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={submitting}
               >
-                Anuluj
+                {t.voting.cancel}
               </Button>
               <Button type="submit" disabled={submitting}>
-                {submitting ? "Tworzenie..." : "Utwórz głosowanie"}
+                {submitting ? t.voting.creating : t.voting.create}
               </Button>
             </div>
           </form>

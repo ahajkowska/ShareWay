@@ -271,6 +271,7 @@ export interface Translations {
     option: string;
     deadline: string;
     allowNewOptions: string;
+    allowAddingOptions: string; // ← DODAJ (ten sam tekst co allowNewOptions)
     anonymousVoting: string;
     cancel: string;
     create: string;
@@ -289,6 +290,7 @@ export interface Translations {
     delete: string;
     viewResults: string;
     hideResults: string;
+    viewDetails: string;
     yourVote: string;
     changeVote: string;
     submitVote: string;
@@ -298,7 +300,49 @@ export interface Translations {
     closedOn: string;
     multipleChoiceInfo: string;
     singleChoiceInfo: string;
-    polls: string;
+    backToGroup: string;
+    subtitle: string;
+    createError: string;
+    voteError: string;
+    addOptionError: string;
+    deleteConfirm: string;
+    deleteError: string;
+    titleRequired: string;
+    minOptionsRequired: string;
+    pollTitlePlaceholder: string;
+    descriptionPlaceholder: string;
+    minOptions: string;
+    settings: string;
+    allowNewOptionsDesc: string;
+    allowMultipleVotes: string;
+    showResultsBeforeVoting: string;
+    showResultsBeforeVotingDesc: string;
+    participant: string;
+    participants: string;
+    leading: string;
+    endsOn: string;
+    locale: string;
+    peopleVoted: string;
+    totalVotesCast: string;
+    status: string;
+    until: string;
+    winner: string;
+    allOptions: string;
+    optionName: string;
+    optionPlaceholder: string;
+    additionalInfo: string;
+    adding: string;
+    add: string;
+    voteButton: string;
+    whoVoted: string;
+    pollInfo: string;
+    createdBy: string;
+    creationDate: string;
+    yes: string;
+    no: string;
+    loadingPolls: string;
+    activePolls: string;
+    closedPolls: string;
   };
 
   dashboard: {
@@ -650,6 +694,7 @@ export const dict: Record<Lang, Translations> = {
       option: "Opcja",
       deadline: "Termin zakończenia",
       allowNewOptions: "Pozwól użytkownikom dodawać nowe opcje",
+      allowAddingOptions: "Pozwól dodawać opcje", // ← DODAJ
       anonymousVoting: "Anonimowe głosowanie",
       cancel: "Anuluj",
       create: "Utwórz",
@@ -668,6 +713,7 @@ export const dict: Record<Lang, Translations> = {
       delete: "Usuń",
       viewResults: "Zobacz wyniki",
       hideResults: "Ukryj wyniki",
+      viewDetails: "Zobacz szczegóły",
       yourVote: "Twój głos",
       changeVote: "Zmień głos",
       submitVote: "Oddaj głos",
@@ -677,7 +723,49 @@ export const dict: Record<Lang, Translations> = {
       closedOn: "Zamknięto",
       multipleChoiceInfo: "Możesz wybrać wiele opcji",
       singleChoiceInfo: "Możesz wybrać tylko jedną opcję",
-      polls: "głosowań",
+      backToGroup: "Powrót do grupy",
+      subtitle: "Podejmujcie decyzje wspólnie w grupie",
+      createError: "Nie udało się utworzyć głosowania. Spróbuj ponownie.",
+      voteError: "Nie udało się oddać głosu. Spróbuj ponownie.",
+      addOptionError: "Nie udało się dodać opcji. Spróbuj ponownie.",
+      deleteConfirm: "Czy na pewno chcesz usunąć to głosowanie?",
+      deleteError: "Nie udało się usunąć głosowania. Spróbuj ponownie.",
+      titleRequired: "Tytuł jest wymagany",
+      minOptionsRequired: "Dodaj przynajmniej 2 opcje",
+      pollTitlePlaceholder: "np. Która wyspa odwiedzamy najpierw?",
+      descriptionPlaceholder: "Dodaj dodatkowe informacje...",
+      minOptions: "min. 2",
+      settings: "Ustawienia",
+      allowNewOptionsDesc: "Uczestnicy będą mogli proponować własne opcje",
+      allowMultipleVotes: "Pozwól na wiele głosów",
+      showResultsBeforeVoting: "Pokazuj wyniki przed głosowaniem",
+      showResultsBeforeVotingDesc: "Uczestnicy zobaczą aktualne wyniki przed oddaniem głosu",
+      participant: "uczestnik",
+      participants: "uczestników",
+      leading: "Prowadzi",
+      endsOn: "Kończy się",
+      locale: "pl-PL",
+      peopleVoted: "osób zagłosowało",
+      totalVotesCast: "łącznie oddanych głosów",
+      status: "Status",
+      until: "do",
+      winner: "Zwycięzca",
+      allOptions: "Wszystkie opcje",
+      optionName: "Nazwa opcji",
+      optionPlaceholder: "np. Mykonos",
+      additionalInfo: "Dodatkowe informacje...",
+      adding: "Dodawanie...",
+      add: "Dodaj",
+      voteButton: "Głosuj",
+      whoVoted: "Kto głosował?",
+      pollInfo: "Informacje o głosowaniu",
+      createdBy: "Utworzone przez",
+      creationDate: "Data utworzenia",
+      yes: "Tak",
+      no: "Nie",
+      loadingPolls: "Ładowanie głosowań...",
+      activePolls: "Aktywne głosowania",
+      closedPolls: "Zakończone głosowania",
     },
     dashboard: {
       title: "Podróż",
@@ -1025,6 +1113,7 @@ export const dict: Record<Lang, Translations> = {
       option: "Option",
       deadline: "Deadline",
       allowNewOptions: "Allow users to add new options",
+      allowAddingOptions: "Allow adding options", // ← DODAJ
       anonymousVoting: "Anonymous Voting",
       cancel: "Cancel",
       create: "Create",
@@ -1043,6 +1132,7 @@ export const dict: Record<Lang, Translations> = {
       delete: "Delete",
       viewResults: "View Results",
       hideResults: "Hide Results",
+      viewDetails: "View Details",
       yourVote: "Your Vote",
       changeVote: "Change Vote",
       submitVote: "Submit Vote",
@@ -1052,7 +1142,49 @@ export const dict: Record<Lang, Translations> = {
       closedOn: "Closed on",
       multipleChoiceInfo: "You can select multiple options",
       singleChoiceInfo: "You can select only one option",
-      polls: "polls",
+      backToGroup: "Back to group",
+      subtitle: "Make decisions together in the group",
+      createError: "Failed to create poll. Please try again.",
+      voteError: "Failed to submit vote. Please try again.",
+      addOptionError: "Failed to add option. Please try again.",
+      deleteConfirm: "Are you sure you want to delete this poll?",
+      deleteError: "Failed to delete poll. Please try again.",
+      titleRequired: "Title is required",
+      minOptionsRequired: "Add at least 2 options",
+      pollTitlePlaceholder: "e.g. Which island do we visit first?",
+      descriptionPlaceholder: "Add additional information...",
+      minOptions: "min. 2",
+      settings: "Settings",
+      allowNewOptionsDesc: "Participants will be able to propose their own options",
+      allowMultipleVotes: "Allow multiple votes",
+      showResultsBeforeVoting: "Show results before voting",
+      showResultsBeforeVotingDesc: "Participants will see current results before voting",
+      participant: "participant",
+      participants: "participants",
+      leading: "Leading",
+      endsOn: "Ends on",
+      locale: "en-US",
+      peopleVoted: "people voted",
+      totalVotesCast: "total votes cast",
+      status: "Status",
+      until: "until",
+      winner: "Winner",
+      allOptions: "All Options",
+      optionName: "Option Name",
+      optionPlaceholder: "e.g. Mykonos",
+      additionalInfo: "Additional information...",
+      adding: "Adding...",
+      add: "Add",
+      voteButton: "Vote",
+      whoVoted: "Who voted?",
+      pollInfo: "Poll Information",
+      createdBy: "Created by",
+      creationDate: "Creation date",
+      yes: "Yes",
+      no: "No",
+      loadingPolls: "Loading polls...",
+      activePolls: "Active Polls",
+      closedPolls: "Closed Polls",
     },
     dashboard: {
       title: "Trip",
