@@ -2,6 +2,8 @@
 
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getChecklistTranslations } from "../translations";
 import ChecklistItem from "./ChecklistItem";
 import type { ChecklistItemDto } from "../types";
 
@@ -14,6 +16,9 @@ interface Props {
 }
 
 export default function ChecklistList({ items, loading, onToggle, onRefresh, error }: Props) {
+    const { lang } = useI18n();
+    const t = getChecklistTranslations(lang);
+
     if (loading) {
         return (
             <div className="grid gap-3">
@@ -30,7 +35,7 @@ export default function ChecklistList({ items, loading, onToggle, onRefresh, err
                 <p className="text-destructive">{error}</p>
                 <Button variant="outline" onClick={onRefresh}>
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Spróbuj ponownie
+                    {t.tryAgain}
                 </Button>
             </div>
         );
@@ -39,8 +44,8 @@ export default function ChecklistList({ items, loading, onToggle, onRefresh, err
     if (!items || items.length === 0) {
         return (
             <div className="text-center py-12 text-muted-foreground">
-                <p className="text-lg mb-2">Lista jest pusta</p>
-                <p className="text-sm">Dodaj pierwszą pozycję używając przycisku powyżej</p>
+                <p className="text-lg mb-2">{t.noItems}</p>
+                <p className="text-sm">{t.addFirstItem}</p>
             </div>
         );
     }

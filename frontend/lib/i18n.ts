@@ -111,6 +111,17 @@ export interface Translations {
       terms: { required: string };
     };
   };
+
+  dashboard: {
+    title: string;
+    subtitle: string;
+    modules: {
+      voting: { name: string; description: string };
+      costs: { name: string; description: string };
+      schedule: { name: string; description: string };
+      checklist: { name: string; description: string };
+    };
+  };
 }
 
 export const dict: Record<Lang, Translations> = {
@@ -293,6 +304,17 @@ export const dict: Record<Lang, Translations> = {
         },
       },
     },
+
+    dashboard: {
+      title: "Podróż",
+      subtitle: "Wybierz moduł, aby zarządzać swoją podróżą",
+      modules: {
+        voting: { name: "Głosowanie", description: "Podejmujcie decyzje wspólnie" },
+        costs: { name: "Koszty", description: "Rozliczajcie wspólne wydatki" },
+        schedule: { name: "Harmonogram", description: "Planujcie trasę i atrakcje" },
+        checklist: { name: "Lista kontrolna", description: "Co zabrać i co zrobić" },
+      },
+    },
   },
 
   en: {
@@ -395,7 +417,7 @@ export const dict: Record<Lang, Translations> = {
 
     footer: {
       description:
-        "Group trip planning and cost sharing made simple. It’s easier to get where you want when you travel together.",
+        "Group trip planning and cost sharing made simple. It's easier to get where you want when you travel together.",
       productTitle: "Product",
       productItems: ["Features", "Pricing", "FAQ"],
       companyTitle: "Company",
@@ -470,6 +492,17 @@ export const dict: Record<Lang, Translations> = {
         terms: {
           required: "You must accept the terms",
         },
+      },
+    },
+
+    dashboard: {
+      title: "Trip",
+      subtitle: "Choose a module to manage your trip",
+      modules: {
+        voting: { name: "Voting", description: "Make decisions together" },
+        costs: { name: "Costs", description: "Split shared expenses" },
+        schedule: { name: "Schedule", description: "Plan route and attractions" },
+        checklist: { name: "Checklist", description: "What to pack and do" },
       },
     },
   },

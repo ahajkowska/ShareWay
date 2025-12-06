@@ -7,11 +7,15 @@ import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Plus } from "lucide-react";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getChecklistTranslations } from "./translations";
 import ChecklistList from "./components/ChecklistList";
 import AddItemForm from "./components/AddItemForm";
 import type { ChecklistItemDto } from "./types";
 
 export default function ChecklistPage() {
+    const { lang } = useI18n();
+    const t = getChecklistTranslations(lang);
     const params = useParams();
     const groupId = params.groupId as string;
     const [items, setItems] = useState<ChecklistItemDto[]>([]);
@@ -25,7 +29,7 @@ export default function ChecklistPage() {
             setError(null);
             
             // MOCK DATA - do odkomentowania gdy backend będzie gotowy
-            await new Promise(resolve => setTimeout(resolve, 500)); // Symulacja opóźnienia
+            await new Promise(resolve => setTimeout(resolve, 500));
             const mockData: ChecklistItemDto[] = [
                 {
                     id: "1",
@@ -67,7 +71,7 @@ export default function ChecklistPage() {
             // setItems(Array.isArray(data) ? data : []);
         } catch (err: any) {
             console.error("Error loading checklist:", err);
-            setError(err.message || "Błąd ładowania checklisty");
+            setError(err.message || t.loadError);
         } finally {
             setLoading(false);
         }
@@ -99,7 +103,7 @@ export default function ChecklistPage() {
             // setIsAddOpen(false);
         } catch (err: any) {
             console.error("Error adding item:", err);
-            alert(err.message || "Nie udało się dodać pozycji");
+            alert(err.message || t.addError);
         }
     };
 
@@ -115,9 +119,12 @@ export default function ChecklistPage() {
         } catch (err: any) {
             console.error("Error toggling item:", err);
             setItems(prev => prev.map(i => (i.id === itemId ? { ...i, isChecked: !newChecked } : i)));
-            alert(err.message || "Nie udało się zapisać zmian");
+            alert(err.message || t.toggleError);
         }
     };
+
+    const completedCount = items.filter(i => i.isChecked).length;
+    const totalCount = items.length;
 
     return (
         <>
@@ -132,21 +139,26 @@ export default function ChecklistPage() {
                         <Card className="mb-6">
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between">
-                                    <span>Lista kontrolna</span>
+                                    <span>{t.checklistTitle}</span>
                                     <Button 
                                         onClick={() => setIsAddOpen(v => !v)} 
                                         className="gap-2"
                                         variant={isAddOpen ? "outline" : "default"}
                                     >
                                         <Plus className="w-4 h-4" /> 
-                                        {isAddOpen ? "Anuluj" : "Dodaj pozycję"}
+                                        {isAddOpen ? t.cancel : t.addItem}
                                     </Button>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="space-y-2">
                                 <p className="text-sm text-muted-foreground">
-                                    Dodawaj elementy do listy. Zaznaczenia są widoczne dla wszystkich członków grupy.
+                                    {t.checklistDescription}
                                 </p>
+                                {totalCount > 0 && (
+                                    <p className="text-sm font-medium text-primary">
+                                        {t.itemsCompleted(completedCount.toString(), totalCount.toString())}
+                                    </p>
+                                )}
                             </CardContent>
                         </Card>
                     </motion.div>

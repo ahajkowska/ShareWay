@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import * as api from "@/lib/api";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "../translations";
 import type { CreateExpenseDto } from "../types";
 
 interface Props {
@@ -15,6 +17,9 @@ interface Props {
 }
 
 export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }: Props) {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
+
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [amount, setAmount] = useState("");
@@ -34,19 +39,19 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
         e?.preventDefault();
         
         if (!title.trim()) {
-            alert("Wpisz tytuł wydatku");
+            alert(t.titleRequired);
             return;
         }
         if (!amount || parseFloat(amount) <= 0) {
-            alert("Wpisz poprawną kwotę");
+            alert(t.invalidAmount);
             return;
         }
         if (!paidBy) {
-            alert("Wybierz kto zapłacił");
+            alert(t.choosePayer);
             return;
         }
         if (splitBetween.length === 0) {
-            alert("Wybierz między kogo podzielić wydatek");
+            alert(t.chooseSplit);
             return;
         }
 
@@ -86,7 +91,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
             // onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || "Błąd tworzenia wydatku");
+            alert(err.message || t.createExpenseError);
         } finally {
             setSubmitting(false);
         }
@@ -128,7 +133,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                     className="relative bg-background rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
                 >
                     <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-background z-10">
-                        <h3 className="text-lg font-bold">Dodaj wydatek</h3>
+                        <h3 className="text-lg font-bold">{t.newExpense}</h3>
                         <button 
                             onClick={() => onOpenChange(false)} 
                             className="p-2 hover:bg-muted rounded"
@@ -141,12 +146,12 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                         {/* Title */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
-                                Tytuł wydatku <span className="text-destructive">*</span>
+                                {t.expenseTitle} <span className="text-destructive">*</span>
                             </label>
                             <input 
                                 value={title} 
                                 onChange={(e) => setTitle(e.target.value)} 
-                                placeholder="np. Zakwaterowanie, Bilety, Jedzenie"
+                                placeholder={t.expenseTitlePlaceholder}
                                 className="w-full px-4 py-3 rounded-xl border border-input" 
                                 autoFocus 
                             />
@@ -154,11 +159,11 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
 
                         {/* Description */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">Opis (opcjonalnie)</label>
+                            <label className="block text-sm font-medium mb-2">{t.description} ({t.optional})</label>
                             <textarea 
                                 value={description} 
                                 onChange={(e) => setDescription(e.target.value)} 
-                                placeholder="Dodatkowe informacje..."
+                                placeholder={t.descriptionPlaceholder}
                                 rows={2} 
                                 className="w-full px-4 py-3 rounded-xl border border-input resize-none" 
                             />
@@ -167,7 +172,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                         {/* Amount */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
-                                Kwota (PLN) <span className="text-destructive">*</span>
+                                {t.amountLabel} ({t.pln}) <span className="text-destructive">*</span>
                             </label>
                             <input 
                                 type="number"
@@ -183,19 +188,18 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                         {/* Paid By */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
-                                Kto zapłacił? <span className="text-destructive">*</span>
+                                {t.paidBy} <span className="text-destructive">*</span>
                             </label>
                             <select
                                 value={paidBy}
                                 onChange={(e) => setPaidBy(e.target.value)}
                                 className="w-full px-4 py-3 rounded-xl border border-input bg-background text-foreground"
                             >
-                                <option value="" className="bg-background text-foreground">Wybierz osobę...</option>
+                                <option value="">{t.choosePersonPlaceholder}</option>
                                 {mockUsers.map(user => (
                                     <option 
                                         key={user.id} 
                                         value={user.id}
-                                        className="bg-background text-foreground"
                                     >
                                         {user.name}
                                     </option>
@@ -207,7 +211,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <label className="text-sm font-medium">
-                                    Podziel między <span className="text-destructive">*</span>
+                                    {t.splitBetween} <span className="text-destructive">*</span>
                                 </label>
                                 <div className="flex gap-2">
                                     <button
@@ -215,7 +219,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                                         onClick={selectAllUsers}
                                         className="text-xs text-primary hover:underline"
                                     >
-                                        Zaznacz wszystkich
+                                        {t.selectAll}
                                     </button>
                                     <span className="text-xs text-muted-foreground">|</span>
                                     <button
@@ -223,7 +227,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                                         onClick={deselectAllUsers}
                                         className="text-xs text-muted-foreground hover:underline"
                                     >
-                                        Odznacz
+                                        {t.deselect}
                                     </button>
                                 </div>
                             </div>
@@ -245,7 +249,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                             </div>
                             {splitBetween.length > 0 && amount && parseFloat(amount) > 0 && (
                                 <p className="text-xs text-muted-foreground mt-2">
-                                    Po {(parseFloat(amount) / splitBetween.length).toFixed(2)} PLN na osobę
+                                    {t.splitPerPerson(((parseFloat(amount) / splitBetween.length)).toFixed(2))}
                                 </p>
                             )}
                         </div>
@@ -258,10 +262,10 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                                 onClick={() => onOpenChange(false)} 
                                 disabled={submitting}
                             >
-                                Anuluj
+                                {t.cancel}
                             </Button>
                             <Button type="submit" disabled={submitting}>
-                                {submitting ? "Dodawanie..." : "Dodaj wydatek"}
+                                {submitting ? t.adding : t.addExpense}
                             </Button>
                         </div>
                     </form>

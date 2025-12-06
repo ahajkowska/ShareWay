@@ -4,6 +4,8 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getScheduleTranslations } from "../translations";
 import * as api from "@/lib/api";
 
 interface Props {
@@ -14,6 +16,8 @@ interface Props {
 }
 
 export default function CreateActivityDialog({ open, onOpenChange, dayId, onCreated }: Props) {
+    const { lang } = useI18n();
+    const t = getScheduleTranslations(lang);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [startTime, setStartTime] = useState("");
@@ -24,7 +28,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!title.trim()) {
-            alert("Wpisz tytuł aktywności");
+            alert(t.titleRequired);
             return;
         }
         try {
@@ -45,13 +49,11 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
             setEndTime("");
             setActivityLocation("");
             
-            onCreated?.(); // Odświeża dane w parent component
-            onOpenChange(false); // Zamyka dialog
-            
-            // Usuń location.reload() - nie jest potrzebne jeśli onCreated() odświeża dane
+            onCreated?.();
+            onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || "Błąd tworzenia aktywności");
+            alert(err.message || t.createActivityError);
         } finally {
             setSubmitting(false);
         }
@@ -77,7 +79,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                     className="relative bg-background rounded-2xl shadow-2xl w-full max-w-lg"
                 >
                     <div className="flex items-center justify-between p-6 border-b">
-                        <h3 className="text-lg font-bold">Dodaj aktywność</h3>
+                        <h3 className="text-lg font-bold">{t.addActivity}</h3>
                         <button 
                             onClick={() => onOpenChange(false)} 
                             className="p-2 hover:bg-muted rounded"
@@ -88,7 +90,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
 
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-2">Tytuł</label>
+                            <label className="block text-sm font-medium mb-2">{t.activityTitle}</label>
                             <input 
                                 value={title} 
                                 onChange={(e) => setTitle(e.target.value)} 
@@ -98,7 +100,9 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-2">Opis (opcjonalnie)</label>
+                            <label className="block text-sm font-medium mb-2">
+                                {t.description} ({t.optional})
+                            </label>
                             <textarea 
                                 value={description} 
                                 onChange={(e) => setDescription(e.target.value)} 
@@ -109,7 +113,9 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
 
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="block text-sm font-medium mb-2">Start (data + czas)</label>
+                                <label className="block text-sm font-medium mb-2">
+                                    {t.startTime} ({t.dateAndTime})
+                                </label>
                                 <input 
                                     type="datetime-local" 
                                     value={startTime} 
@@ -118,7 +124,9 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-2">Koniec (opcjonalnie)</label>
+                                <label className="block text-sm font-medium mb-2">
+                                    {t.endTime} ({t.optional})
+                                </label>
                                 <input 
                                     type="datetime-local" 
                                     value={endTime} 
@@ -129,7 +137,9 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-2">Lokalizacja (opcjonalnie)</label>
+                            <label className="block text-sm font-medium mb-2">
+                                {t.location} ({t.optional})
+                            </label>
                             <input 
                                 value={activityLocation} 
                                 onChange={(e) => setActivityLocation(e.target.value)} 
@@ -143,10 +153,10 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                                 onClick={() => onOpenChange(false)} 
                                 disabled={submitting}
                             >
-                                Anuluj
+                                {t.cancel}
                             </Button>
                             <Button type="submit" disabled={submitting}>
-                                {submitting ? "Dodawanie..." : "Dodaj aktywność"}
+                                {submitting ? t.adding : t.addActivity}
                             </Button>
                         </div>
                     </form>

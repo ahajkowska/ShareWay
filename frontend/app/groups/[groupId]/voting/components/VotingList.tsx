@@ -1,6 +1,8 @@
 "use client";
 
 import { Card, CardContent } from "@/app/components/ui/card";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getVotingTranslations } from "../translations";
 import type { Voting } from "../types";
 import VotingCard from "./VotingCard";
 
@@ -23,25 +25,29 @@ export default function VotingList({
   onDelete,
   onViewDetails
 }: VotingListProps) {
+  const { lang } = useI18n();
+  const t = getVotingTranslations(lang);
+
   if (loading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">
-            Ładowanie głosowań...
-          </p>
-        </CardContent>
-      </Card>
+      <div className="space-y-3">
+        {[1, 2, 3].map(n => (
+          <Card key={n}>
+            <CardContent className="pt-6">
+              <div className="h-64 bg-muted rounded-lg animate-pulse" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     );
   }
 
   if (votings.length === 0) {
     return (
       <Card>
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">
-            Brak aktywnych głosowań. Utwórz nowe!
-          </p>
+        <CardContent className="pt-12 pb-12 text-center">
+          <p className="text-lg text-muted-foreground mb-2">{t.noPolls}</p>
+          <p className="text-sm text-muted-foreground">{t.createFirstPoll}</p>
         </CardContent>
       </Card>
     );
@@ -49,23 +55,23 @@ export default function VotingList({
 
   // Sortuj: aktywne najpierw, potem po dacie utworzenia
   const sortedVotings = [...votings].sort((a, b) => {
-    if (a.isActive !== b.isActive) {
-      return a.isActive ? -1 : 1;
+    if (a.status !== b.status) {
+      return a.status === "open" ? -1 : 1;
     }
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  const activeVotings = sortedVotings.filter(v => v.isActive);
-  const closedVotings = sortedVotings.filter(v => ! v.isActive);
+  const activeVotings = sortedVotings.filter(v => v.status === "open");
+  const closedVotings = sortedVotings.filter(v => v.status === "closed");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* Aktywne głosowania */}
       {activeVotings.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-            Aktywne głosowania ({activeVotings.length})
+            {t.activePolls} ({activeVotings.length})
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeVotings.map((voting, index) => (
@@ -84,10 +90,10 @@ export default function VotingList({
       )}
 
       {/* Zakończone głosowania */}
-      {closedVotings. length > 0 && (
+      {closedVotings.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold mb-4 text-muted-foreground">
-            Zakończone głosowania ({closedVotings.length})
+            {t.closedPolls} ({closedVotings.length})
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {closedVotings.map((voting, index) => (

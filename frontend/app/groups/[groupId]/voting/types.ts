@@ -11,26 +11,25 @@ export interface VotingOption {
     id: string;
     text: string;
     description?: string;
-    addedBy: string;
-    addedByName: string;
-    addedAt: Date;
-    votes: Vote[];
+    votes: number;
+    voters: string[];
 }
 
 export interface Voting {
     id: string;
-    groupId: string;
     title: string;
     description?: string;
     createdBy: string;
     createdByName: string;
     createdAt: Date;
-    endsAt?: Date;
-    isActive: boolean;
     allowAddingOptions: boolean;
     allowMultipleVotes: boolean;
     showResultsBeforeVoting: boolean;
+    endsAt: Date;
+    status: "open" | "closed";
     options: VotingOption[];
+    totalVoters: number;
+    userVote?: string | null;  // ID opcji na którą użytkownik głosował
 }
 
 export interface VotingFormData {

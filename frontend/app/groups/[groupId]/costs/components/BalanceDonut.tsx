@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "../translations";
 
 interface Props {
     netBalance: number;
@@ -9,6 +11,9 @@ interface Props {
 }
 
 export default function BalanceDonut({ netBalance, totalIOweThem, totalTheyOweMe }: Props) {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
+    
     const total = totalIOweThem + totalTheyOweMe;
     const iOwePercentage = total > 0 ? (totalIOweThem / total) * 100 : 0;
     const theyOwePercentage = total > 0 ? (totalTheyOweMe / total) * 100 : 0;
@@ -23,7 +28,6 @@ export default function BalanceDonut({ netBalance, totalIOweThem, totalTheyOweMe
 
     return (
         <div className="flex flex-col items-center">
-            {/* SVG with centered text */}
             <div className="relative" style={{ width: size, height: size }}>
                 <svg width={size} height={size} className="transform -rotate-90">
                     <circle
@@ -66,9 +70,8 @@ export default function BalanceDonut({ netBalance, totalIOweThem, totalTheyOweMe
                     )}
                 </svg>
 
-                {/* Center text - positioned absolutely in the middle */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <p className="text-xs text-muted-foreground mb-1">Bilans</p>
+                    <p className="text-xs text-muted-foreground mb-1">{t.balance}</p>
                     <p className={cn(
                         "text-2xl font-bold",
                         netBalance > 0 && "text-green-600 dark:text-green-400",
@@ -77,7 +80,7 @@ export default function BalanceDonut({ netBalance, totalIOweThem, totalTheyOweMe
                     )}>
                         {netBalance > 0 ? '+' : ''}{netBalance.toFixed(2)}
                     </p>
-                    <p className="text-xs text-muted-foreground">PLN</p>
+                    <p className="text-xs text-muted-foreground">{t.pln}</p>
                 </div>
             </div>
 
@@ -86,18 +89,18 @@ export default function BalanceDonut({ netBalance, totalIOweThem, totalTheyOweMe
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-green-500" />
                     <div>
-                        <p className="text-muted-foreground">Mi są winni</p>
+                        <p className="text-muted-foreground">{t.theyOweMe}</p>
                         <p className="font-bold text-green-600 dark:text-green-400">
-                            {totalTheyOweMe.toFixed(2)} PLN
+                            {totalTheyOweMe.toFixed(2)} {t.pln}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-destructive" />
                     <div>
-                        <p className="text-muted-foreground">Jestem winien/winna</p>
+                        <p className="text-muted-foreground">{t.iOweLabel}</p>
                         <p className="font-bold text-destructive">
-                            {totalIOweThem.toFixed(2)} PLN
+                            {totalIOweThem.toFixed(2)} {t.pln}
                         </p>
                     </div>
                 </div>
