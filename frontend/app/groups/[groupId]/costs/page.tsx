@@ -7,6 +7,8 @@ import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Plus, Wallet, TrendingUp } from "lucide-react";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "./translations";
 import * as api from "@/lib/api";
 import ExpenseList from "./components/ExpenseList";
 import CreateExpenseDialog from "./components/CreateExpenseDialog";
@@ -14,6 +16,8 @@ import PersonalBalance from "./components/PersonalBalance";
 import type { ExpenseDto, BalanceGraphDto, MyBalanceSummaryDto } from "./types";
 
 export default function CostsPage() {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
     const params = useParams();
     const tripId = params.groupId as string;
     
@@ -112,7 +116,7 @@ export default function CostsPage() {
             // setExpenses(data);
         } catch (err: any) {
             console.error("Error loading expenses:", err);
-            alert(err.message || "Nie udało się załadować wydatków");
+            alert(err.message || t.loadError);
         } finally {
             setLoading(false);
         }
@@ -165,15 +169,15 @@ export default function CostsPage() {
                     {
                         userId: "user-2",
                         userName: "Anna Nowak",
-                        balance: 135.00, // Anna mi jest winna łącznie
+                        balance: 135.00,
                         expenses: [
                             {
                                 expenseId: "exp-2",
                                 expenseTitle: "Bilety autokarowe",
                                 totalAmount: 480.00,
-                                myShare: 120.00, // ja powinienem zapłacić
-                                iPaid: 0.00, // ja zapłaciłem
-                                balance: -120.00, // jestem winien Annie 120 (ona zapłaciła, ja nie)
+                                myShare: 120.00,
+                                iPaid: 0.00,
+                                balance: -120.00,
                             },
                             {
                                 expenseId: "exp-6",
@@ -181,15 +185,15 @@ export default function CostsPage() {
                                 totalAmount: 360.00,
                                 myShare: 90.00,
                                 iPaid: 0.00,
-                                balance: -90.00, // jestem winien Annie 90
+                                balance: -90.00,
                             },
                             {
                                 expenseId: "exp-1",
                                 expenseTitle: "Zakwaterowanie - Hotel Aurora",
                                 totalAmount: 1200.00,
-                                myShare: 300.00, // mój udział
-                                iPaid: 1200.00, // ja zapłaciłem za wszystkich
-                                balance: 300.00, // Anna mi jest winna swoje 300 (jej udział)
+                                myShare: 300.00,
+                                iPaid: 1200.00,
+                                balance: 300.00,
                             },
                             {
                                 expenseId: "exp-5",
@@ -197,14 +201,14 @@ export default function CostsPage() {
                                 totalAmount: 85.00,
                                 myShare: 21.25,
                                 iPaid: 85.00,
-                                balance: 21.25, // Anna mi jest winna swoje 21.25
+                                balance: 21.25,
                             },
                         ],
                     },
                     {
                         userId: "user-3",
                         userName: "Piotr Wiśniewski",
-                        balance: 230.00, // Piotr mi jest winien łącznie
+                        balance: 230.00,
                         expenses: [
                             {
                                 expenseId: "exp-3",
@@ -212,7 +216,7 @@ export default function CostsPage() {
                                 totalAmount: 280.00,
                                 myShare: 70.00,
                                 iPaid: 0.00,
-                                balance: -70.00, // jestem winien Piotrowi 70 (on zapłacił)
+                                balance: -70.00,
                             },
                             {
                                 expenseId: "exp-1",
@@ -220,7 +224,7 @@ export default function CostsPage() {
                                 totalAmount: 1200.00,
                                 myShare: 300.00,
                                 iPaid: 1200.00,
-                                balance: 300.00, // Piotr mi jest winien swoje 300
+                                balance: 300.00,
                             },
                             {
                                 expenseId: "exp-5",
@@ -228,14 +232,14 @@ export default function CostsPage() {
                                 totalAmount: 85.00,
                                 myShare: 21.25,
                                 iPaid: 85.00,
-                                balance: 21.25, // Piotr mi jest winien swoje 21.25 (ale to już jest ujęte w exp-5 dla Anny)
+                                balance: 21.25,
                             },
                         ],
                     },
                     {
                         userId: "user-4",
                         userName: "Maria Zielińska",
-                        balance: 291.25, // Maria mi jest winna łącznie
+                        balance: 291.25,
                         expenses: [
                             {
                                 expenseId: "exp-4",
@@ -243,7 +247,7 @@ export default function CostsPage() {
                                 totalAmount: 120.00,
                                 myShare: 30.00,
                                 iPaid: 0.00,
-                                balance: -30.00, // jestem winien Marii 30 (ona zapłaciła)
+                                balance: -30.00,
                             },
                             {
                                 expenseId: "exp-1",
@@ -251,7 +255,7 @@ export default function CostsPage() {
                                 totalAmount: 1200.00,
                                 myShare: 300.00,
                                 iPaid: 1200.00,
-                                balance: 300.00, // Maria mi jest winna swoje 300
+                                balance: 300.00,
                             },
                             {
                                 expenseId: "exp-5",
@@ -259,13 +263,13 @@ export default function CostsPage() {
                                 totalAmount: 85.00,
                                 myShare: 21.25,
                                 iPaid: 85.00,
-                                balance: 21.25, // Maria mi jest winna swoje 21.25
+                                balance: 21.25,
                             },
                         ],
                     },
                 ],
-                totalIOweThem: 310.00, // 120 (bilety) + 90 (śniadania) + 70 (obiad) + 30 (Gubałówka) = 310
-                totalTheyOweMe: 963.75, // 300 (Anna hotel) + 21.25 (Anna ognisko) + 300 (Piotr hotel) + 21.25 (Piotr ognisko) + 300 (Maria hotel) + 21.25 (Maria ognisko) = 963.75
+                totalIOweThem: 310.00,
+                totalTheyOweMe: 963.75,
             };
             
             setMyBalance(mockMyBalance);
@@ -283,7 +287,7 @@ export default function CostsPage() {
     }, [tripId]);
 
     const handleDeleteExpense = async (expenseId: string) => {
-        if (!confirm("Na pewno chcesz usunąć ten wydatek?")) return;
+        if (!confirm(t.deleteConfirm)) return;
         
         try {
             // MOCK - usuń lokalnie
@@ -295,7 +299,7 @@ export default function CostsPage() {
             // await loadBalance();
         } catch (err: any) {
             console.error("Error deleting expense:", err);
-            alert(err.message || "Nie udało się usunąć wydatku");
+            alert(err.message || t.deleteError);
         }
     };
 
@@ -329,9 +333,9 @@ export default function CostsPage() {
                                             <Wallet className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h1 className="text-2xl font-bold">Rozliczenia wyjazdu</h1>
+                                            <h1 className="text-2xl font-bold">{t.costSettlements}</h1>
                                             <p className="text-sm text-muted-foreground mt-0.5">
-                                                Zarządzaj wydatkami i zobacz kto komu winien
+                                                {t.manageExpenses}
                                             </p>
                                         </div>
                                     </div>
@@ -341,7 +345,7 @@ export default function CostsPage() {
                                         disabled={loading}
                                     >
                                         <Plus className="w-4 h-4" /> 
-                                        Nowy wydatek
+                                        {t.newExpense}
                                     </Button>
                                 </CardTitle>
                             </CardHeader>
@@ -350,7 +354,7 @@ export default function CostsPage() {
                                     <div className="flex items-center gap-2 text-muted-foreground">
                                         <TrendingUp className="w-4 h-4" />
                                         <span className="text-sm">
-                                            Łączne wydatki: <span className="font-bold text-foreground">{balance.totalExpenses.toFixed(2)} PLN</span>
+                                            {t.totalExpenses}: <span className="font-bold text-foreground">{balance.totalExpenses.toFixed(2)} {t.pln}</span>
                                         </span>
                                     </div>
                                 </CardContent>

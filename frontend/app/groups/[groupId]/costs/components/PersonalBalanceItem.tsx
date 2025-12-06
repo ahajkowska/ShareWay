@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, CheckCircle2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "../translations";
 import { cn } from "@/lib/utils";
 import type { PersonalBalanceDto, ExpenseBreakdown } from "../types";
 
@@ -13,6 +15,8 @@ interface Props {
 }
 
 export default function PersonBalanceItem({ person, onSettleExpense, tripId }: Props) {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
     const [expanded, setExpanded] = useState(false);
     const isOwed = person.balance > 0;
     const iOwe = person.balance < 0;
@@ -43,7 +47,7 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                     <div className="text-left">
                         <p className="font-medium text-sm">{person.userName}</p>
                         <p className="text-xs text-muted-foreground">
-                            {person.expenses.length} {person.expenses.length === 1 ? 'wydatek' : 'wydatki'}
+                            {person.expenses.length} {person.expenses.length === 1 ? t.expense : t.expenses}
                         </p>
                     </div>
                 </div>
@@ -54,7 +58,7 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                         isOwed && "text-green-600 dark:text-green-400",
                         iOwe && "text-destructive"
                     )}>
-                        {isOwed ? '+' : ''}{person.balance.toFixed(2)} PLN
+                        {isOwed ? '+' : ''}{person.balance.toFixed(2)} {t.pln}
                     </span>
                     {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </div>
@@ -81,31 +85,31 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                                         expenseIsOwed && "text-green-600 dark:text-green-400",
                                         expenseIOwe && "text-destructive"
                                     )}>
-                                        {expenseIsOwed ? '+' : ''}{exp.balance.toFixed(2)} PLN
+                                        {expenseIsOwed ? '+' : ''}{exp.balance.toFixed(2)} {t.pln}
                                     </span>
                                 </div>
 
                                 {/* Expense Details */}
                                 <div className="text-xs text-muted-foreground space-y-0.5">
                                     <div className="flex justify-between">
-                                        <span>Mój udział:</span>
-                                        <span>{exp.myShare.toFixed(2)} PLN</span>
+                                        <span>{t.myShare}</span>
+                                        <span>{exp.myShare.toFixed(2)} {t.pln}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span>Ja zapłaciłem:</span>
-                                        <span className="font-medium">{exp.iPaid.toFixed(2)} PLN</span>
+                                        <span>{t.iPaid}</span>
+                                        <span className="font-medium">{exp.iPaid.toFixed(2)} {t.pln}</span>
                                     </div>
                                 </div>
 
                                 {/* Status Info */}
                                 {expenseIsOwed && (
                                     <div className="text-xs text-green-600 dark:text-green-400 pt-2 border-t">
-                                        → {person.userName} mi jest winien/winna {exp.balance.toFixed(2)} PLN
+                                        → {person.userName} {t.owesMe} {exp.balance.toFixed(2)} {t.pln}
                                     </div>
                                 )}
                                 {expenseIOwe && (
                                     <div className="text-xs text-destructive pt-2 border-t">
-                                        → Jestem winien/winna {person.userName} {Math.abs(exp.balance).toFixed(2)} PLN
+                                        → {t.iOwe} {person.userName} {Math.abs(exp.balance).toFixed(2)} {t.pln}
                                     </div>
                                 )}
 
@@ -120,10 +124,7 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                                     className="w-full"
                                 >
                                     <CheckCircle2 className="w-3 h-3 mr-2" />
-                                    {expenseIOwe 
-                                        ? `Oznacz jako oddane` 
-                                        : `Oznacz jako otrzymane`
-                                    }
+                                    {expenseIOwe ? t.markAsPaid : t.markAsReceived}
                                 </Button>
                             </div>
                         );

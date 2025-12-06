@@ -4,6 +4,8 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, CheckCircle2, Banknote } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "../translations";
 import { cn } from "@/lib/utils";
 import type { ExpenseBreakdown } from "../types";
 import * as api from "@/lib/api";
@@ -17,6 +19,8 @@ interface Props {
 }
 
 export default function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled }: Props) {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
     const [amount, setAmount] = useState(Math.abs(expense.balance).toFixed(2));
     const [submitting, setSubmitting] = useState(false);
 
@@ -28,32 +32,25 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
         
         const amountNum = parseFloat(amount);
         if (isNaN(amountNum) || amountNum <= 0) {
-            alert("Wpisz poprawną kwotę");
+            alert(t.enterValidAmount);
             return;
         }
 
         if (amountNum > Math.abs(expense.balance)) {
-            alert(`Kwota nie może być większa niż ${Math.abs(expense.balance).toFixed(2)} PLN`);
+            alert(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2)));
             return;
         }
 
         try {
             setSubmitting(true);
 
-            // Odwrotny wydatek
             const settlementPayload = {
-                amount: Math.round(amountNum * 100), // PLN → centy
+                amount: Math.round(amountNum * 100),
                 description: iOwe 
-                    ? `Rozliczenie: ${expense.expenseTitle}` 
-                    : `Otrzymano: ${expense.expenseTitle}`,
+                    ? `${t.settlement}: ${expense.expenseTitle}` 
+                    : `${t.received}: ${expense.expenseTitle}`,
                 date: new Date().toISOString(),
                 debtorIds: iOwe ? [expense.personUserId] : [myUserId],
-                // Jeśli JA jestem winien:
-                //   - Payer = JA (current user)
-                //   - Debtor = druga osoba
-                // Jeśli DRUGA osoba jest winna:
-                //   - Payer = JA (current user) - ale to będzie "odwrotny" expense
-                //   - Debtor = JA - żeby anulować dług
             };
 
             await api.createExpense(expense.tripId, settlementPayload);
@@ -62,7 +59,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
             onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || "Błąd podczas zapisywania rozliczenia");
+            alert(err.message || t.settlementError);
         } finally {
             setSubmitting(false);
         }
@@ -88,7 +85,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                     className="relative bg-background rounded-2xl shadow-2xl w-full max-w-md"
                 >
                     <div className="flex items-center justify-between p-6 border-b">
-                        <h3 className="text-lg font-bold">Oznacz jako rozliczone</h3>
+                        <h3 className="text-lg font-bold">{t.markAsSettled}</h3>
                         <button 
                             onClick={() => onOpenChange(false)} 
                             className="p-2 hover:bg-muted rounded"
@@ -103,16 +100,16 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                             <p className="font-semibold mb-2">{expense.expenseTitle}</p>
                             <div className="text-sm text-muted-foreground space-y-1">
                                 <div className="flex justify-between">
-                                    <span>Łączna kwota:</span>
-                                    <span className="font-medium">{expense.totalAmount.toFixed(2)} PLN</span>
+                                    <span>{t.totalAmount}</span>
+                                    <span className="font-medium">{expense.totalAmount.toFixed(2)} {t.pln}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Mój udział:</span>
-                                    <span className="font-medium">{expense.myShare.toFixed(2)} PLN</span>
+                                    <span>{t.myShare}</span>
+                                    <span className="font-medium">{expense.myShare.toFixed(2)} {t.pln}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>Ja zapłaciłem:</span>
-                                    <span className="font-medium">{expense.iPaid.toFixed(2)} PLN</span>
+                                    <span>{t.iPaid}</span>
+                                    <span className="font-medium">{expense.iPaid.toFixed(2)} {t.pln}</span>
                                 </div>
                             </div>
                         </div>
@@ -130,19 +127,19 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                     theyOweMe && "text-green-600 dark:text-green-400"
                                 )} />
                                 <p className="font-medium text-sm">
-                                    {iOwe && `Oddajesz pieniądze dla: ${expense.personName}`}
-                                    {theyOweMe && `Otrzymujesz pieniądze od: ${expense.personName}`}
+                                    {iOwe && `${t.youAreGivingMoneyTo} ${expense.personName}`}
+                                    {theyOweMe && `${t.youAreReceivingMoneyFrom} ${expense.personName}`}
                                 </p>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                                {iOwe && `Jesteś winien/winna za ten wydatek: `}
-                                {theyOweMe && `Jest Ci winien/winna za ten wydatek: `}
+                                {iOwe && `${t.youOweForThisExpense} `}
+                                {theyOweMe && `${t.theyOweForThisExpense} `}
                                 <span className={cn(
                                     "font-bold",
                                     iOwe && "text-destructive",
                                     theyOweMe && "text-green-600 dark:text-green-400"
                                 )}>
-                                    {Math.abs(expense.balance).toFixed(2)} PLN
+                                    {Math.abs(expense.balance).toFixed(2)} {t.pln}
                                 </span>
                             </p>
                         </div>
@@ -150,7 +147,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                         {/* Amount Input */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
-                                Kwota do rozliczenia (PLN) <span className="text-destructive">*</span>
+                                {t.amountToSettle} <span className="text-destructive">*</span>
                             </label>
                             <input 
                                 type="number"
@@ -164,7 +161,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                 autoFocus
                             />
                             <p className="text-xs text-muted-foreground mt-2">
-                                Możesz rozliczyć całość lub część kwoty za ten wydatek
+                                {t.canSettlePartial}
                             </p>
                         </div>
 
@@ -177,7 +174,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                 onClick={() => setAmount((Math.abs(expense.balance) / 2).toFixed(2))}
                                 className="flex-1"
                             >
-                                Połowa
+                                {t.half}
                             </Button>
                             <Button
                                 type="button"
@@ -186,17 +183,17 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                 onClick={() => setAmount(Math.abs(expense.balance).toFixed(2))}
                                 className="flex-1"
                             >
-                                Całość
+                                {t.full}
                             </Button>
                         </div>
 
                         {/* Info */}
                         <div className="bg-muted/50 p-3 rounded-lg text-xs text-muted-foreground">
-                            <p className="font-medium mb-1">Informacja</p>
+                            <p className="font-medium mb-1">{t.information}</p>
                             <p>
-                                Zostanie utworzony wydatek rozliczeniowy, który automatycznie wyrówna saldo.
-                                {iOwe && " Upewnij się, że faktycznie przekazałeś pieniądze."}
-                                {theyOweMe && " Upewnij się, że faktycznie otrzymałeś pieniądze."}
+                                {t.settleInfo}
+                                {iOwe && ` ${t.makeSureYouPaid}`}
+                                {theyOweMe && ` ${t.makeSureYouReceived}`}
                             </p>
                         </div>
 
@@ -209,7 +206,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                 disabled={submitting}
                                 className="flex-1"
                             >
-                                Anuluj
+                                {t.cancel}
                             </Button>
                             <Button 
                                 type="submit" 
@@ -220,7 +217,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                 )}
                             >
                                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                                {submitting ? "Zapisywanie..." : "Oznacz jako rozliczone"}
+                                {submitting ? t.saving : t.markAsSettled}
                             </Button>
                         </div>
                     </form>

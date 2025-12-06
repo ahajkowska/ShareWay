@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Trash2, RefreshCw } from "lucide-react";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "../translations";
 import type { ExpenseDto } from "../types";
 
 interface Props {
@@ -13,11 +15,14 @@ interface Props {
 }
 
 export default function ExpenseList({ expenses, loading, onDelete, onRefresh }: Props) {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
+
     if (loading) {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>Wydatki</CardTitle>
+                    <CardTitle>{t.expenses}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-3">
@@ -34,12 +39,12 @@ export default function ExpenseList({ expenses, loading, onDelete, onRefresh }: 
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>Wydatki</CardTitle>
+                    <CardTitle>{t.expenses}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="text-center py-12 text-muted-foreground">
-                        <p className="text-lg mb-2">Brak wydatków</p>
-                        <p className="text-sm">Dodaj pierwszy wydatek używając przycisku "Nowy wydatek"</p>
+                        <p className="text-lg mb-2">{t.noExpenses}</p>
+                        <p className="text-sm">{t.addFirstExpense}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -49,7 +54,7 @@ export default function ExpenseList({ expenses, loading, onDelete, onRefresh }: 
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Wydatki ({expenses.length})</CardTitle>
+                <CardTitle>{t.expenses} ({expenses.length})</CardTitle>
                 <Button variant="ghost" size="sm" onClick={onRefresh}>
                     <RefreshCw className="w-4 h-4" />
                 </Button>
@@ -69,14 +74,14 @@ export default function ExpenseList({ expenses, loading, onDelete, onRefresh }: 
                                     </p>
                                 )}
                                 <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                                    <span>Zapłacił: {expense.paidByName}</span>
-                                    <span>Data: {new Date(expense.date).toLocaleDateString("pl-PL")}</span>
+                                    <span>{t.paidBy}: {expense.paidByName}</span>
+                                    <span>{t.date}: {new Date(expense.date).toLocaleDateString(t.locale)}</span>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-lg font-bold">{expense.amount.toFixed(2)} PLN</p>
+                                <p className="text-lg font-bold">{expense.amount.toFixed(2)} {t.pln}</p>
                                 <p className="text-xs text-muted-foreground">
-                                    {expense.splitBetween.length} {expense.splitBetween.length === 1 ? "osoba" : "osób"}
+                                    {expense.splitBetween.length} {expense.splitBetween.length === 1 ? t.person : t.people}
                                 </p>
                             </div>
                             <Button

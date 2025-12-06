@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/ca
 import { Button } from "@/app/components/ui/button";
 import { RefreshCw, User, DollarSign } from "lucide-react";
 import { useState } from "react";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getCostsTranslations } from "../translations";
 import type { MyBalanceSummaryDto, ExpenseBreakdown } from "../types";
 import SettleBalanceDialog from "./SettleBalanceDialog";
 import PersonBalanceItem from "./PersonalBalanceItem";
@@ -17,6 +19,8 @@ interface Props {
 }
 
 export default function PersonalBalance({ myBalance, loading, onRefresh, tripId }: Props) {
+    const { lang } = useI18n();
+    const t = getCostsTranslations(lang);
     const [settleDialogOpen, setSettleDialogOpen] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState<ExpenseBreakdown & { 
         personName: string;
@@ -28,7 +32,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
         return (
             <Card className="sticky top-24">
                 <CardHeader>
-                    <CardTitle>Moje saldo</CardTitle>
+                    <CardTitle>{t.myBalance}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-3">
@@ -46,11 +50,11 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
         return (
             <Card className="sticky top-24">
                 <CardHeader>
-                    <CardTitle>Moje saldo</CardTitle>
+                    <CardTitle>{t.myBalance}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-muted-foreground text-center py-8">
-                        Brak danych do wyświetlenia
+                        {t.noDataToShow}
                     </p>
                 </CardContent>
             </Card>
@@ -71,7 +75,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                 <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                         <User className="w-5 h-5" />
-                        Moje saldo
+                        {t.myBalance}
                     </CardTitle>
                     <Button variant="ghost" size="sm" onClick={onRefresh}>
                         <RefreshCw className="w-4 h-4" />
@@ -91,10 +95,10 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                                 <DollarSign className="w-8 h-8 text-green-600 dark:text-green-400" />
                             </div>
                             <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                                ✅ Wszystko rozliczone!
+                                ✅ {t.allSettled}
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
-                                Nie masz żadnych zaległych płatności
+                                {t.noOutstandingPayments}
                             </p>
                         </div>
                     )}
@@ -104,7 +108,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                         <div>
                             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                                 <User className="w-4 h-4" />
-                                Rozliczenia z osobami ({myBalance.balances.length})
+                                {t.settlementsWithPeople} ({myBalance.balances.length})
                             </h4>
                             <div className="space-y-2">
                                 {myBalance.balances.map((person) => (
