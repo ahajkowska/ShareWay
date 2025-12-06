@@ -111,6 +111,206 @@ export interface Translations {
       terms: { required: string };
     };
   };
+  
+  // === DODAJ NOWE SEKCJE DLA MODUŁÓW ===
+  
+  costs: {
+    myBalance: string;
+    balance: string;
+    allSettled: string;
+    noOutstandingPayments: string;
+    settlementsWithPeople: string;
+    theyOweMe: string;
+    iOweThem: string;
+    pln: string;
+    expense: string;
+    expenses: string;
+    myShare: string;
+    iPaid: string;
+    totalAmount: string;
+    owesMe: string;
+    iOwe: string;
+    markAsSettled: string;
+    markAsPaid: string;
+    markAsReceived: string;
+    settlementTitle: string;
+    amountToSettle: string;
+    canSettlePartial: string;
+    half: string;
+    full: string;
+    cancel: string;
+    saving: string;
+    settleInfo: string;
+    makeSureYouPaid: string;
+    makeSureYouReceived: string;
+    youAreGivingMoneyTo: string;
+    youAreReceivingMoneyFrom: string;
+    youOweForThisExpense: string;
+    theyOweForThisExpense: string;
+    balanceGraph: string;
+    optimizedSettlements: string;
+    totalExpenses: string;
+    noSettlementsNeeded: string;
+    pays: string;
+    addExpense: string;
+    createExpense: string;
+    expenseTitle: string;
+    amount: string;
+    whoPaid: string;
+    selectPerson: string;
+    date: string;
+    splitBetween: string;
+    allParticipants: string;
+    specificPeople: string;
+    creating: string;
+    create: string;
+    noExpenses: string;
+    addFirstExpense: string;
+    paidBy: string;
+    splitAmong: string;
+    people: string;
+  };
+
+  checklist: {
+    checklist: string;
+    addItem: string;
+    createItem: string;
+    itemTitle: string;
+    description: string;
+    optional: string;
+    assignTo: string;
+    selectPerson: string;
+    dueDate: string;
+    priority: string;
+    low: string;
+    medium: string;
+    high: string;
+    category: string;
+    general: string;
+    packing: string;
+    booking: string;
+    documents: string;
+    other: string;
+    cancel: string;
+    create: string;
+    creating: string;
+    noItems: string;
+    addFirstItem: string;
+    completed: string;
+    pending: string;
+    assignedTo: string;
+    unassigned: string;
+    due: string;
+    overdue: string;
+    markAsComplete: string;
+    markAsIncomplete: string;
+    delete: string;
+    edit: string;
+    filterBy: string;
+    all: string;
+    myTasks: string;
+    sortBy: string;
+    status: string;
+    tasks: string;
+  };
+
+  schedule: {
+    schedule: string;
+    addEvent: string;
+    createEvent: string;
+    eventTitle: string;
+    description: string;
+    optional: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    category: string;
+    transport: string;
+    accommodation: string;
+    activity: string;
+    meal: string;
+    other: string;
+    cancel: string;
+    create: string;
+    creating: string;
+    noEvents: string;
+    addFirstEvent: string;
+    today: string;
+    tomorrow: string;
+    upcomingEvents: string;
+    pastEvents: string;
+    allEvents: string;
+    day: string;
+    week: string;
+    month: string;
+    list: string;
+    from: string;
+    to: string;
+    at: string;
+    duration: string;
+    hours: string;
+    days: string;
+    edit: string;
+    delete: string;
+    viewDetails: string;
+    hideDetails: string;
+    events: string;
+  };
+
+  voting: {
+    voting: string;
+    createPoll: string;
+    pollTitle: string;
+    description: string;
+    optional: string;
+    pollType: string;
+    singleChoice: string;
+    multipleChoice: string;
+    options: string;
+    addOption: string;
+    option: string;
+    deadline: string;
+    allowNewOptions: string;
+    anonymousVoting: string;
+    cancel: string;
+    create: string;
+    creating: string;
+    noPolls: string;
+    addFirstPoll: string;
+    active: string;
+    closed: string;
+    votes: string;
+    vote: string;
+    voted: string;
+    notVoted: string;
+    closePoll: string;
+    reopenPoll: string;
+    edit: string;
+    delete: string;
+    viewResults: string;
+    hideResults: string;
+    yourVote: string;
+    changeVote: string;
+    submitVote: string;
+    votedBy: string;
+    noVotes: string;
+    closesIn: string;
+    closedOn: string;
+    multipleChoiceInfo: string;
+    singleChoiceInfo: string;
+    polls: string;
+  };
+
+  dashboard: {
+    title: string;
+    subtitle: string;
+    modules: {
+      voting: { name: string; description: string };
+      costs: { name: string; description: string };
+      schedule: { name: string; description: string };
+      checklist: { name: string; description: string };
+    };
+  };
 }
 
 export const dict: Record<Lang, Translations> = {
@@ -293,6 +493,202 @@ export const dict: Record<Lang, Translations> = {
         },
       },
     },
+    costs: {
+      myBalance: "Moje saldo",
+      balance: "Bilans",
+      allSettled: "Wszystko rozliczone!",
+      noOutstandingPayments: "Nie masz żadnych zaległych płatności",
+      settlementsWithPeople: "Rozliczenia z osobami",
+      theyOweMe: "Mi są winni",
+      iOweThem: "Jestem winien/winna",
+      pln: "PLN",
+      expense: "wydatek",
+      expenses: "wydatki",
+      myShare: "Mój udział:",
+      iPaid: "Ja zapłaciłem:",
+      totalAmount: "Łączna kwota:",
+      owesMe: "mi jest winien/winna",
+      iOwe: "Jestem winien/winna",
+      markAsSettled: "Oznacz jako rozliczone",
+      markAsPaid: "Oznacz jako oddane",
+      markAsReceived: "Oznacz jako otrzymane",
+      settlementTitle: "Oznacz jako rozliczone",
+      amountToSettle: "Kwota do rozliczenia (PLN)",
+      canSettlePartial: "Możesz rozliczyć całość lub część kwoty za ten wydatek",
+      half: "Połowa",
+      full: "Całość",
+      cancel: "Anuluj",
+      saving: "Zapisywanie...",
+      settleInfo: "Zostanie utworzony wydatek rozliczeniowy, który automatycznie wyrówna saldo.",
+      makeSureYouPaid: "Upewnij się, że faktycznie przekazałeś pieniądze.",
+      makeSureYouReceived: "Upewnij się, że faktycznie otrzymałeś pieniądze.",
+      youAreGivingMoneyTo: "Oddajesz pieniądze dla:",
+      youAreReceivingMoneyFrom: "Otrzymujesz pieniądze od:",
+      youOweForThisExpense: "Jesteś winien/winna za ten wydatek:",
+      theyOweForThisExpense: "Jest Ci winien/winna za ten wydatek:",
+      balanceGraph: "Graf rozliczeń",
+      optimizedSettlements: "Zoptymalizowane rozliczenia",
+      totalExpenses: "Łącznie wydatków",
+      noSettlementsNeeded: "Brak rozliczeń do wykonania",
+      pays: "płaci",
+      addExpense: "Dodaj wydatek",
+      createExpense: "Utwórz wydatek",
+      expenseTitle: "Tytuł wydatku",
+      amount: "Kwota (PLN)",
+      whoPaid: "Kto zapłacił?",
+      selectPerson: "Wybierz osobę...",
+      date: "Data",
+      splitBetween: "Podziel między",
+      allParticipants: "Wszyscy uczestnicy",
+      specificPeople: "Wybrane osoby",
+      creating: "Tworzenie...",
+      create: "Utwórz",
+      noExpenses: "Brak wydatków",
+      addFirstExpense: "Dodaj pierwszy wydatek klikając przycisk powyżej",
+      paidBy: "Zapłacił:",
+      splitAmong: "Podzielono między",
+      people: "osoby",
+    },
+
+    checklist: {
+      checklist: "Lista kontrolna",
+      addItem: "Dodaj zadanie",
+      createItem: "Utwórz zadanie",
+      itemTitle: "Nazwa zadania",
+      description: "Opis",
+      optional: "opcjonalnie",
+      assignTo: "Przypisz do",
+      selectPerson: "Wybierz osobę...",
+      dueDate: "Termin wykonania",
+      priority: "Priorytet",
+      low: "Niski",
+      medium: "Średni",
+      high: "Wysoki",
+      category: "Kategoria",
+      general: "Ogólne",
+      packing: "Pakowanie",
+      booking: "Rezerwacje",
+      documents: "Dokumenty",
+      other: "Inne",
+      cancel: "Anuluj",
+      create: "Utwórz",
+      creating: "Tworzenie...",
+      noItems: "Brak zadań",
+      addFirstItem: "Dodaj pierwsze zadanie klikając przycisk powyżej",
+      completed: "Ukończone",
+      pending: "Oczekujące",
+      assignedTo: "Przypisane do:",
+      unassigned: "Nieprzypisane",
+      due: "Termin:",
+      overdue: "Przeterminowane",
+      markAsComplete: "Oznacz jako ukończone",
+      markAsIncomplete: "Oznacz jako nieukończone",
+      delete: "Usuń",
+      edit: "Edytuj",
+      filterBy: "Filtruj według",
+      all: "Wszystkie",
+      myTasks: "Moje zadania",
+      sortBy: "Sortuj według",
+      status: "Status",
+      tasks: "zadań",
+    },
+
+    schedule: {
+      schedule: "Harmonogram",
+      addEvent: "Dodaj wydarzenie",
+      createEvent: "Utwórz wydarzenie",
+      eventTitle: "Nazwa wydarzenia",
+      description: "Opis",
+      optional: "opcjonalnie",
+      startDate: "Data rozpoczęcia",
+      endDate: "Data zakończenia",
+      location: "Lokalizacja",
+      category: "Kategoria",
+      transport: "Transport",
+      accommodation: "Nocleg",
+      activity: "Aktywność",
+      meal: "Posiłek",
+      other: "Inne",
+      cancel: "Anuluj",
+      create: "Utwórz",
+      creating: "Tworzenie...",
+      noEvents: "Brak wydarzeń",
+      addFirstEvent: "Dodaj pierwsze wydarzenie klikając przycisk powyżej",
+      today: "Dzisiaj",
+      tomorrow: "Jutro",
+      upcomingEvents: "Nadchodzące wydarzenia",
+      pastEvents: "Minione wydarzenia",
+      allEvents: "Wszystkie wydarzenia",
+      day: "Dzień",
+      week: "Tydzień",
+      month: "Miesiąc",
+      list: "Lista",
+      from: "od",
+      to: "do",
+      at: "o",
+      duration: "Czas trwania",
+      hours: "godzin",
+      days: "dni",
+      edit: "Edytuj",
+      delete: "Usuń",
+      viewDetails: "Zobacz szczegóły",
+      hideDetails: "Ukryj szczegóły",
+      events: "wydarzeń",
+    },
+
+    voting: {
+      voting: "Głosowania",
+      createPoll: "Utwórz głosowanie",
+      pollTitle: "Tytuł głosowania",
+      description: "Opis",
+      optional: "opcjonalnie",
+      pollType: "Typ głosowania",
+      singleChoice: "Pojedynczy wybór",
+      multipleChoice: "Wielokrotny wybór",
+      options: "Opcje",
+      addOption: "Dodaj opcję",
+      option: "Opcja",
+      deadline: "Termin zakończenia",
+      allowNewOptions: "Pozwól użytkownikom dodawać nowe opcje",
+      anonymousVoting: "Anonimowe głosowanie",
+      cancel: "Anuluj",
+      create: "Utwórz",
+      creating: "Tworzenie...",
+      noPolls: "Brak głosowań",
+      addFirstPoll: "Utwórz pierwsze głosowanie klikając przycisk powyżej",
+      active: "Aktywne",
+      closed: "Zakończone",
+      votes: "głosów",
+      vote: "głos",
+      voted: "Zagłosowano",
+      notVoted: "Nie zagłosowano",
+      closePoll: "Zamknij głosowanie",
+      reopenPoll: "Otwórz ponownie",
+      edit: "Edytuj",
+      delete: "Usuń",
+      viewResults: "Zobacz wyniki",
+      hideResults: "Ukryj wyniki",
+      yourVote: "Twój głos",
+      changeVote: "Zmień głos",
+      submitVote: "Oddaj głos",
+      votedBy: "Zagłosowali:",
+      noVotes: "Brak głosów",
+      closesIn: "Zamknięcie za",
+      closedOn: "Zamknięto",
+      multipleChoiceInfo: "Możesz wybrać wiele opcji",
+      singleChoiceInfo: "Możesz wybrać tylko jedną opcję",
+      polls: "głosowań",
+    },
+    dashboard: {
+      title: "Podróż",
+      subtitle: "Wybierz moduł, aby zarządzać swoją podróżą",
+      modules: {
+        voting: { name: "Głosowanie", description: "Podejmujcie decyzje wspólnie" },
+        costs: { name: "Koszty", description: "Rozliczajcie wspólne wydatki" },
+        schedule: { name: "Harmonogram", description: "Planujcie trasę i atrakcje" },
+        checklist: { name: "Lista kontrolna", description: "Co zabrać i co zrobić" },
+      },
+    },
   },
 
   en: {
@@ -470,6 +866,202 @@ export const dict: Record<Lang, Translations> = {
         terms: {
           required: "You must accept the terms",
         },
+      },
+    },
+    costs: {
+      myBalance: "My Balance",
+      balance: "Balance",
+      allSettled: "All Settled!",
+      noOutstandingPayments: "You have no outstanding payments",
+      settlementsWithPeople: "Settlements with People",
+      theyOweMe: "They Owe Me",
+      iOweThem: "I Owe Them",
+      pln: "PLN",
+      expense: "expense",
+      expenses: "expenses",
+      myShare: "My share:",
+      iPaid: "I paid:",
+      totalAmount: "Total amount:",
+      owesMe: "owes me",
+      iOwe: "I owe",
+      markAsSettled: "Mark as settled",
+      markAsPaid: "Mark as paid",
+      markAsReceived: "Mark as received",
+      settlementTitle: "Mark as Settled",
+      amountToSettle: "Amount to Settle (PLN)",
+      canSettlePartial: "You can settle all or part of the amount for this expense",
+      half: "Half",
+      full: "Full",
+      cancel: "Cancel",
+      saving: "Saving...",
+      settleInfo: "A settlement expense will be created that automatically balances the amount.",
+      makeSureYouPaid: "Make sure you have actually transferred the money.",
+      makeSureYouReceived: "Make sure you have actually received the money.",
+      youAreGivingMoneyTo: "You are giving money to:",
+      youAreReceivingMoneyFrom: "You are receiving money from:",
+      youOweForThisExpense: "You owe for this expense:",
+      theyOweForThisExpense: "They owe you for this expense:",
+      balanceGraph: "Balance Graph",
+      optimizedSettlements: "Optimized Settlements",
+      totalExpenses: "Total Expenses",
+      noSettlementsNeeded: "No settlements needed",
+      pays: "pays",
+      addExpense: "Add Expense",
+      createExpense: "Create Expense",
+      expenseTitle: "Expense Title",
+      amount: "Amount (PLN)",
+      whoPaid: "Who Paid?",
+      selectPerson: "Select person...",
+      date: "Date",
+      splitBetween: "Split Between",
+      allParticipants: "All Participants",
+      specificPeople: "Specific People",
+      creating: "Creating...",
+      create: "Create",
+      noExpenses: "No Expenses",
+      addFirstExpense: "Add your first expense by clicking the button above",
+      paidBy: "Paid by:",
+      splitAmong: "Split among",
+      people: "people",
+    },
+
+    checklist: {
+      checklist: "Checklist",
+      addItem: "Add Item",
+      createItem: "Create Item",
+      itemTitle: "Item Title",
+      description: "Description",
+      optional: "optional",
+      assignTo: "Assign To",
+      selectPerson: "Select person...",
+      dueDate: "Due Date",
+      priority: "Priority",
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+      category: "Category",
+      general: "General",
+      packing: "Packing",
+      booking: "Booking",
+      documents: "Documents",
+      other: "Other",
+      cancel: "Cancel",
+      create: "Create",
+      creating: "Creating...",
+      noItems: "No Items",
+      addFirstItem: "Add your first item by clicking the button above",
+      completed: "Completed",
+      pending: "Pending",
+      assignedTo: "Assigned to:",
+      unassigned: "Unassigned",
+      due: "Due:",
+      overdue: "Overdue",
+      markAsComplete: "Mark as Complete",
+      markAsIncomplete: "Mark as Incomplete",
+      delete: "Delete",
+      edit: "Edit",
+      filterBy: "Filter by",
+      all: "All",
+      myTasks: "My Tasks",
+      sortBy: "Sort by",
+      status: "Status",
+      tasks: "tasks",
+    },
+
+    schedule: {
+      schedule: "Schedule",
+      addEvent: "Add Event",
+      createEvent: "Create Event",
+      eventTitle: "Event Title",
+      description: "Description",
+      optional: "optional",
+      startDate: "Start Date",
+      endDate: "End Date",
+      location: "Location",
+      category: "Category",
+      transport: "Transport",
+      accommodation: "Accommodation",
+      activity: "Activity",
+      meal: "Meal",
+      other: "Other",
+      cancel: "Cancel",
+      create: "Create",
+      creating: "Creating...",
+      noEvents: "No Events",
+      addFirstEvent: "Add your first event by clicking the button above",
+      today: "Today",
+      tomorrow: "Tomorrow",
+      upcomingEvents: "Upcoming Events",
+      pastEvents: "Past Events",
+      allEvents: "All Events",
+      day: "Day",
+      week: "Week",
+      month: "Month",
+      list: "List",
+      from: "from",
+      to: "to",
+      at: "at",
+      duration: "Duration",
+      hours: "hours",
+      days: "days",
+      edit: "Edit",
+      delete: "Delete",
+      viewDetails: "View Details",
+      hideDetails: "Hide Details",
+      events: "events",
+    },
+
+    voting: {
+      voting: "Voting",
+      createPoll: "Create Poll",
+      pollTitle: "Poll Title",
+      description: "Description",
+      optional: "optional",
+      pollType: "Poll Type",
+      singleChoice: "Single Choice",
+      multipleChoice: "Multiple Choice",
+      options: "Options",
+      addOption: "Add Option",
+      option: "Option",
+      deadline: "Deadline",
+      allowNewOptions: "Allow users to add new options",
+      anonymousVoting: "Anonymous Voting",
+      cancel: "Cancel",
+      create: "Create",
+      creating: "Creating...",
+      noPolls: "No Polls",
+      addFirstPoll: "Create your first poll by clicking the button above",
+      active: "Active",
+      closed: "Closed",
+      votes: "votes",
+      vote: "vote",
+      voted: "Voted",
+      notVoted: "Not Voted",
+      closePoll: "Close Poll",
+      reopenPoll: "Reopen",
+      edit: "Edit",
+      delete: "Delete",
+      viewResults: "View Results",
+      hideResults: "Hide Results",
+      yourVote: "Your Vote",
+      changeVote: "Change Vote",
+      submitVote: "Submit Vote",
+      votedBy: "Voted by:",
+      noVotes: "No Votes",
+      closesIn: "Closes in",
+      closedOn: "Closed on",
+      multipleChoiceInfo: "You can select multiple options",
+      singleChoiceInfo: "You can select only one option",
+      polls: "polls",
+    },
+    dashboard: {
+      title: "Trip",
+      subtitle: "Choose a module to manage your trip",
+      modules: {
+        voting: { name: "Voting", description: "Make decisions together" },
+        costs: { name: "Costs", description: "Split shared expenses" },
+        schedule: { name: "Schedule", description: "Plan route and attractions" },
+        checklist: { name: "Checklist", description: "What to pack and do" },
       },
     },
   },
