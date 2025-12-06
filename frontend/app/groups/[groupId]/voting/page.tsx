@@ -11,6 +11,7 @@ import VotingList from "./components/VotingList";
 import CreateVotingDialog from "./components/CreateVotingDialog";
 import VotingDetailsDialog from "./components/VotingDetailsDialog";
 import Navbar from "@/app/components/Navbar";
+// import * as api from "@/lib/api"; // <- do dodania później
 import type { Voting, VotingFormData } from "./types";
 
 export default function GroupVotingPage() {
