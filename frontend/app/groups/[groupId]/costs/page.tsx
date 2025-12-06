@@ -372,7 +372,6 @@ export default function CostsPage() {
 
                         {/* Right Column - Balance Summary (1/3 width) */}
                         <div className="lg:col-span-1">
-                            {/* ZAMIEŃ BalanceSummary na PersonalBalance */}
                             <PersonalBalance 
                                 myBalance={myBalance} 
                                 loading={loading} 
