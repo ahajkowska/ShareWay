@@ -11,20 +11,6 @@ export interface ExpenseDto {
   createdAt: string | Date;
 }
 
-export interface CreateExpenseDto {
-  amount: number;
-  description?: string;
-  debtorIds: string[]; // subset of active participants
-  splitMethod?: "equal" | "custom";
-  metadata?: Record<string, any>;
-}
-
-export interface SettlementEdge {
-  fromUserId: string; // pays
-  toUserId: string;   // receives
-  amount: number;     // amount in baseCurrency
-}
-
 export interface BalanceGraphDto {
   settlements: Settlement[];
   totalExpenses?: number;
@@ -36,11 +22,35 @@ export interface Settlement {
   amount: number;
 }
 
-export interface CreateExpensePayload {
+export interface CreateExpenseDto {
   title: string;
   description?: string;
   amount: number;
   paidBy: string; // User ID
   splitBetween: string[]; // Array User IDs
   date?: string;
+}
+
+export interface ExpenseBreakdown {
+    expenseId: string;
+    expenseTitle: string;
+    totalAmount: number;
+    myShare: number;
+    iPaid: number;
+    balance: number;
+}
+
+export interface PersonalBalanceDto {
+    userId: string;
+    userName: string;
+    balance: number;
+    expenses: ExpenseBreakdown[];
+}
+
+export interface MyBalanceSummaryDto {
+    myUserId: string;
+    myUserName: string;
+    balances: PersonalBalanceDto[];
+    totalIOweThem: number;
+    totalTheyOweMe: number;
 }

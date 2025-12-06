@@ -265,3 +265,55 @@ export async function fetchBalanceGraph(tripId: string): Promise<BalanceGraphDto
         method: "GET",
     });
 }
+
+// ============================================
+// PLAN API (Days + Activities)
+// ============================================
+
+/**
+ * Fetch plan (days + activities) for a trip
+ */
+export async function fetchPlan(tripId: string) {
+    return fetchAuth(apiUrl(`/trips/${tripId}/plan`), {
+        method: "GET",
+    });
+}
+
+/**
+ * Create a new day
+ */
+export async function createDay(tripId: string, payload: { date: string }) {
+    return fetchAuth(apiUrl(`/trips/${tripId}/days`), {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+/**
+ * Create a new activity
+ */
+export async function createActivity(dayId: string, payload: any) {
+    return fetchAuth(apiUrl(`/days/${dayId}/activities`), {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+}
+
+/**
+ * Update an activity
+ */
+export async function updateActivity(activityId: string, payload: any) {
+    return fetchAuth(apiUrl(`/activities/${activityId}`), {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+    });
+}
+
+/**
+ * Delete an activity
+ */
+export async function deleteActivity(activityId: string) {
+    return fetchAuth(apiUrl(`/activities/${activityId}`), {
+        method: "DELETE",
+    });
+}
