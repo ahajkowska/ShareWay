@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { RefreshCw, TrendingDown, TrendingUp, User, DollarSign } from "lucide-react";
+import { RefreshCw, User, DollarSign } from "lucide-react";
 import { useState } from "react";
 import type { MyBalanceSummaryDto, ExpenseBreakdown } from "../types";
 import SettleBalanceDialog from "./SettleBalanceDialog";
@@ -57,8 +57,6 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
         );
     }
 
-    const iOwe = myBalance.balances.filter(b => b.balance < 0);
-    const theyOweMe = myBalance.balances.filter(b => b.balance > 0);
     const netBalance = myBalance.totalTheyOweMe - myBalance.totalIOweThem;
     const isSettled = netBalance === 0;
 
@@ -93,7 +91,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                                 <DollarSign className="w-8 h-8 text-green-600 dark:text-green-400" />
                             </div>
                             <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                                Wszystko rozliczone!
+                                ✅ Wszystko rozliczone!
                             </p>
                             <p className="text-sm text-muted-foreground mt-1">
                                 Nie masz żadnych zaległych płatności
@@ -101,35 +99,15 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                         </div>
                     )}
 
-                    {/* People I Owe */}
-                    {iOwe.length > 0 && (
+                    {/* Wszystkie osoby - jedna lista */}
+                    {myBalance.balances.length > 0 && (
                         <div>
-                            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-destructive">
-                                <TrendingDown className="w-4 h-4" />
-                                Komu jestem winien/winna ({iOwe.length})
+                            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                                <User className="w-4 h-4" />
+                                Rozliczenia z osobami ({myBalance.balances.length})
                             </h4>
                             <div className="space-y-2">
-                                {iOwe.map((person) => (
-                                    <PersonBalanceItem 
-                                        key={person.userId} 
-                                        person={person}
-                                        tripId={tripId}
-                                        onSettleExpense={(exp, name) => handleSettleExpense(exp, name, person.userId, tripId)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* People Who Owe Me */}
-                    {theyOweMe.length > 0 && (
-                        <div>
-                            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-green-600 dark:text-green-400">
-                                <TrendingUp className="w-4 h-4" />
-                                Kto mi jest winien ({theyOweMe.length})
-                            </h4>
-                            <div className="space-y-2">
-                                {theyOweMe.map((person) => (
+                                {myBalance.balances.map((person) => (
                                     <PersonBalanceItem 
                                         key={person.userId} 
                                         person={person}
