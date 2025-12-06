@@ -28,9 +28,9 @@ export default function VotingCard({
 }: VotingCardProps) {
   const { lang } = useI18n();
   const t = getVotingTranslations(lang);
-  const totalVotes = voting.options.reduce((sum, opt) => sum + opt.votes.length, 0);
-  const uniqueVoters = new Set(voting.options.flatMap(opt => opt.votes.map(v => v.userId)));
-  const sortedOptions = [...voting.options].sort((a, b) => b.votes.length - a.votes.length);
+  const totalVotes = voting.options.reduce((sum, opt) => sum + opt.votes, 0);
+  const uniqueVoters = new Set(voting.options.flatMap(opt => opt.voters));
+  const sortedOptions = [...voting.options].sort((a, b) => b.votes - a.votes);
   const topOption = sortedOptions[0];
 
   return (
@@ -83,17 +83,17 @@ export default function VotingCard({
           </div>
 
           {/* Top opcja */}
-          {topOption && topOption.votes.length > 0 && (
+          {topOption && topOption.votes > 0 && (
             <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
               <p className="text-xs text-muted-foreground mb-1">{t.leading}:</p>
               <p className="font-semibold">{topOption.text}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Progress 
-                  value={totalVotes > 0 ? (topOption.votes.length / totalVotes) * 100 : 0} 
+                  value={totalVotes > 0 ? (topOption.votes / totalVotes) * 100 : 0} 
                   className="flex-1"
                 />
                 <span className="text-xs font-medium">
-                  {topOption.votes.length}
+                  {topOption.votes}
                 </span>
               </div>
             </div>

@@ -37,10 +37,10 @@ export default function VotingDetailsDialog({
 
   if (!voting || !open) return null;
 
-  const totalVotes = voting.options.reduce((sum, opt) => sum + opt.votes.length, 0);
-  const uniqueVoters = new Set(voting.options.flatMap(opt => opt.votes.map(v => v.userId)));
+  const totalVotes = voting.options.reduce((sum, opt) => sum + opt.votes, 0);
+  const uniqueVoters = new Set(voting.options.flatMap(opt => opt.voters));
   
-  const sortedOptions = [...voting.options].sort((a, b) => b.votes.length - a.votes.length);
+  const sortedOptions = [...voting.options].sort((a, b) => b.votes - a.votes);
   const mostPopular = sortedOptions[0];
 
   const handleAddOption = async (e: React.FormEvent) => {
@@ -137,7 +137,7 @@ export default function VotingDetailsDialog({
                   </CardHeader>
                   <CardContent>
                     <p className="text-lg font-semibold text-green-600">
-                      {voting.isActive ? t.active : t.closed}
+                      {voting.status === "open" ? t.active : t.closed}
                     </p>
                     {voting.endsAt && (
                       <p className="text-xs text-muted-foreground">
@@ -149,7 +149,7 @@ export default function VotingDetailsDialog({
               </div>
 
               {/* Najlepsze wyniki */}
-              {mostPopular && mostPopular.votes.length > 0 && (
+              {mostPopular && mostPopular.votes > 0 && (
                 <Card className="border-primary/50 bg-primary/5">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -162,8 +162,8 @@ export default function VotingDetailsDialog({
                       <p className="text-sm text-muted-foreground">{mostPopular.description}</p>
                     )}
                     <p className="text-sm mt-2">
-                      <strong>{mostPopular.votes.length}</strong> {t.votes}
-                      ({totalVotes > 0 ? ((mostPopular.votes.length / totalVotes) * 100).toFixed(0) : 0}%)
+                      <strong>{mostPopular.votes}</strong> {t.votes}
+                      ({totalVotes > 0 ? ((mostPopular.votes / totalVotes) * 100).toFixed(0) : 0}%)
                     </p>
                   </CardContent>
                 </Card>
@@ -239,7 +239,7 @@ export default function VotingDetailsDialog({
 
                   {/* Lista opcji */}
                   {sortedOptions.map((option, index) => {
-                    const percentage = totalVotes > 0 ? (option.votes.length / totalVotes) * 100 : 0;
+                    const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
                     
                     return (
                       <div key={option.id} className="space-y-2 p-4 border rounded-lg hover:bg-muted/30 transition-colors">
@@ -259,7 +259,7 @@ export default function VotingDetailsDialog({
                           </div>
                           <div className="text-right flex flex-col items-end gap-2">
                             <div>
-                              <p className="text-lg font-bold">{option.votes.length}</p>
+                              <p className="text-lg font-bold">{option.votes}</p>
                               <p className="text-xs text-muted-foreground">{percentage.toFixed(1)}%</p>
                             </div>
                             <Button
@@ -273,15 +273,15 @@ export default function VotingDetailsDialog({
                         <Progress value={percentage} className="h-3" />
                         
                         {/* Lista głosujących */}
-                        {option.votes.length > 0 && (
+                        {option.voters.length > 0 && (
                           <details className="text-sm">
                             <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                              {t.whoVoted} ({option.votes.length})
+                              {t.whoVoted} ({option.voters.length})
                             </summary>
                             <ul className="mt-2 space-y-1 pl-4">
-                              {option.votes.map((vote) => (
-                                <li key={vote.id} className="text-xs">
-                                  • {vote.userName} - {new Date(vote.votedAt).toLocaleDateString(t.locale)}
+                              {option.voters.map((voterId, idx) => (
+                                <li key={`${option.id}-${idx}`} className="text-xs">
+                                  • {voterId}
                                 </li>
                               ))}
                             </ul>
