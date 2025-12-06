@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { Clock, MapPin, Edit, Trash2, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getScheduleTranslations } from "../translations";
 import { cn } from "@/lib/utils";
 import type { ActivityDto } from "../types";
 import EditActivityDialog from "./EditActivityDialog";
@@ -15,6 +17,8 @@ interface Props {
 }
 
 export default function ActivityTimeline({ activities, onRefresh }: Props) {
+    const { lang } = useI18n();
+    const t = getScheduleTranslations(lang);
     const [editingActivity, setEditingActivity] = useState<ActivityDto | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -24,7 +28,7 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
     );
 
     const handleDelete = async (activityId: string) => {
-        if (!confirm("Na pewno chcesz usunąć tę aktywność?")) return;
+        if (!confirm(t.deleteActivityConfirm)) return;
         
         try {
             setDeleting(activityId);
@@ -32,7 +36,7 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
             onRefresh();
         } catch (err: any) {
             console.error("Error deleting activity:", err);
-            alert(err.message || "Błąd podczas usuwania aktywności");
+            alert(err.message || t.deleteActivityError);
         } finally {
             setDeleting(null);
         }
@@ -42,7 +46,7 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
         return (
             <div className="text-center py-8 text-muted-foreground">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">Brak zaplanowanych aktywności</p>
+                <p className="text-sm">{t.noActivitiesPlanned}</p>
             </div>
         );
     }
@@ -102,7 +106,7 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                                 {activity.createdBy && (
                                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                                         <User className="w-3.5 h-3.5" />
-                                        <span>Dodane przez: {activity.createdBy}</span>
+                                        <span>{t.addedBy}: {activity.createdBy}</span>
                                     </div>
                                 )}
 
@@ -115,7 +119,7 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                                         className="h-8 text-xs"
                                     >
                                         <Edit className="w-3 h-3 mr-1" />
-                                        Edytuj
+                                        {t.edit}
                                     </Button>
                                     <Button
                                         variant="ghost"
@@ -125,7 +129,7 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                                         className="h-8 text-xs text-destructive hover:text-destructive"
                                     >
                                         <Trash2 className="w-3 h-3 mr-1" />
-                                        {deleting === activity.id ? "Usuwanie..." : "Usuń"}
+                                        {deleting === activity.id ? t.deleting : t.delete}
                                     </Button>
                                 </div>
                             </div>
