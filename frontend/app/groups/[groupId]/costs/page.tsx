@@ -6,12 +6,12 @@ import { motion } from "framer-motion";
 import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Plus, AlertCircle } from "lucide-react";
+import { Plus, Wallet, TrendingUp } from "lucide-react";
 import * as api from "@/lib/api";
-import type { ExpenseDto, BalanceGraphDto } from "./types";
 import ExpenseList from "./components/ExpenseList";
 import CreateExpenseDialog from "./components/CreateExpenseDialog";
-import BalanceSummary from "./components/BalanceSummary";
+import PersonalBalance from "./components/PersonalBalance";
+import type { ExpenseDto, BalanceGraphDto, MyBalanceSummaryDto } from "./types";
 
 export default function CostsPage() {
     const params = useParams();
@@ -20,76 +20,323 @@ export default function CostsPage() {
     const [expenses, setExpenses] = useState<ExpenseDto[]>([]);
     const [balance, setBalance] = useState<BalanceGraphDto | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [createOpen, setCreateOpen] = useState(false);
+    const [createExpenseOpen, setCreateExpenseOpen] = useState(false);
+    const [myBalance, setMyBalance] = useState<MyBalanceSummaryDto | null>(null);
 
-    const loadAll = async () => {
+    const loadExpenses = async () => {
         try {
             setLoading(true);
-            setError(null);
             
-            const [expensesData, balanceData] = await Promise.all([
-                api.fetchExpenses(tripId),
-                api.fetchBalanceGraph(tripId)
-            ]);
+            // MOCK DATA - usuń gdy backend będzie gotowy
+            await new Promise(resolve => setTimeout(resolve, 500));
             
-            setExpenses(Array.isArray(expensesData) ? expensesData : []);
-            setBalance(balanceData ?? null);
+            const mockExpenses: ExpenseDto[] = [
+                {
+                    id: "exp-1",
+                    tripId: tripId,
+                    title: "Zakwaterowanie - Hotel Aurora",
+                    description: "3 noce, pokoje 2-osobowe",
+                    amount: 1200.00,
+                    paidBy: "user-1",
+                    paidByName: "Jan Kowalski",
+                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
+                    date: "2024-12-15T14:00:00",
+                    createdAt: "2024-12-15T14:00:00",
+                },
+                {
+                    id: "exp-2",
+                    tripId: tripId,
+                    title: "Bilety autokarowe",
+                    description: "Warszawa → Zakopane → Warszawa",
+                    amount: 480.00,
+                    paidBy: "user-2",
+                    paidByName: "Anna Nowak",
+                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
+                    date: "2024-12-15T08:00:00",
+                    createdAt: "2024-12-15T08:00:00",
+                },
+                {
+                    id: "exp-3",
+                    tripId: tripId,
+                    title: "Obiad - Restauracja Góralska",
+                    description: "Tradycyjna kuchnia podhalańska",
+                    amount: 280.00,
+                    paidBy: "user-3",
+                    paidByName: "Piotr Wiśniewski",
+                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
+                    date: "2024-12-15T18:00:00",
+                    createdAt: "2024-12-15T18:00:00",
+                },
+                {
+                    id: "exp-4",
+                    tripId: tripId,
+                    title: "Bilety na Gubałówkę",
+                    description: "Kolejka linowa - 4 osoby",
+                    amount: 120.00,
+                    paidBy: "user-4",
+                    paidByName: "Maria Zielińska",
+                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
+                    date: "2024-12-16T10:00:00",
+                    createdAt: "2024-12-16T10:00:00",
+                },
+                {
+                    id: "exp-5",
+                    tripId: tripId,
+                    title: "Zakupy na ognisko",
+                    description: "Kiełbaski, chleb, napoje",
+                    amount: 85.00,
+                    paidBy: "user-1",
+                    paidByName: "Jan Kowalski",
+                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
+                    date: "2024-12-16T17:00:00",
+                    createdAt: "2024-12-16T17:00:00",
+                },
+                {
+                    id: "exp-6",
+                    tripId: tripId,
+                    title: "Śniadania w hotelu",
+                    description: "Bufet szwedzki - 3 dni",
+                    amount: 360.00,
+                    paidBy: "user-2",
+                    paidByName: "Anna Nowak",
+                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
+                    date: "2024-12-15T14:30:00",
+                    createdAt: "2024-12-15T14:30:00",
+                },
+            ];
+            
+            setExpenses(mockExpenses);
+            
+            // PRAWDZIWE API - odkomentuj gdy backend działa
+            // const data = await api.fetchExpenses(tripId);
+            // setExpenses(data);
         } catch (err: any) {
-            console.error("Error loading costs data:", err);
-            setError(err.message || "Nie udało się załadować danych");
-            setExpenses([]);
-            setBalance(null);
+            console.error("Error loading expenses:", err);
+            alert(err.message || "Nie udało się załadować wydatków");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        if (tripId) {
-            loadAll();
-        }
-    }, [tripId]);
-
-    const handleCreate = async (payload: any) => {
+    const loadBalance = async () => {
         try {
-            await api.createExpense(tripId, payload);
-            setCreateOpen(false);
-            await loadAll(); // Odśwież dane po dodaniu
+            // MOCK DATA
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const mockBalance: BalanceGraphDto = {
+                settlements: [
+                    {
+                        from: "Jan Kowalski",
+                        to: "Anna Nowak",
+                        amount: 45.00,
+                    },
+                    {
+                        from: "Piotr Wiśniewski",
+                        to: "Anna Nowak",
+                        amount: 135.00,
+                    },
+                    {
+                        from: "Maria Zielińska",
+                        to: "Jan Kowalski",
+                        amount: 281.25,
+                    },
+                ],
+                totalExpenses: 2525.00,
+            };
+            
+            setBalance(mockBalance);
+            
+            // PRAWDZIWE API - odkomentuj gdy backend działa
+            // const data = await api.fetchBalanceGraph(tripId);
+            // setBalance(data);
         } catch (err: any) {
-            console.error("Error creating expense:", err);
-            alert(err.message || "Błąd podczas dodawania wydatku");
+            console.error("Error loading balance:", err);
         }
     };
 
-    const handleDelete = async (expenseId: string) => {
+    const loadMyBalance = async () => {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const mockMyBalance: MyBalanceSummaryDto = {
+                myUserId: "user-1",
+                myUserName: "Jan Kowalski",
+                balances: [
+                    {
+                        userId: "user-2",
+                        userName: "Anna Nowak",
+                        balance: 135.00, // Anna mi jest winna łącznie
+                        expenses: [
+                            {
+                                expenseId: "exp-2",
+                                expenseTitle: "Bilety autokarowe",
+                                totalAmount: 480.00,
+                                myShare: 120.00, // ja powinienem zapłacić
+                                iPaid: 0.00, // ja zapłaciłem
+                                balance: -120.00, // jestem winien Annie 120 (ona zapłaciła, ja nie)
+                            },
+                            {
+                                expenseId: "exp-6",
+                                expenseTitle: "Śniadania w hotelu",
+                                totalAmount: 360.00,
+                                myShare: 90.00,
+                                iPaid: 0.00,
+                                balance: -90.00, // jestem winien Annie 90
+                            },
+                            {
+                                expenseId: "exp-1",
+                                expenseTitle: "Zakwaterowanie - Hotel Aurora",
+                                totalAmount: 1200.00,
+                                myShare: 300.00, // mój udział
+                                iPaid: 1200.00, // ja zapłaciłem za wszystkich
+                                balance: 300.00, // Anna mi jest winna swoje 300 (jej udział)
+                            },
+                            {
+                                expenseId: "exp-5",
+                                expenseTitle: "Zakupy na ognisko",
+                                totalAmount: 85.00,
+                                myShare: 21.25,
+                                iPaid: 85.00,
+                                balance: 21.25, // Anna mi jest winna swoje 21.25
+                            },
+                        ],
+                    },
+                    {
+                        userId: "user-3",
+                        userName: "Piotr Wiśniewski",
+                        balance: 230.00, // Piotr mi jest winien łącznie
+                        expenses: [
+                            {
+                                expenseId: "exp-3",
+                                expenseTitle: "Obiad - Restauracja Góralska",
+                                totalAmount: 280.00,
+                                myShare: 70.00,
+                                iPaid: 0.00,
+                                balance: -70.00, // jestem winien Piotrowi 70 (on zapłacił)
+                            },
+                            {
+                                expenseId: "exp-1",
+                                expenseTitle: "Zakwaterowanie - Hotel Aurora",
+                                totalAmount: 1200.00,
+                                myShare: 300.00,
+                                iPaid: 1200.00,
+                                balance: 300.00, // Piotr mi jest winien swoje 300
+                            },
+                            {
+                                expenseId: "exp-5",
+                                expenseTitle: "Zakupy na ognisko",
+                                totalAmount: 85.00,
+                                myShare: 21.25,
+                                iPaid: 85.00,
+                                balance: 21.25, // Piotr mi jest winien swoje 21.25 (ale to już jest ujęte w exp-5 dla Anny)
+                            },
+                        ],
+                    },
+                    {
+                        userId: "user-4",
+                        userName: "Maria Zielińska",
+                        balance: 291.25, // Maria mi jest winna łącznie
+                        expenses: [
+                            {
+                                expenseId: "exp-4",
+                                expenseTitle: "Bilety na Gubałówkę",
+                                totalAmount: 120.00,
+                                myShare: 30.00,
+                                iPaid: 0.00,
+                                balance: -30.00, // jestem winien Marii 30 (ona zapłaciła)
+                            },
+                            {
+                                expenseId: "exp-1",
+                                expenseTitle: "Zakwaterowanie - Hotel Aurora",
+                                totalAmount: 1200.00,
+                                myShare: 300.00,
+                                iPaid: 1200.00,
+                                balance: 300.00, // Maria mi jest winna swoje 300
+                            },
+                            {
+                                expenseId: "exp-5",
+                                expenseTitle: "Zakupy na ognisko",
+                                totalAmount: 85.00,
+                                myShare: 21.25,
+                                iPaid: 85.00,
+                                balance: 21.25, // Maria mi jest winna swoje 21.25
+                            },
+                        ],
+                    },
+                ],
+                totalIOweThem: 310.00, // 120 (bilety) + 90 (śniadania) + 70 (obiad) + 30 (Gubałówka) = 310
+                totalTheyOweMe: 963.75, // 300 (Anna hotel) + 21.25 (Anna ognisko) + 300 (Piotr hotel) + 21.25 (Piotr ognisko) + 300 (Maria hotel) + 21.25 (Maria ognisko) = 963.75
+            };
+            
+            setMyBalance(mockMyBalance);
+        } catch (err: any) {
+            console.error("Error loading my balance:", err);
+        }
+    };
+
+    useEffect(() => {
+        if (tripId) {
+            loadExpenses();
+            loadBalance();
+            loadMyBalance();
+        }
+    }, [tripId]);
+
+    const handleDeleteExpense = async (expenseId: string) => {
         if (!confirm("Na pewno chcesz usunąć ten wydatek?")) return;
         
         try {
-            await api.deleteExpense(expenseId);
-            await loadAll(); // Odśwież dane po usunięciu
+            // MOCK - usuń lokalnie
+            setExpenses(prev => prev.filter(exp => exp.id !== expenseId));
+            
+            // PRAWDZIWE API
+            // await api.deleteExpense(expenseId);
+            // await loadExpenses();
+            // await loadBalance();
         } catch (err: any) {
             console.error("Error deleting expense:", err);
-            alert(err.message || "Błąd podczas usuwania wydatku");
+            alert(err.message || "Nie udało się usunąć wydatku");
         }
+    };
+
+    const handleRefreshExpenses = async () => {
+        await loadExpenses();
+    };
+
+    const handleRefreshBalance = async () => {
+        await loadBalance();
+    };
+
+    const handleRefreshMyBalance = async () => {
+        await loadMyBalance();
     };
 
     return (
         <>
             <Navbar />
             <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
-                <div className="container mx-auto px-4 max-w-6xl">
+                <div className="container mx-auto px-4 max-w-7xl">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card className="mb-6">
+                        <Card className="mb-6 border-none shadow-lg bg-gradient-to-r from-primary/5 to-travel-coral/5">
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between">
-                                    <span>Podział kosztów</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-travel-coral flex items-center justify-center shadow-lg">
+                                            <Wallet className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <h1 className="text-2xl font-bold">Rozliczenia wyjazdu</h1>
+                                            <p className="text-sm text-muted-foreground mt-0.5">
+                                                Zarządzaj wydatkami i zobacz kto komu winien
+                                            </p>
+                                        </div>
+                                    </div>
                                     <Button 
-                                        onClick={() => setCreateOpen(true)} 
+                                        onClick={() => setCreateExpenseOpen(true)} 
                                         className="gap-2"
                                         disabled={loading}
                                     >
@@ -98,59 +345,39 @@ export default function CostsPage() {
                                     </Button>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground">
-                                    Dodawaj wspólne wydatki, a system automatycznie obliczy rozliczenia między uczestnikami.
-                                </p>
-                            </CardContent>
+                            {balance && balance.totalExpenses !== undefined && (
+                                <CardContent className="pt-0">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <TrendingUp className="w-4 h-4" />
+                                        <span className="text-sm">
+                                            Łączne wydatki: <span className="font-bold text-foreground">{balance.totalExpenses.toFixed(2)} PLN</span>
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            )}
                         </Card>
                     </motion.div>
 
-                    {/* Error State */}
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
-                            <Card className="mb-6 border-destructive">
-                                <CardContent className="pt-6">
-                                    <div className="flex items-center gap-3 text-destructive">
-                                        <AlertCircle className="w-5 h-5" />
-                                        <div className="flex-1">
-                                            <p className="font-medium">Wystąpił błąd</p>
-                                            <p className="text-sm">{error}</p>
-                                        </div>
-                                        <Button 
-                                            variant="outline" 
-                                            size="sm" 
-                                            onClick={loadAll}
-                                        >
-                                            Spróbuj ponownie
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    )}
-
-                    {/* Main Content */}
-                    <div className="grid lg:grid-cols-3 gap-6">
-                        {/* Expenses List (2/3 width) */}
+                    {/* Main Content - Two Columns */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left Column - Expenses List (2/3 width) */}
                         <div className="lg:col-span-2">
                             <ExpenseList 
-                                expenses={expenses} 
-                                loading={loading} 
-                                onDelete={handleDelete}
-                                onRefresh={loadAll}
+                                expenses={expenses}
+                                loading={loading}
+                                onDelete={handleDeleteExpense}
+                                onRefresh={handleRefreshExpenses}
                             />
                         </div>
 
-                        {/* Balance Summary (1/3 width) */}
-                        <div>
-                            <BalanceSummary 
-                                balance={balance} 
+                        {/* Right Column - Balance Summary (1/3 width) */}
+                        <div className="lg:col-span-1">
+                            {/* ZAMIEŃ BalanceSummary na PersonalBalance */}
+                            <PersonalBalance 
+                                myBalance={myBalance} 
                                 loading={loading} 
-                                onRefresh={loadAll} 
+                                onRefresh={handleRefreshMyBalance}
+                                tripId={tripId}
                             />
                         </div>
                     </div>
@@ -159,9 +386,13 @@ export default function CostsPage() {
 
             {/* Create Expense Dialog */}
             <CreateExpenseDialog 
-                open={createOpen} 
-                onOpenChange={setCreateOpen} 
-                onSubmit={handleCreate} 
+                open={createExpenseOpen} 
+                onOpenChange={setCreateExpenseOpen} 
+                tripId={tripId}
+                onCreated={() => {
+                    loadExpenses();
+                    loadBalance();
+                }}
             />
         </>
     );
