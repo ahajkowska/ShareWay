@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { format, isToday } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
 import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Plus, Calendar, ChevronDown, MapPinned, Sun, Cloud, Sunrise } from "lucide-react";
-import * as api from "@/lib/api";
+import { useI18n } from "@/app/context/LanguageContext";
+import { getScheduleTranslations } from "./translations";
 import type { DayDto } from "./types";
 import ActivityTimeline from "./components/ActivityTimeline";
 import CreateDayDialog from "./components/CreateDayDialog";
@@ -21,6 +22,9 @@ const dayIcons = [Sun, Cloud, Sunrise];
 export default function SchedulePage() {
     const params = useParams();
     const tripId = params.groupId as string;
+    const { lang } = useI18n();
+    const t = getScheduleTranslations(lang);
+    const dateLocale = lang === 'pl' ? pl : enUS;
     
     const [days, setDays] = useState<DayDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -35,117 +39,14 @@ export default function SchedulePage() {
             setLoading(true);
             setError(null);
             
-            // MOCK DATA
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // TODO: Replace with actual API call
+            // const data = await fetchAuth<DayDto[]>(apiUrl(`/api/trips/${tripId}/schedule`), {});
+            // setDays(data);
             
-            const mockDays: DayDto[] = [
-                {
-                    id: "day-1",
-                    tripId: tripId,
-                    date: "2024-12-15",
-                    activities: [
-                        {
-                            id: "act-1",
-                            dayId: "day-1",
-                            title: "Wyjazd z Warszawy",
-                            description: "Zbiórka na dworcu centralnym",
-                            startTime: "2024-12-15T08:00:00",
-                            endTime: "2024-12-15T08:30:00",
-                            location: "Dworzec Centralny, Warszawa",
-                            createdBy: "Jan",
-                        },
-                        {
-                            id: "act-2",
-                            dayId: "day-1",
-                            title: "Przyjazd do hotelu",
-                            description: "Zakwaterowanie i odpoczynek",
-                            startTime: "2024-12-15T14:00:00",
-                            endTime: "2024-12-15T16:00:00",
-                            location: "Hotel Aurora, Zakopane",
-                            createdBy: "Jan",
-                        },
-                        {
-                            id: "act-3",
-                            dayId: "day-1",
-                            title: "Obiad w restauracji",
-                            description: "Tradycyjna kuchnia podhalańska",
-                            startTime: "2024-12-15T18:00:00",
-                            endTime: "2024-12-15T20:00:00",
-                            location: "Restauracja Góralska, ul. Krupówki 15",
-                            createdBy: "Jan",
-                        },
-                    ],
-                },
-                {
-                    id: "day-2",
-                    tripId: tripId,
-                    date: "2024-12-16",
-                    activities: [
-                        {
-                            id: "act-4",
-                            dayId: "day-2",
-                            title: "Śniadanie w hotelu",
-                            description: "Bufet szwedzki",
-                            startTime: "2024-12-16T08:00:00",
-                            endTime: "2024-12-16T09:00:00",
-                            location: "Hotel Aurora - restauracja",
-                            createdBy: "Jan",
-                        },
-                        {
-                            id: "act-5",
-                            dayId: "day-2",
-                            title: "Wycieczka na Gubałówkę",
-                            description: "Kolejka linowa + spacer po szczycie",
-                            startTime: "2024-12-16T10:00:00",
-                            endTime: "2024-12-16T14:00:00",
-                            location: "Gubałówka",
-                            createdBy: "Jan",
-                        },
-                        {
-                            id: "act-6",
-                            dayId: "day-2",
-                            title: "Wieczór przy ognisku",
-                            description: "Pieczenie kiełbasek, gitara",
-                            startTime: "2024-12-16T19:00:00",
-                            endTime: "2024-12-16T22:00:00",
-                            location: "Ognisko przy hotelu",
-                            createdBy: "Jan",
-                        },
-                    ],
-                },
-                {
-                    id: "day-3",
-                    tripId: tripId,
-                    date: "2024-12-17",
-                    activities: [
-                        {
-                            id: "act-7",
-                            dayId: "day-3",
-                            title: "Checkout z hotelu",
-                            description: "Wymeldowanie, zapakowanie bagaży",
-                            startTime: "2024-12-17T10:00:00",
-                            endTime: "2024-12-17T11:00:00",
-                            location: "Hotel Aurora",
-                            createdBy: "Jan",
-                        },
-                        {
-                            id: "act-8",
-                            dayId: "day-3",
-                            title: "Powrót do Warszawy",
-                            description: "Odjazd autokarem",
-                            startTime: "2024-12-17T12:00:00",
-                            endTime: "2024-12-17T18:00:00",
-                            location: "Zakopane → Warszawa",
-                            createdBy: "Jan",
-                        },
-                    ],
-                },
-            ];
-            
-            setDays(mockDays);
+            setDays([]);
         } catch (err: any) {
             console.error("Error loading schedule:", err);
-            setError(err.message || "Nie udało się załadować harmonogramu");
+            setError(err.message || t.loadError);
             setDays([]);
         } finally {
             setLoading(false);
@@ -160,6 +61,12 @@ export default function SchedulePage() {
 
     const handleCreateDay = async (date: string) => {
         try {
+            // TODO: Replace with actual API call
+            // await fetchAuth(apiUrl(`/api/trips/${tripId}/schedule/days`), {
+            //     method: 'POST',
+            //     body: JSON.stringify({ date }),
+            // });
+            
             const newDay: DayDto = {
                 id: `day-${Date.now()}`,
                 tripId: tripId,
@@ -170,7 +77,7 @@ export default function SchedulePage() {
             setCreateDayOpen(false);
         } catch (err: any) {
             console.error("Error creating day:", err);
-            alert(err.message || "Błąd podczas dodawania dnia");
+            alert(err.message || t.createDayError);
         }
     };
 
@@ -201,11 +108,11 @@ export default function SchedulePage() {
                                             <Calendar className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h1 className="text-2xl font-bold">Harmonogram wyjazdu</h1>
+                                            <h1 className="text-2xl font-bold">{t.schedule}</h1>
                                             {days.length > 0 && (
                                                 <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-2">
                                                     <MapPinned className="w-4 h-4" />
-                                                    {days.length} {days.length === 1 ? 'dzień' : 'dni'} podróży
+                                                    {days.length} {days.length === 1 ? t.day : t.days} {t.daysOfTravel}
                                                 </p>
                                             )}
                                         </div>
@@ -216,7 +123,7 @@ export default function SchedulePage() {
                                         disabled={loading}
                                     >
                                         <Plus className="w-4 h-4" /> 
-                                        Dodaj dzień
+                                        {t.addDay}
                                     </Button>
                                 </CardTitle>
                             </CardHeader>
@@ -239,7 +146,7 @@ export default function SchedulePage() {
                                 <p className="text-destructive text-center">{error}</p>
                                 <div className="flex justify-center mt-4">
                                     <Button onClick={load} variant="outline">
-                                        Spróbuj ponownie
+                                        {t.tryAgain}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -251,13 +158,13 @@ export default function SchedulePage() {
                         <Card>
                             <CardContent className="pt-12 pb-12 text-center">
                                 <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                                <p className="text-lg font-medium mb-2">Brak zaplanowanych dni</p>
+                                <p className="text-lg font-medium mb-2">{t.noDaysPlanned}</p>
                                 <p className="text-sm text-muted-foreground mb-6">
-                                    Dodaj pierwszy dzień aby rozpocząć planowanie
+                                    {t.addFirstDay}
                                 </p>
                                 <Button onClick={() => setCreateDayOpen(true)}>
                                     <Plus className="w-4 h-4 mr-2" />
-                                    Dodaj dzień
+                                    {t.addDay}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -305,16 +212,16 @@ export default function SchedulePage() {
                                                     <div className="text-left">
                                                         <div className="flex items-center gap-2">
                                                             <h3 className="text-lg font-semibold">
-                                                                {format(date, "d MMMM yyyy", { locale: pl })}
+                                                                {format(date, "d MMMM yyyy", { locale: dateLocale })}
                                                             </h3>
                                                             {isCurrentDay && (
                                                                 <span className="px-2 py-0.5 bg-travel-coral text-white text-xs font-medium rounded-full">
-                                                                    Dziś
+                                                                    {t.today}
                                                                 </span>
                                                             )}
                                                         </div>
                                                         <p className="text-sm text-muted-foreground">
-                                                            {format(date, "EEEE", { locale: pl })} · Dzień {index + 1} · {day.activities.length} {day.activities.length === 1 ? 'aktywność' : 'aktywności'}
+                                                            {format(date, "EEEE", { locale: dateLocale })} · {t.dayNumber} {index + 1} · {day.activities.length} {day.activities.length === 1 ? t.activity : t.activities}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -346,7 +253,7 @@ export default function SchedulePage() {
                                                             className="w-full mt-4 border-dashed border-2"
                                                         >
                                                             <Plus className="w-4 h-4 mr-2" />
-                                                            Dodaj aktywność
+                                                            {t.addActivity}
                                                         </Button>
                                                     </div>
                                                 </motion.div>

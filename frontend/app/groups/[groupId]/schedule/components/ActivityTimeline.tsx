@@ -1,7 +1,6 @@
 "use client";
 
 import { format } from "date-fns";
-import { pl } from "date-fns/locale";
 import { Clock, MapPin, Edit, Trash2, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
