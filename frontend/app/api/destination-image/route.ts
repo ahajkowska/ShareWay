@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { TripAccentPreset } from "@/lib/types/trip";
 import {
   buildDestinationQueries,
+  getLocationDetails,
   learnDestination,
   normalizeToAsciiLower,
   translateToEnglishTokens,
@@ -225,15 +226,16 @@ function buildFallbackPexelsQueries(
   preset: TripAccentPreset,
   exclude: string[] = []
 ) {
-  const translated = translateToEnglishTokens(destination || "");
-  const normDest = normalizeToAsciiLower(translated || destination).trim();
-  const parts = normDest
-    .split(",")
-    .map((p) => p.trim())
-    .filter(Boolean);
-  const city = parts[0] || normDest.split(/\s+/)[0] || "";
-  const region = parts.slice(1).join(" ").trim();
-  const combined = [city, region].filter(Boolean).join(" ");
+  const location = getLocationDetails(destination);
+  const {
+    city,
+    country,
+    englishCity,
+    englishCountry,
+    combined,
+    englishCombined,
+    normalized,
+  } = location;
 
   const genericByPreset: Record<TripAccentPreset, string[]> = {
     mountains: ["mountain landscape sunrise", "alpine mountains view"],
@@ -268,29 +270,49 @@ function buildFallbackPexelsQueries(
       ? ["outdoor", "adventure"]
       : ["travel"];
 
-  const withDestination = city
+  const joinSegments = (a?: string, b?: string) =>
+    a && b ? `${a} ${b}`.trim() : "";
+
+  const withDestination = [
+    englishCombined,
+    combined,
+    joinSegments(city, country),
+    joinSegments(country, city),
+    joinSegments(englishCity, englishCountry),
+    joinSegments(englishCountry, englishCity),
+    city ? `${city} ${presetHints[0] ?? ""}`.trim() : "",
+    englishCity ? `${englishCity} ${presetHints[0] ?? ""}`.trim() : "",
+    city ? `${city} scenic view` : "",
+    englishCity ? `${englishCity} scenic view` : "",
+  ].filter(Boolean);
+
+  const withCountryHints = [
+    country ? `${country} ${presetHints[0] ?? ""}`.trim() : "",
+    englishCountry ? `${englishCountry} ${presetHints[0] ?? ""}`.trim() : "",
+    country ? `${country} scenic view` : "",
+    englishCountry ? `${englishCountry} scenic view` : "",
+  ].filter(Boolean);
+
+  const baseCombined =
+    englishCombined || combined || normalized || joinSegments(city, country);
+
+  const withCombinedHints = baseCombined
     ? [
-        `${city} ${region}`.trim(),
-        `${city} ${region} travel landscape`.trim(),
-        `${city} ${region} ${presetHints[0] ?? ""}`.trim(),
-        `${city} ${presetHints[0] ?? ""}`.trim(),
-        `${city} scenic view`,
+        `${baseCombined} ${presetHints[0] ?? ""}`.trim(),
+        `${baseCombined} ${presetHints.join(" ")}`.trim(),
+        `${baseCombined} travel`,
+        `${baseCombined} landscape`,
+        `${baseCombined} aerial view`,
       ]
     : [];
 
-  const withCombinedHints =
-    combined || region
-      ? [
-          `${combined} ${presetHints[0] ?? ""}`.trim(),
-          `${combined} ${presetHints.join(" ")}`.trim(),
-          `${combined} travel`,
-          `${combined} landscape`,
-        ]
-      : [];
+  const withSingles = [englishCity, englishCountry, city, country].filter(Boolean);
 
   const all = [
     ...withDestination,
     ...withCombinedHints,
+    ...withSingles,
+    ...withCountryHints,
     ...presetFallbacks,
     "travel destination landscape",
   ];
