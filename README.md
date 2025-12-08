@@ -1,4 +1,5 @@
 # ShareWay
+
 Aplikacja do wspólnego organizowania i planowania podróży grupowych - od wspólnego planowania, aż po przejrzysty podział kosztów.
 
 ## Funkcjonalności
@@ -7,12 +8,14 @@ Aplikacja do wspólnego organizowania i planowania podróży grupowych - od wsp�
 - **Travel** - Dołączanie do grup podróży, dzięki czemu możliwość skorzystania z kolejnych modułów aplikacji.
 
 ### Moduły
+
 - **Cost Split** - Przejrzysty podział kosztów między uczestnikami
 - **Schedule** - Wspólne planowanie harmonogramu podróży
 - **Checklist** - Lista zadań do wykonania przed i podczas wyjazdu, lista przedmiotów do zabrania
 - **Voting** - Demokratyczne głosowanie nad decyzjami grupowymi
 
 ### Cechy techniczne
+
 - Architektura mikroserwisów
 - Konteneryzacja z Docker
 - Możliwość używania różnych języków dla każdego serwisu
@@ -21,11 +24,13 @@ Aplikacja do wspólnego organizowania i planowania podróży grupowych - od wsp�
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 
 ### Backend (Mikroserwisy)
+
 - **Auth Service**: ?
 - **Cost Split**: ?
 - **Schedule**: ?
@@ -33,15 +38,17 @@ Aplikacja do wspólnego organizowania i planowania podróży grupowych - od wsp�
 - **Voting**: ?
 
 ### Infrastructure
+
 - **Containerization**: Docker + Docker Compose
 - **API Gateway**: ?
-- **Databases**: 
+- **Databases**:
   - ?
 - **Authentication**: ?
 
 ## Quick Start
 
 ### Wymagania
+
 - Docker Desktop (lub Docker + Docker Compose)
 - Node.js 20+ (dla lokalnego developmentu)
 - Git
@@ -57,23 +64,32 @@ Aplikacja do wspólnego organizowania i planowania podróży grupowych - od wsp�
 ### Zmienne środowiskowe
 
 Stwórz pliki `.env` w odpowiednich katalogach:
--
+
+- `frontend/.env.local` (na podstawie `frontend/.env.example`)
+  - `PEXELS_API_KEY` – klucz do Pexels API
+  - `EMBEDDING_RERANKER_URL` – opcjonalny endpoint serwisu do rerankingu embeddingowego (np. `http://localhost:5005/rerank` albo w docker-compose: `http://embedding-reranker:5005/rerank`)
+
+**Docker Compose**: jeśli uruchamiasz przez `docker-compose`, ustaw `PEXELS_API_KEY` w swoim środowisku lub w pliku `.env` w katalogu głównym – compose przekaże go do kontenera frontu.
+Jeżeli chcesz używać rerankingu embeddingowego, dodaj też `EMBEDDING_RERANKER_URL=http://embedding-reranker:5005/rerank`.
 
 ...
 
 ## Deployment
 
 ### Production build
+
 ```bash
 docker-compose up --build -d
 ```
 
 ### Stop wszystkich serwisów
+
 ```bash
 docker-compose down
 ```
 
 ### Czyszczenie wolumenów (UWAGA: usunie dane!)
+
 ```bash
 docker-compose down -v
 ```
