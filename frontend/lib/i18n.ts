@@ -5,8 +5,9 @@ export interface Translations {
   nav: {
     login: string;
     signup: string;
-    dashboard: string;
     logout: string;
+    profile: string;
+    settings: string;
   };
   hero: {
     kicker: string;
@@ -95,6 +96,7 @@ export interface Translations {
     toast: {
       loginSuccess: string;
       registerSuccess: string;
+      logoutSuccess: string;
     };
     validation: {
       name: { required: string; min: (n: number) => string };
@@ -111,6 +113,92 @@ export interface Translations {
       terms: { required: string };
     };
   };
+  dashboard: {
+    // title: string;
+    subtitle: string;
+    empty: {
+      title: string;
+      description: string;
+    };
+    actions: {
+      joinTrip: string;
+      newTrip: string;
+      openTrip: string;
+      copyCode: string;
+      archive: string;
+      restore: string;
+      delete: string;
+      moreActions: string;
+    };
+    filters: {
+      searchPlaceholder: string;
+      all: string;
+      active: string;
+      organizer: string;
+      participant: string;
+      moreFilters: string;
+      dateRange: string;
+      from: string;
+      to: string;
+      location: string;
+      locationPlaceholder: string;
+      participantsCount: string;
+      min: string;
+      max: string;
+      reset: string;
+      apply: string;
+    };
+    sort: {
+      label: string;
+      startDate: string;
+      name: string;
+      lastActivity: string;
+      role: string;
+    };
+    dialogs: {
+      joinTitle: string;
+      joinDescription: string;
+      joinPlaceholder: string;
+      cancel: string;
+      joinButton: string;
+      newTripTitle: string;
+      newTripDescription: string;
+      tripName: string;
+      tripNamePlaceholder: string;
+      destination: string;
+      destinationPlaceholder: string;
+      startDate: string;
+      endDate: string;
+      createButton: string;
+      archiveTitle: string;
+
+      archiveButton: string;
+      restoreTitle: string;
+      restoreDescription: string;
+      restoreButton: string;
+      deleteTitle: string;
+      deleteDescription: string;
+      deleteButton: string;
+    };
+    roles: {
+      organizer: string;
+      participant: string;
+    };
+
+    moreMembers: string;
+    toasts: {
+      codeCopied: string;
+      tripDeleted: string;
+
+      tripRestored: string;
+      invalidCode: string;
+      joinedTrip: string;
+    };
+    pagination: {
+      previous: string;
+      next: string;
+    };
+  };
 }
 
 export const dict: Record<Lang, Translations> = {
@@ -119,8 +207,9 @@ export const dict: Record<Lang, Translations> = {
     nav: {
       login: "Zaloguj się",
       signup: "Załóż konto",
-      dashboard: "Panel",
       logout: "Wyloguj",
+      profile: "Profil",
+      settings: "Ustawienia",
     },
 
     hero: {
@@ -230,6 +319,7 @@ export const dict: Record<Lang, Translations> = {
       },
       rights: "Wszystkie prawa zastrzeżone.",
     },
+
     auth: {
       login: {
         title: "Zaloguj się",
@@ -266,6 +356,7 @@ export const dict: Record<Lang, Translations> = {
       toast: {
         loginSuccess: "Zalogowano pomyślnie!",
         registerSuccess: "Konto utworzone pomyślnie!",
+        logoutSuccess: "Wylogowano pomyślnie!",
       },
       validation: {
         name: {
@@ -293,6 +384,97 @@ export const dict: Record<Lang, Translations> = {
         },
       },
     },
+
+    dashboard: {
+      // title: "Twoje podróże",
+      subtitle:
+        "Zarządzaj wspólnymi wyjazdami, zapraszaj znajomych i łatwo ogarniaj koszty.",
+      empty: {
+        title: "Nie masz jeszcze żadnych podróży",
+        description:
+          "Dołącz do istniejącej wyprawy za pomocą kodu zaproszenia albo stwórz nową podróż i zaproś znajomych.",
+      },
+      actions: {
+        joinTrip: "Dołącz do podróży",
+        newTrip: "Nowa podróż",
+        openTrip: "Otwórz podróż",
+        copyCode: "Kopiuj kod zaproszenia",
+        archive: "Archiwizuj podróż",
+        restore: "Przywróć podróż",
+        delete: "Usuń podróż",
+        moreActions: "Więcej akcji",
+      },
+      filters: {
+        searchPlaceholder: "Szukaj po nazwie lub miejscu…",
+        all: "Wszystkie",
+        active: "Aktywne",
+
+        organizer: "Jestem organizatorem",
+        participant: "Jestem uczestnikiem",
+        moreFilters: "Więcej filtrów",
+        dateRange: "Zakres dat",
+        from: "Od",
+        to: "Do",
+        location: "Miejsce docelowe",
+        locationPlaceholder: "np. Chorwacja",
+        participantsCount: "Liczba uczestników",
+        min: "Min.",
+        max: "Maks.",
+        reset: "Wyczyść filtry",
+        apply: "Zastosuj",
+      },
+      sort: {
+        label: "Sortowanie",
+        startDate: "Data rozpoczęcia",
+        name: "Nazwa",
+        lastActivity: "Ostatnia aktywność",
+        role: "Rola",
+      },
+      dialogs: {
+        joinTitle: "Dołącz do podróży",
+        joinDescription:
+          "Wpisz kod zaproszenia, który otrzymałeś od organizatora wyprawy.",
+        joinPlaceholder: "Wpisz kod zaproszenia (np. TRIP-2025-ABC)",
+        cancel: "Anuluj",
+        joinButton: "Dołącz",
+        newTripTitle: "Nowa podróż",
+        newTripDescription:
+          "Utwórz nową wyprawę, ustal miejsce, daty i zaproś znajomych.",
+        tripName: "Nazwa podróży",
+        tripNamePlaceholder: "np. Majówka w Chorwacji",
+        destination: "Miejsce docelowe",
+        destinationPlaceholder: "np. Split, Chorwacja",
+        startDate: "Data rozpoczęcia",
+        endDate: "Data zakończenia",
+        createButton: "Utwórz podróż",
+        archiveTitle: "Zarchiwizować tę podróż?",
+        archiveButton: "Archiwizuj",
+        restoreTitle: "Przywrócić tę podróż?",
+        restoreDescription: "Podróż zostanie ponownie oznaczona jako aktywna.",
+        restoreButton: "Przywróć",
+        deleteTitle: "Usunąć tę podróż?",
+        deleteDescription:
+          "Tej operacji nie można cofnąć. Wszystkie dane podróży zostaną usunięte.",
+        deleteButton: "Usuń podróż",
+      },
+      roles: {
+        organizer: "Organizator",
+        participant: "Uczestnik",
+      },
+
+      moreMembers: "osób więcej",
+      toasts: {
+        codeCopied: "Kod zaproszenia skopiowany",
+        tripDeleted: "Podróż została usunięta.",
+        tripRestored: "Podróż została przywrócona.",
+        invalidCode: "Nieprawidłowy kod zaproszenia.",
+        joinedTrip: "Dołączono do podróży.",
+      },
+      pagination: {
+        previous: "Poprzednia",
+        next: "Następna",
+      },
+    },
   },
 
   en: {
@@ -300,8 +482,9 @@ export const dict: Record<Lang, Translations> = {
     nav: {
       login: "Log in",
       signup: "Sign up",
-      dashboard: "Dashboard",
       logout: "Log out",
+      profile: "Profile",
+      settings: "Settings",
     },
 
     hero: {
@@ -409,6 +592,7 @@ export const dict: Record<Lang, Translations> = {
       },
       rights: "All rights reserved.",
     },
+
     auth: {
       login: {
         title: "Log in",
@@ -445,6 +629,7 @@ export const dict: Record<Lang, Translations> = {
       toast: {
         loginSuccess: "Logged in successfully!",
         registerSuccess: "Account created successfully!",
+        logoutSuccess: "Logged out successfully!",
       },
       validation: {
         name: {
@@ -470,6 +655,95 @@ export const dict: Record<Lang, Translations> = {
         terms: {
           required: "You must accept the terms",
         },
+      },
+    },
+
+    dashboard: {
+      // title: "Your trips",
+      subtitle:
+        "Manage group trips, invite friends and keep costs under control with ease.",
+      empty: {
+        title: "You don’t have any trips yet",
+        description:
+          "Join an existing trip using an invite code or create a new one and invite your friends.",
+      },
+      actions: {
+        joinTrip: "Join a trip",
+        newTrip: "New trip",
+        openTrip: "Open trip",
+        copyCode: "Copy invite code",
+        archive: "Archive trip",
+        restore: "Restore trip",
+        delete: "Delete trip",
+        moreActions: "More actions",
+      },
+      filters: {
+        searchPlaceholder: "Search by name or destination…",
+        all: "All",
+        active: "Active",
+        organizer: "I’m an organizer",
+        participant: "I’m a participant",
+        moreFilters: "More filters",
+        dateRange: "Date range",
+        from: "From",
+        to: "To",
+        location: "Destination",
+        locationPlaceholder: "e.g. Croatia",
+        participantsCount: "Number of participants",
+        min: "Min",
+        max: "Max",
+        reset: "Clear filters",
+        apply: "Apply",
+      },
+      sort: {
+        label: "Sort by",
+        startDate: "Start date",
+        name: "Name",
+        lastActivity: "Last activity",
+        role: "Role",
+      },
+      dialogs: {
+        joinTitle: "Join a trip",
+        joinDescription:
+          "Enter the invite code you received from the trip organizer.",
+        joinPlaceholder: "Enter invite code (e.g. TRIP-2025-ABC)",
+        cancel: "Cancel",
+        joinButton: "Join",
+        newTripTitle: "New trip",
+        newTripDescription:
+          "Create a new trip, set dates and destination, then invite your friends.",
+        tripName: "Trip name",
+        tripNamePlaceholder: "e.g. May getaway in Croatia",
+        destination: "Destination",
+        destinationPlaceholder: "e.g. Split, Croatia",
+        startDate: "Start date",
+        endDate: "End date",
+        createButton: "Create trip",
+        archiveTitle: "Archive this trip?",
+        archiveButton: "Archive",
+        restoreTitle: "Restore this trip?",
+        restoreDescription: "The trip will be marked as active again.",
+        restoreButton: "Restore",
+        deleteTitle: "Delete this trip?",
+        deleteDescription:
+          "This action cannot be undone. All trip data will be removed.",
+        deleteButton: "Delete trip",
+      },
+      roles: {
+        organizer: "Organizer",
+        participant: "Participant",
+      },
+      moreMembers: "more people",
+      toasts: {
+        codeCopied: "Invite code copied",
+        tripDeleted: "Trip has been deleted.",
+        tripRestored: "Trip has been restored.",
+        invalidCode: "Invalid invite code.",
+        joinedTrip: "You joined the trip.",
+      },
+      pagination: {
+        previous: "Previous",
+        next: "Next",
       },
     },
   },
