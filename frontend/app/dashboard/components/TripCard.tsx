@@ -1,11 +1,8 @@
 "use client";
 
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MapPin, Calendar, Copy, ChevronRight, Users } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback } from "@/app/components/ui/avatar";
@@ -13,10 +10,6 @@ import { Badge } from "@/app/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Trip, TripAccentPreset, TripMember } from "@/lib/types/trip";
 import { toast } from "sonner";
-import {
-  findBestDestinationImage,
-  getPresetFallbackImage,
-} from "@/lib/destinationImageCatalog";
 
 interface TripCardProps {
   trip: Trip;
@@ -101,6 +94,39 @@ function getAccentPreset(trip: Trip): TripAccentPreset {
   return "neutral";
 }
 
+const imageUrlCache = new Map<string, string>();
+const LOCAL_CACHE_KEY = "dashboard-destination-image-cache-v2-no-fallback";
+let cacheHydratedFromStorage = false;
+
+function hydrateCacheFromStorage() {
+  if (cacheHydratedFromStorage) return;
+  cacheHydratedFromStorage = true;
+  if (typeof window === "undefined") return;
+
+  try {
+    // Drop legacy cache that could contain fallback images.
+    window.localStorage.removeItem("dashboard-destination-image-cache-v1");
+    const raw = window.localStorage.getItem(LOCAL_CACHE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Record<string, string>;
+    Object.entries(parsed).forEach(([key, value]) => {
+      if (typeof key === "string" && typeof value === "string") {
+        imageUrlCache.set(key, value);
+      }
+    });
+  } catch {}
+}
+
+function persistCacheToStorage() {
+  if (typeof window === "undefined") return;
+  const entries = Array.from(imageUrlCache.entries());
+  const limited = entries.slice(Math.max(0, entries.length - 50));
+  const asObject = Object.fromEntries(limited);
+  try {
+    window.localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(asObject));
+  } catch {}
+}
+
 const fallbackMembers: TripMember[] = [
   { id: "f1", name: "Alicja Nowak" },
   { id: "f2", name: "Bartek Kowalski" },
@@ -116,7 +142,7 @@ function withFallbackMembers(trip: Trip): TripMember[] {
   const seed = Number(trip.id) || trip.id.length;
   return fallbackMembers
     .map((m, i) => ({ ...m, id: `${m.id}-${seed + i}` }))
-    .slice(seed % 3, seed % 3 + 4);
+    .slice(seed % 3, (seed % 3) + 4);
 }
 
 export default function TripCard({ trip, index, onOpen }: TripCardProps) {
@@ -124,9 +150,13 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
   const isArchived = trip.status === "ARCHIVED";
   const preset = getAccentPreset(trip);
   const style = accentStyles[preset];
-  const heroImageUrl =
-    findBestDestinationImage(`${trip.destination} ${trip.name}`)?.url ||
-    getPresetFallbackImage(preset);
+  const cacheKey = useMemo(
+    () => `${preset}:${trip.destination.toLowerCase()}`,
+    [preset, trip.destination]
+  );
+  const [imageUrl, setImageUrl] = useState<string | null>(() => {
+    return imageUrlCache.get(cacheKey) ?? null;
+  });
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -147,6 +177,50 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
     x.set(0);
     y.set(0);
   };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let mounted = true;
+    hydrateCacheFromStorage();
+    const cached = imageUrlCache.get(cacheKey);
+    if (cached) {
+      setImageUrl(cached);
+      return () => {
+        controller.abort();
+      };
+    }
+
+    setImageUrl(null);
+
+    const load = async () => {
+      try {
+        const params = new URLSearchParams({
+          q: trip.destination,
+          preset,
+        });
+        const res = await fetch(`/api/destination-image?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+
+        const data = (await res.json()) as { url?: string };
+        if (mounted && data?.url) {
+          setImageUrl(data.url);
+          imageUrlCache.set(cacheKey, data.url);
+          persistCacheToStorage();
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, [cacheKey, preset, trip.destination]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("pl-PL", {
@@ -225,8 +299,7 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
       (1000 * 60 * 60 * 24)
   );
   const tripDuration = Math.ceil(
-    (new Date(trip.endDate).getTime() -
-      new Date(trip.startDate).getTime()) /
+    (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) /
       (1000 * 60 * 60 * 24)
   );
 
@@ -255,17 +328,36 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
             "border border-border/50 bg-card",
             "shadow-card transition-all duration-500",
             style.glow,
-            isArchived && "opacity-60 grayscale-[30%]"
+            isArchived && "opacity-70 grayscale-35 contrast-90"
           )}
         >
-          <div className="relative h-28 overflow-hidden">
+          {isArchived && (
             <div
-              className="absolute inset-0 bg-center bg-cover"
-              style={{ backgroundImage: `url(${heroImageUrl})` }}
-              aria-hidden="true"
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-background/55 z-10"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/35 to-background/70" />
-            <div className={cn("absolute inset-0 bg-gradient-to-b", style.gradient)} />
+          )}
+          <div className="relative h-28 overflow-hidden">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={`Zdjęcie destynacji ${trip.destination}`}
+                fill
+                className="object-cover"
+                sizes="(min-width: 1280px) 360px, (min-width: 768px) 320px, 100vw"
+                unoptimized
+                priority={index < 3}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-linear-to-br from-background via-muted/30 to-background" />
+            )}
+            <div className="absolute inset-0 bg-linear-to-br from-black/15 via-black/10 to-transparent dark:from-background/70 dark:via-background/45 dark:to-background/25 transition-colors" />
+            <div
+              className={cn(
+                "absolute inset-0 bg-linear-to-b pointer-events-none mix-blend-multiply dark:mix-blend-normal",
+                style.gradient
+              )}
+            />
 
             {!isArchived && daysUntil > 0 && (
               <div className="absolute top-3 left-3">
