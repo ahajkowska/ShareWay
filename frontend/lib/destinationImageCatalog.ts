@@ -1,200 +1,9 @@
 import type { TripAccentPreset } from "@/lib/types/trip";
 import { getPrebakedQueries } from "@/lib/prebakedQueries";
 
-export type DestinationEntry = {
-  match: RegExp;
-  url: string;
-  queries: string[];
-  leadQuery?: string;
-};
-
 type LearnedDestination = {
   queries: string[];
   imageUrl: string;
-};
-
-export const destinationFallbacks: DestinationEntry[] = [
-  {
-    match: /zakopane|tatry|kudowa|stolowe/,
-    url: "https://images.pexels.com/photos/1441974/pexels-photo-1441974.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Tatra Mountains Poland winter landscape",
-      "Zakopane Tatra Mountains Poland winter",
-      "Poland mountains winter landscape",
-    ],
-  },
-  {
-    match: /sopot|baltyk|morze baltyckie|gdansk|gdynia/,
-    url: "https://images.pexels.com/photos/994605/pexels-photo-994605.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Baltic sea coast Poland beach",
-      "Sopot Baltic sea Poland",
-      "Baltic sea Poland seaside",
-    ],
-  },
-  {
-    match: /zermatt|alpy|alps/,
-    url: "https://images.pexels.com/photos/547115/pexels-photo-547115.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: ["Zermatt Swiss Alps mountains", "Swiss Alps mountain landscape"],
-  },
-  {
-    match: /berlin|niemcy|germany/,
-    url: "https://images.pexels.com/photos/532892/pexels-photo-532892.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Berlin city skyline Germany",
-      "Berlin Germany city",
-      "Brandenburg Gate Berlin Germany",
-    ],
-  },
-  {
-    match: /nowy jork|nowy york|nyc|new york/,
-    url: "https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "New York City skyline night",
-      "NYC skyline sunset",
-      "New York City aerial view",
-    ],
-  },
-  {
-    match: /paryz|paris/,
-    url: "https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Paris Eiffel Tower sunset",
-      "Paris city skyline",
-      "Eiffel Tower Paris night",
-    ],
-  },
-  {
-    match: /praga|prague/,
-    url: "https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Prague Charles Bridge night",
-      "Prague old town skyline",
-      "Prague castle river",
-    ],
-  },
-  {
-    match: /barcelona|hiszpania barcelona/,
-    url: "https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Barcelona city skyline",
-      "Barcelona Sagrada Familia aerial",
-      "Barcelona Spain beach city",
-    ],
-  },
-  {
-    match: /chorwacja|croatia|split|dubrovnik|zadar|pula|makarska|hvar|trogir/,
-    url: "https://images.pexels.com/photos/1456291/pexels-photo-1456291.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Croatia Adriatic sea beach",
-      "Croatia coast turquoise water",
-      "Split Croatia seaside",
-      "Dubrovnik Croatia coastline",
-    ],
-  },
-  {
-    match: /bali|indonez/,
-    url: "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: ["Bali Indonesia beach", "Bali Indonesia tropical island"],
-    leadQuery: "Bali Indonesia surf beach",
-  },
-  {
-    match: /surf camp|surfing|surfer|peniche|surf/,
-    url: "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Portugal surf camp beach",
-      "Peniche Portugal surfing",
-      "surf camp Europe ocean",
-    ],
-    leadQuery: "surf camp sunset wave",
-  },
-  {
-    match: /mazury|mazur/,
-    url: "https://images.pexels.com/photos/1482061/pexels-photo-1482061.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Masurian lakes Poland sunrise",
-      "Mazury lake Poland kayak",
-      "Masuria Poland lake landscape",
-    ],
-  },
-  {
-    match: /norwegia|norway|fjord/,
-    url: "https://images.pexels.com/photos/2437299/pexels-photo-2437299.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Norway fjords mountains sea",
-      "Norwegian fjord sunset",
-      "Norway fjords landscape",
-    ],
-  },
-  {
-    match: /islandia|iceland/,
-    url: "https://images.pexels.com/photos/2246476/pexels-photo-2246476.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Iceland aurora landscape",
-      "Iceland waterfall landscape",
-      "Iceland mountains snow",
-    ],
-  },
-  {
-    match: /santorini|grecja|greece/,
-    url: "https://images.pexels.com/photos/1068983/pexels-photo-1068983.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: [
-      "Santorini Greece blue domes",
-      "Greece island sunset",
-      "Santorini cliff village sea",
-    ],
-  },
-  {
-    match: /merzouga|sahara|maroko|morocco/,
-    url: "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    queries: ["Sahara desert Morocco dunes", "Morocco desert dunes sunset"],
-  },
-];
-
-const presetFallbacks: Record<TripAccentPreset, string[]> = {
-  mountains: [
-    "https://images.pexels.com/photos/1441974/pexels-photo-1441974.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/547115/pexels-photo-547115.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  beach: [
-    "https://images.pexels.com/photos/994605/pexels-photo-994605.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/1456291/pexels-photo-1456291.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/1068983/pexels-photo-1068983.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  city: [
-    "https://images.pexels.com/photos/532892/pexels-photo-532892.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/378570/pexels-photo-378570.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  desert: [
-    "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/1860710/pexels-photo-1860710.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  tropical: [
-    "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/3601453/pexels-photo-3601453.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  winter: [
-    "https://images.pexels.com/photos/1441974/pexels-photo-1441974.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/547115/pexels-photo-547115.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  lake: [
-    "https://images.pexels.com/photos/1482061/pexels-photo-1482061.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/346529/pexels-photo-346529.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  countryside: [
-    "https://images.pexels.com/photos/318987/pexels-photo-318987.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/51951/field-clouds-sky-earth-51951.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  adventure: [
-    "https://images.pexels.com/photos/808465/pexels-photo-808465.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    "https://images.pexels.com/photos/2051196/pexels-photo-2051196.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
-  neutral: [
-    "https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?auto=compress&cs=tinysrgb&w=1600",
-  ],
 };
 
 const tokenDictionary: Record<string, string> = {
@@ -301,11 +110,99 @@ export function translateToEnglishTokens(destination: string) {
   return translated.replace(/\s+/g, " ").trim();
 }
 
+export type LocationDetails = {
+  city: string;
+  country: string;
+  englishCity: string;
+  englishCountry: string;
+  combined: string;
+  englishCombined: string;
+  normalized: string;
+};
+
+export function getLocationDetails(destination: string): LocationDetails {
+  const normalized = normalizeToAsciiLower(destination || "");
+  const segments = destination
+    .split(",")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+  const city = segments[0] || "";
+  const country = segments.slice(1).join(" ").trim();
+  const englishCity = city ? translateToEnglishTokens(city) : "";
+  const englishCountry = country ? translateToEnglishTokens(country) : "";
+  const combined = [city, country].filter(Boolean).join(" ").trim();
+  const englishCombined = [englishCity, englishCountry]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return {
+    city,
+    country,
+    englishCity,
+    englishCountry,
+    combined,
+    englishCombined,
+    normalized,
+  };
+}
+
+function buildLocationPriorityQueries(
+  location: LocationDetails,
+  presetHints: string[]
+) {
+  const queries: string[] = [];
+  const {
+    city,
+    country,
+    englishCity,
+    englishCountry,
+    combined,
+    englishCombined,
+  } = location;
+  const addQuery = (value?: string) => {
+    if (value) queries.push(value.trim());
+  };
+
+  addQuery(englishCombined);
+  if (
+    englishCountry &&
+    englishCity &&
+    `${englishCountry} ${englishCity}`.trim() !== englishCombined
+  ) {
+    addQuery(`${englishCountry} ${englishCity}`);
+  }
+  addQuery(combined);
+  if (country && city) addQuery(`${country} ${city}`);
+  addQuery(englishCity && country ? `${englishCity} ${country}` : "");
+  addQuery(englishCountry && city ? `${englishCountry} ${city}` : "");
+
+  const firstHint = presetHints[0];
+  if (firstHint) {
+    [englishCity, city].forEach((value) => {
+      if (value) addQuery(`${value} ${firstHint}`);
+    });
+    [englishCountry, country].forEach((value) => {
+      if (value) addQuery(`${value} ${firstHint}`);
+    });
+  }
+
+  [englishCity, englishCountry, city, country].forEach(addQuery);
+  const landscapeHints = ["landscape", "scenic view", "aerial view", "sunrise", "sunset"];
+  landscapeHints.forEach((hint) => {
+    [englishCity, city, englishCountry, country]
+      .filter(Boolean)
+      .forEach((value) => addQuery(`${value} ${hint}`));
+  });
+  return queries.filter(Boolean);
+}
+
 export function buildDestinationQueries(
   destination: string,
   preset: TripAccentPreset = "neutral"
 ) {
   const translated = translateToEnglishTokens(destination || "");
+  const locationDetails = getLocationDetails(destination);
   const parts = translated
     .split(",")
     .map((p) => p.trim())
@@ -313,13 +210,7 @@ export function buildDestinationQueries(
   const primary = parts[0] || translated || destination.trim() || "";
   const secondary = parts.length > 1 ? parts[1] : "";
 
-  const normalizedDestination = normalizeToAsciiLower(destination);
   const extraFromPrebaked = getPrebakedQueries(destination);
-  const fallbackEntry = destinationFallbacks.find(({ match }) =>
-    match.test(normalizedDestination)
-  );
-  const extraFromFallback = fallbackEntry?.queries ?? [];
-  const leadQuery = fallbackEntry?.leadQuery ? [fallbackEntry.leadQuery] : [];
 
   const learned = learnedDestinations.get(normalizeKey(destination));
   const extraFromLearned = learned?.queries ?? [];
@@ -342,6 +233,11 @@ export function buildDestinationQueries(
       : preset === "adventure"
       ? ["outdoor", "adventure"]
       : [];
+
+  const locationQueries = buildLocationPriorityQueries(
+    locationDetails,
+    presetHints
+  );
 
   const contextual: string[] = [];
   if (primary && secondary) {
@@ -368,10 +264,9 @@ export function buildDestinationQueries(
   const withPresetHints = presetHints.map((hint) => `${primary} ${hint}`);
 
   const all = [
-    ...leadQuery, // prefer curated lead for a given place
+    ...locationQueries,
     ...extraFromPrebaked,
     ...extraFromLearned,
-    ...extraFromFallback,
     ...contextual,
     ...descriptiveCombos,
     ...baseQueries,
@@ -379,48 +274,6 @@ export function buildDestinationQueries(
   ];
 
   return Array.from(new Set(all.filter((v) => v && v.trim().length > 0)));
-}
-
-export function findSpecificDestinationImage(destination: string) {
-  const learned = learnedDestinations.get(normalizeKey(destination));
-  if (learned?.imageUrl) return learned.imageUrl;
-
-  const normalizedDestination = normalizeToAsciiLower(destination);
-  const match = destinationFallbacks.find(({ match }) =>
-    match.test(normalizedDestination)
-  );
-  return match?.url ?? null;
-}
-
-function pickFromPool(values: string[], seedText: string) {
-  if (!values.length) return "";
-  const seed = hashString(seedText);
-  const index = Math.abs(seed) % values.length;
-  return values[index];
-}
-
-function hashString(text: string) {
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    hash = (hash << 5) - hash + text.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash;
-}
-
-export function findDestinationFallbackImage(
-  destination: string,
-  preset: TripAccentPreset = "neutral"
-) {
-  const normalizedDestination = normalizeToAsciiLower(destination);
-  const match = destinationFallbacks.find(({ match }) =>
-    match.test(normalizedDestination)
-  );
-  if (match?.url) return match.url;
-
-  const pool = presetFallbacks[preset] ?? presetFallbacks.neutral;
-  const safePool = pool.length ? pool : presetFallbacks.neutral;
-  return pickFromPool(safePool, normalizedDestination || preset);
 }
 
 export function learnDestination(
