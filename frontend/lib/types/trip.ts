@@ -60,6 +60,7 @@ export type TripStatus = "ACTIVE" | "ARCHIVED";
 
 export type Trip = {
   id: string;
+  groupId?: string;
   name: string;
   description?: string;
   destination: string;

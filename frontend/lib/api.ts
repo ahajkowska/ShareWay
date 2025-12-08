@@ -129,7 +129,7 @@ export async function fetchAuth<T>(
 // TYPE IMPORTS
 // ============================================
 
-import type { ExpenseDto, BalanceGraphDto } from "@/app/groups/[groupId]/costs/types";
+import type { ExpenseDto, BalanceGraphDto } from "@/app/dashboard/[groupId]/costs/types";
 
 // ============================================
 // VOTING API

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 interface TripCardProps {
   trip: Trip;
   index: number;
-  onOpen: (id: string) => void;
+  onOpen: (trip: Trip) => void;
 }
 
 const accentStyles: Record<
@@ -320,7 +320,7 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
         className="h-full cursor-pointer"
-        onClick={() => onOpen(trip.id)}
+        onClick={() => onOpen(trip)}
       >
         <div
           className={cn(
@@ -472,7 +472,7 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onOpen(trip.id);
+                    onOpen(trip);
                   }}
                   className="rounded-lg text-xs h-8 px-3 group/btn hover:bg-muted/50"
                 >

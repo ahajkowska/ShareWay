@@ -382,7 +382,7 @@ export default function GroupVotingPage() {
                     {/* Back button */}
                     <Button
                         variant="ghost"
-                        onClick={() => router.push(`/groups/${groupId}`)}
+                        onClick={() => router.push(`/dashboard/${groupId}`)}
                         className="mb-6 gap-2"
                     >
                         <ArrowLeft className="w-4 h-4" />
