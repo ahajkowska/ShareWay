@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import DashboardFiltersSidebar from "@/app/dashboard/components/filters/DashboardFiltersSidebar";
 import TripCard from "@/app/dashboard/components/TripCard";
@@ -12,6 +13,7 @@ import { cn, normalizeSearchText } from "@/lib/utils";
 import { SlidersHorizontal, SearchX, Loader2 } from "lucide-react";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
+import type { Trip } from "@/lib/types/trip";
 
 const t = {
   dashboard: {
@@ -42,6 +44,7 @@ export default function DashboardPageClient({
 }: {
   initialSidebarOpen: boolean;
 }) {
+  const router = useRouter();
   const {
     filters,
     setFilters,
@@ -245,6 +248,11 @@ export default function DashboardPageClient({
     ? `${navGutter}px`
     : `calc(${sidebarWidth}px + ${navGutter + 48}px)`;
 
+  const handleOpenTrip = (trip: Trip) => {
+    const targetId = trip.groupId ?? trip.id;
+    router.push(`/dashboard/${targetId}`);
+  };
+
   return (
     <div className="relative min-h-screen flex bg-background text-foreground">
       {!isMobile && (
@@ -384,7 +392,7 @@ export default function DashboardPageClient({
                   key={trip.id}
                   trip={trip}
                   index={index}
-                  onOpen={(id) => console.log("Open trip", id)}
+                  onOpen={handleOpenTrip}
                 />
               ))}
             </div>
