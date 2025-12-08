@@ -24,5 +24,14 @@ export function AvatarFallback({
   className?: string;
   children: React.ReactNode;
 }) {
-  return <span className={cn("select-none", className)}>{children}</span>;
+  return (
+    <span
+      className={cn(
+        "inline-flex h-full w-full items-center justify-center rounded-full select-none",
+        className
+      )}
+    >
+      {children}
+    </span>
+  );
 }
