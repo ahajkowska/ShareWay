@@ -1,1 +1,0 @@
-# Joining a group, creating a trip

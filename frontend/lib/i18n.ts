@@ -113,8 +113,8 @@ export interface Translations {
       terms: { required: string };
     };
   };
+
   dashboard: {
-    // title: string;
     subtitle: string;
     empty: {
       title: string;
@@ -171,7 +171,6 @@ export interface Translations {
       endDate: string;
       createButton: string;
       archiveTitle: string;
-
       archiveButton: string;
       restoreTitle: string;
       restoreDescription: string;
@@ -184,12 +183,10 @@ export interface Translations {
       organizer: string;
       participant: string;
     };
-
     moreMembers: string;
     toasts: {
       codeCopied: string;
       tripDeleted: string;
-
       tripRestored: string;
       invalidCode: string;
       joinedTrip: string;
@@ -197,6 +194,14 @@ export interface Translations {
     pagination: {
       previous: string;
       next: string;
+    };
+
+    /* DODANE Z origin/main — NIE nadpisuje, tylko rozszerza */
+    modules?: {
+      voting: { name: string; description: string };
+      costs: { name: string; description: string };
+      schedule: { name: string; description: string };
+      checklist: { name: string; description: string };
     };
   };
 }
@@ -273,32 +278,30 @@ export const dict: Record<Lang, Translations> = {
         {
           title: "Wspólne tworzenie planu",
           description:
-            "Zapraszaj znajomych, zbieraj propozycje i układaj harmonogram podróży w jednym miejscu, czytelnie dla całej grupy.",
+            "Zapraszaj znajomych, zbieraj propozycje i układaj harmonogram podróży.",
         },
         {
           title: "Przejrzysty podział kosztów",
           description:
-            "Dodawaj wydatki w trakcie wyjazdu, a ShareWay pomoże policzyć, kto komu i ile powinien zwrócić — bez arkuszy i ręcznych podsumowań.",
+            "Dodawaj wydatki, a ShareWay policzy kto komu i ile powinien zwrócić.",
         },
         {
           title: "Miejsca i harmonogram w jednym widoku",
           description:
-            "Zapisuj kluczowe punkty podróży, godziny i lokalizacje, aby każdy uczestnik miał dostęp do aktualnego planu.",
+            "Zapisuj kluczowe punkty podróży, aby każdy miał dostęp do aktualnego planu.",
         },
         {
           title: "Lista kontrolna przed wyjazdem",
-          description:
-            "Twórz wspólne checklisty rzeczy do zabrania i zadań do wykonania przed podróżą, żeby nikt nie zapomniał o najważniejszych rzeczach.",
+          description: "Twórz wspólne checklisty zadań i rzeczy do zabrania.",
         },
         {
           title: "Głosowania w grupie",
-          description:
-            "Głosujcie nad terminami, noclegami czy atrakcjami i podejmujcie decyzje szybko, zamiast przedzierać się przez długie konwersacje.",
+          description: "Głosujcie nad terminami, noclegami i atrakcjami.",
         },
         {
           title: "Bezpieczne dane",
           description:
-            "Plany podróży i dane dotyczące kosztów są przechowywane z zachowaniem zasad bezpieczeństwa i ochrony prywatności.",
+            "Twoje dane są przechowywane z zachowaniem zasad bezpieczeństwa.",
         },
       ],
     },
@@ -386,7 +389,6 @@ export const dict: Record<Lang, Translations> = {
     },
 
     dashboard: {
-      // title: "Twoje podróże",
       subtitle:
         "Zarządzaj wspólnymi wyjazdami, zapraszaj znajomych i łatwo ogarniaj koszty.",
       empty: {
@@ -408,7 +410,6 @@ export const dict: Record<Lang, Translations> = {
         searchPlaceholder: "Szukaj po nazwie lub miejscu…",
         all: "Wszystkie",
         active: "Aktywne",
-
         organizer: "Jestem organizatorem",
         participant: "Jestem uczestnikiem",
         moreFilters: "Więcej filtrów",
@@ -473,6 +474,23 @@ export const dict: Record<Lang, Translations> = {
       pagination: {
         previous: "Poprzednia",
         next: "Następna",
+      },
+
+      /* Uzupełnienie z origin/main */
+      modules: {
+        voting: {
+          name: "Głosowanie",
+          description: "Podejmujcie decyzje wspólnie",
+        },
+        costs: { name: "Koszty", description: "Rozliczajcie wspólne wydatki" },
+        schedule: {
+          name: "Harmonogram",
+          description: "Planujcie trasę i atrakcje",
+        },
+        checklist: {
+          name: "Lista kontrolna",
+          description: "Co zabrać i co zrobić",
+        },
       },
     },
   },
@@ -578,7 +596,7 @@ export const dict: Record<Lang, Translations> = {
 
     footer: {
       description:
-        "Group trip planning and cost sharing made simple. It’s easier to get where you want when you travel together.",
+        "Group trip planning and cost sharing made simple. It's easier to get where you want when you travel together.",
       productTitle: "Product",
       productItems: ["Features", "Pricing", "FAQ"],
       companyTitle: "Company",
@@ -659,7 +677,6 @@ export const dict: Record<Lang, Translations> = {
     },
 
     dashboard: {
-      // title: "Your trips",
       subtitle:
         "Manage group trips, invite friends and keep costs under control with ease.",
       empty: {
@@ -744,6 +761,17 @@ export const dict: Record<Lang, Translations> = {
       pagination: {
         previous: "Previous",
         next: "Next",
+      },
+
+      /* modules from origin/main */
+      modules: {
+        voting: { name: "Voting", description: "Make decisions together" },
+        costs: { name: "Costs", description: "Split shared expenses" },
+        schedule: {
+          name: "Schedule",
+          description: "Plan route and attractions",
+        },
+        checklist: { name: "Checklist", description: "What to pack and do" },
       },
     },
   },
