@@ -1,27 +1,49 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: dev
     ports:
-      - "3000:3000"
+      - "3001:3000"
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+      - frontend-node_modules:/app/node_modules
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - NEXT_WEBPACK_USEPOLLING=1
+      - PORT=3000
       - API_URL=http://api-gateway:4000
+      - PEXELS_API_KEY=${PEXELS_API_KEY:-}
+      - EMBEDDING_RERANKER_URL=${EMBEDDING_RERANKER_URL:-}
     depends_on:
       - api-gateway
+      - embedding-reranker
     networks:
       - shareway-network
 
-  # API Gateway - reverse proxy
   api-gateway:
     image: nginx:alpine
     ports:
       - "4000:80"
     volumes:
       - ./backend/api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - shareway-network
+
+  embedding-reranker:
+    build:
+      context: ./embedding-reranker
+      dockerfile: Dockerfile
+    environment:
+      - MODEL_ID=${EMBEDDING_MODEL_ID:-openai/clip-vit-base-patch32}
+    ports:
+      - "5005:5005"
     networks:
       - shareway-network
 
@@ -39,3 +61,4 @@ networks:
 
 volumes:
   postgres-data:
+  frontend-node_modules:
