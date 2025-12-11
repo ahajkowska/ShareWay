@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { RedisRepository } from './redis.repository';
+import { RedisRepository } from './redis.repository.js';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 

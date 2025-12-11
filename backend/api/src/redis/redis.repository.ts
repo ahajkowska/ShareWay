@@ -1,16 +1,15 @@
-import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
-import { REDIS_CLIENT } from './redis.module';
+import {
+  Inject,
+  Injectable,
+  OnModuleDestroy,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { REDIS_CLIENT } from './redis.module.js';
 import Redis from 'ioredis';
+import * as bcrypt from 'bcrypt';
 
-export type SessionRecord = {
-  userId: string;
-  refreshTokenHash: string;
-  createdAt: string;
-  sessionExpiryTimestampMs: string;
-  // userAgent: string;
-  // ipAddress: string;
-  // Do we need that additional logic?
-};
+const SALT_ROUNDS = 10;
+const REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 @Injectable()
 export class RedisRepository implements OnModuleDestroy {
@@ -20,20 +19,57 @@ export class RedisRepository implements OnModuleDestroy {
     await this.redisClient.quit();
   }
 
-  // sessionId would be retrieved from the JWT token's payload
-  async storeSession(sessionRecord: SessionRecord, sessionId: string) {
-    const { userId, sessionExpiryTimestampMs } = sessionRecord;
-    const sessionKey = this.retrieveSessionKey(userId, sessionId);
-    const ttl = Math.floor((+sessionExpiryTimestampMs - Date.now()) / 1000);
+  async storeRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    const key = this.getRefreshTokenKey(userId);
+    const tokenHash = await bcrypt.hash(refreshToken, SALT_ROUNDS);
 
-    await this.redisClient
-      .multi()
-      .hset(sessionKey, sessionRecord)
-      .expire(sessionKey, ttl)
-      .exec();
+    await this.redisClient.setex(
+      key,
+      REFRESH_TOKEN_TTL_SECONDS,
+      JSON.stringify({
+        tokenHash,
+        createdAt: new Date().toISOString(),
+      }),
+    );
   }
 
-  private retrieveSessionKey(userId: string, sessionId: string) {
-    return `sess:${userId}:${sessionId}`;
+  async validateRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<boolean> {
+    const key = this.getRefreshTokenKey(userId);
+    const stored = await this.redisClient.get(key);
+
+    if (!stored) {
+      throw new UnauthorizedException('Refresh token not found or expired');
+    }
+
+    const { tokenHash } = JSON.parse(stored);
+    const isValid = await bcrypt.compare(refreshToken, tokenHash);
+
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    return true;
+  }
+
+  async removeRefreshToken(userId: string): Promise<void> {
+    const key = this.getRefreshTokenKey(userId);
+    await this.redisClient.del(key);
+  }
+
+  async rotateRefreshToken(
+    userId: string,
+    oldRefreshToken: string,
+    newRefreshToken: string,
+  ): Promise<void> {
+    await this.validateRefreshToken(userId, oldRefreshToken);
+    await this.removeRefreshToken(userId);
+    await this.storeRefreshToken(userId, newRefreshToken);
+  }
+
+  private getRefreshTokenKey(userId: string): string {
+    return `refresh_token:${userId}`;
   }
 }
