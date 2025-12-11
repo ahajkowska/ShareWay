@@ -10,6 +10,27 @@ export class EnvironmentalVariables {
 
   @IsString()
   REDIS_HOST: string;
+
+  @IsString()
+  DATABASE_HOST: string;
+
+  @IsNumber()
+  DATABASE_PORT: number;
+
+  @IsString()
+  DATABASE_USER: string;
+
+  @IsString()
+  DATABASE_PASSWORD: string;
+
+  @IsString()
+  DATABASE_NAME: string;
+
+  @IsString()
+  JWT_SECRET: string;
+
+  @IsString()
+  JWT_REFRESH_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {
