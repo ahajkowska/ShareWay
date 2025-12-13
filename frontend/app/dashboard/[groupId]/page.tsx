@@ -1,15 +1,17 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Vote, Wallet, Calendar, ListChecks } from "lucide-react";
+import { Vote, Wallet, Calendar, ListChecks, ArrowLeft } from "lucide-react";
+import { Button } from "@/app/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import Navbar from "@/app/components/Navbar";
 import { useI18n } from "@/app/context/LanguageContext";
 
 export default function GroupDashboard() {
     const params = useParams();
+    const router = useRouter();
     const groupId = params.groupId as string;
     const { t } = useI18n();
 
@@ -49,6 +51,16 @@ export default function GroupDashboard() {
             <Navbar />
             <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
                 <div className="container mx-auto px-4">
+                    {/* Back button */}
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.push('/dashboard')}
+                        className="mb-6 gap-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        {t.dashboard.backToTrips}
+                    </Button>
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}

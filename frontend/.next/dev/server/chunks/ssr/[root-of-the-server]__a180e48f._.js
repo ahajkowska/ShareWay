@@ -218,6 +218,8 @@ const dict = {
         },
         dashboard: {
             subtitle: "Zarządzaj wspólnymi wyjazdami, zapraszaj znajomych i łatwo ogarniaj koszty.",
+            title: "Moduły podroży",
+            backToTrips: "Powrót do listy podroży",
             empty: {
                 title: "Nie masz jeszcze żadnych podróży",
                 description: "Dołącz do istniejącej wyprawy za pomocą kodu zaproszenia albo stwórz nową podróż i zaproś znajomych."
@@ -493,6 +495,8 @@ const dict = {
         },
         dashboard: {
             subtitle: "Manage group trips, invite friends and keep costs under control with ease.",
+            title: "Trip Modules",
+            backToTrips: "Back to trips list",
             empty: {
                 title: "You don’t have any trips yet",
                 description: "Join an existing trip using an invite code or create a new one and invite your friends."

@@ -116,6 +116,8 @@ export interface Translations {
 
   dashboard: {
     subtitle: string;
+    title?: string;
+    backToTrips?: string;
     empty: {
       title: string;
       description: string;
@@ -391,6 +393,8 @@ export const dict: Record<Lang, Translations> = {
     dashboard: {
       subtitle:
         "Zarządzaj wspólnymi wyjazdami, zapraszaj znajomych i łatwo ogarniaj koszty.",
+      title: "Moduły podroży",
+      backToTrips: "Powrót do listy podroży",
       empty: {
         title: "Nie masz jeszcze żadnych podróży",
         description:
@@ -679,6 +683,8 @@ export const dict: Record<Lang, Translations> = {
     dashboard: {
       subtitle:
         "Manage group trips, invite friends and keep costs under control with ease.",
+      title: "Trip Modules",
+      backToTrips: "Back to trips list",
       empty: {
         title: "You don’t have any trips yet",
         description:
