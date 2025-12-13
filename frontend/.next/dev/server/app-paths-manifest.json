@@ -1,7 +1,6 @@
 {
   "/api/trips/route": "app/api/trips/route.js",
-  "/dashboard/[groupId]/checklist/page": "app/dashboard/[groupId]/checklist/page.js",
+  "/dashboard/[groupId]/costs/page": "app/dashboard/[groupId]/costs/page.js",
   "/dashboard/[groupId]/page": "app/dashboard/[groupId]/page.js",
-  "/dashboard/[groupId]/voting/page": "app/dashboard/[groupId]/voting/page.js",
   "/dashboard/page": "app/dashboard/page.js"
 }

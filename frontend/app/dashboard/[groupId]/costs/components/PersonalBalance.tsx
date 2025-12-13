@@ -16,9 +16,10 @@ interface Props {
     loading: boolean;
     onRefresh: () => Promise<void>;
     tripId: string;
+    baseCurrency: string;
 }
 
-export default function PersonalBalance({ myBalance, loading, onRefresh, tripId }: Props) {
+export default function PersonalBalance({ myBalance, loading, onRefresh, tripId, baseCurrency }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
     const [settleDialogOpen, setSettleDialogOpen] = useState(false);
@@ -116,6 +117,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                                         key={person.userId} 
                                         person={person}
                                         tripId={tripId}
+                                        baseCurrency={baseCurrency}
                                         onSettleExpense={(exp, name) => handleSettleExpense(exp, name, person.userId, tripId)}
                                     />
                                 ))}
@@ -133,6 +135,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId 
                     onOpenChange={setSettleDialogOpen}
                     expense={selectedExpense}
                     myUserId={myBalance.myUserId}
+                    baseCurrency={baseCurrency}
                     onSettled={onRefresh}
                 />
             )}

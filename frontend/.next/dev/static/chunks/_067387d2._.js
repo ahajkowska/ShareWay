@@ -406,7 +406,7 @@ const costsTranslations = {
         youAreReceivingMoneyFrom: "Otrzymujesz pieniądze od:",
         youOweForThisExpense: "Jesteś winien/winna za ten wydatek:",
         theyOweForThisExpense: "Jest Ci winien/winna za ten wydatek:",
-        amountToSettle: "Kwota do rozliczenia (PLN)",
+        amountToSettle: "Kwota do rozliczenia",
         canSettlePartial: "Możesz rozliczyć całość lub część kwoty za ten wydatek",
         half: "Połowa",
         full: "Całość",
@@ -417,7 +417,7 @@ const costsTranslations = {
         cancel: "Anuluj",
         saving: "Zapisywanie...",
         enterValidAmount: "Wpisz poprawną kwotę",
-        amountCannotExceed: (max)=>`Kwota nie może być większa niż ${max} PLN`,
+        amountCannotExceed: (max, currency)=>`Kwota nie może być większa niż ${max} ${currency}`,
         settlement: "Rozliczenie",
         received: "Otrzymano",
         settlementError: "Błąd podczas zapisywania rozliczenia",
@@ -449,12 +449,12 @@ const costsTranslations = {
         description: "Opis",
         descriptionPlaceholder: "Dodatkowe informacje...",
         optional: "opcjonalnie",
-        amountLabel: "Kwota (PLN)",
+        amountLabel: "Kwota",
         choosePersonPlaceholder: "Wybierz osobę...",
         splitBetween: "Podziel między",
         selectAll: "Zaznacz wszystkich",
         deselect: "Odznacz",
-        splitPerPerson: (amt)=>`Po ${amt} PLN na osobę`,
+        splitPerPerson: (amt, currency)=>`Po ${amt} ${currency} na osobę`,
         titleRequired: "Wpisz tytuł wydatku",
         invalidAmount: "Wpisz poprawną kwotę",
         choosePayer: "Wybierz kto zapłacił",
@@ -482,7 +482,7 @@ const costsTranslations = {
         youAreReceivingMoneyFrom: "You are receiving money from:",
         youOweForThisExpense: "You owe for this expense:",
         theyOweForThisExpense: "They owe you for this expense:",
-        amountToSettle: "Amount to Settle (PLN)",
+        amountToSettle: "Amount to Settle",
         canSettlePartial: "You can settle all or part of the amount for this expense",
         half: "Half",
         full: "Full",
@@ -493,7 +493,7 @@ const costsTranslations = {
         cancel: "Cancel",
         saving: "Saving...",
         enterValidAmount: "Enter a valid amount",
-        amountCannotExceed: (max)=>`Amount cannot exceed ${max} PLN`,
+        amountCannotExceed: (max, currency)=>`Amount cannot exceed ${max} ${currency}`,
         settlement: "Settlement",
         received: "Received",
         settlementError: "Error saving settlement",
@@ -525,12 +525,12 @@ const costsTranslations = {
         description: "Description",
         descriptionPlaceholder: "Additional info...",
         optional: "optional",
-        amountLabel: "Amount (PLN)",
+        amountLabel: "Amount",
         choosePersonPlaceholder: "Choose person...",
         splitBetween: "Split between",
         selectAll: "Select all",
         deselect: "Deselect",
-        splitPerPerson: (amt)=>`${amt} PLN per person`,
+        splitPerPerson: (amt, currency)=>`${amt} ${currency} per person`,
         titleRequired: "Enter expense title",
         invalidAmount: "Enter a valid amount",
         choosePayer: "Choose who paid",
@@ -569,7 +569,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
+function ExpenseList({ expenses, loading, onDelete, onRefresh, baseCurrency }) {
     _s();
     const { lang } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$context$2f$LanguageContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useI18n"])();
     const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$translations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCostsTranslations"])(lang);
@@ -581,12 +581,12 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                         children: t.expenses
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                        lineNumber: 25,
+                        lineNumber: 26,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                    lineNumber: 24,
+                    lineNumber: 25,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -601,23 +601,23 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                 className: "h-20 bg-muted rounded-lg animate-pulse"
                             }, n, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                lineNumber: 30,
+                                lineNumber: 31,
                                 columnNumber: 29
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                        lineNumber: 28,
+                        lineNumber: 29,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                    lineNumber: 27,
+                    lineNumber: 28,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-            lineNumber: 23,
+            lineNumber: 24,
             columnNumber: 13
         }, this);
     }
@@ -629,12 +629,12 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                         children: t.expenses
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                        lineNumber: 42,
+                        lineNumber: 43,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                    lineNumber: 41,
+                    lineNumber: 42,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -646,7 +646,7 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                 children: t.noExpenses
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                lineNumber: 46,
+                                lineNumber: 47,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -654,24 +654,24 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                 children: t.addFirstExpense
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                lineNumber: 47,
+                                lineNumber: 48,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                        lineNumber: 45,
+                        lineNumber: 46,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                    lineNumber: 44,
+                    lineNumber: 45,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-            lineNumber: 40,
+            lineNumber: 41,
             columnNumber: 13
         }, this);
     }
@@ -689,7 +689,7 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                        lineNumber: 57,
+                        lineNumber: 58,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -700,18 +700,18 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                             className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                            lineNumber: 59,
+                            lineNumber: 60,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                        lineNumber: 58,
+                        lineNumber: 59,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                lineNumber: 56,
+                lineNumber: 57,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -728,7 +728,7 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                             children: expense.title
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                            lineNumber: 70,
+                                            lineNumber: 71,
                                             columnNumber: 33
                                         }, this),
                                         expense.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -736,7 +736,7 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                             children: expense.description
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                            lineNumber: 72,
+                                            lineNumber: 73,
                                             columnNumber: 37
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -750,7 +750,7 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                                    lineNumber: 77,
+                                                    lineNumber: 78,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -761,19 +761,19 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                                    lineNumber: 78,
+                                                    lineNumber: 79,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                            lineNumber: 76,
+                                            lineNumber: 77,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                    lineNumber: 69,
+                                    lineNumber: 70,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -788,7 +788,7 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                            lineNumber: 82,
+                                            lineNumber: 83,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -800,13 +800,13 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                            lineNumber: 83,
+                                            lineNumber: 84,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                    lineNumber: 81,
+                                    lineNumber: 82,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -818,34 +818,34 @@ function ExpenseList({ expenses, loading, onDelete, onRefresh }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                        lineNumber: 93,
+                                        lineNumber: 94,
                                         columnNumber: 33
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                                    lineNumber: 87,
+                                    lineNumber: 88,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, expense.id, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                            lineNumber: 65,
+                            lineNumber: 66,
                             columnNumber: 25
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                    lineNumber: 63,
+                    lineNumber: 64,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-                lineNumber: 62,
+                lineNumber: 63,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/dashboard/[groupId]/costs/components/ExpenseList.tsx",
-        lineNumber: 55,
+        lineNumber: 56,
         columnNumber: 9
     }, this);
 }
@@ -885,7 +885,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
+function CreateExpenseDialog({ open, onOpenChange, tripId, baseCurrency, onCreated }) {
     _s();
     const { lang } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$context$2f$LanguageContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useI18n"])();
     const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$translations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCostsTranslations"])(lang);
@@ -999,7 +999,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                     className: "absolute inset-0 bg-black/50"
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                    lineNumber: 121,
+                    lineNumber: 122,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1025,7 +1025,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                     children: t.newExpense
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 136,
+                                    lineNumber: 137,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1035,18 +1035,18 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                        lineNumber: 141,
+                                        lineNumber: 142,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 137,
+                                    lineNumber: 138,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                            lineNumber: 135,
+                            lineNumber: 136,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1065,13 +1065,13 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                     children: "*"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 149,
+                                                    lineNumber: 150,
                                                     columnNumber: 50
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 148,
+                                            lineNumber: 149,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1082,13 +1082,13 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             autoFocus: true
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 152,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 147,
+                                    lineNumber: 148,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1103,7 +1103,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 162,
+                                            lineNumber: 163,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1114,13 +1114,13 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             className: "w-full px-4 py-3 rounded-xl border border-input resize-none"
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 163,
+                                            lineNumber: 164,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 161,
+                                    lineNumber: 162,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1130,20 +1130,20 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             children: [
                                                 t.amountLabel,
                                                 " (",
-                                                t.pln,
+                                                baseCurrency,
                                                 ") ",
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     className: "text-destructive",
                                                     children: "*"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 175,
-                                                    columnNumber: 59
+                                                    lineNumber: 176,
+                                                    columnNumber: 66
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 175,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1156,13 +1156,13 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             className: "w-full px-4 py-3 rounded-xl border border-input"
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 177,
+                                            lineNumber: 178,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 174,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1177,13 +1177,13 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                     children: "*"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 191,
+                                                    lineNumber: 192,
                                                     columnNumber: 44
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 190,
+                                            lineNumber: 191,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1196,7 +1196,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                     children: t.choosePersonPlaceholder
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 198,
+                                                    lineNumber: 199,
                                                     columnNumber: 33
                                                 }, this),
                                                 mockUsers.map((user)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1204,19 +1204,19 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                         children: user.name
                                                     }, user.id, false, {
                                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                        lineNumber: 200,
+                                                        lineNumber: 201,
                                                         columnNumber: 37
                                                     }, this))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 194,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 189,
+                                    lineNumber: 190,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1234,13 +1234,13 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                             children: "*"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                            lineNumber: 214,
+                                                            lineNumber: 215,
                                                             columnNumber: 54
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 213,
+                                                    lineNumber: 214,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1253,7 +1253,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                             children: t.selectAll
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                            lineNumber: 217,
+                                                            lineNumber: 218,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1261,7 +1261,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                             children: "|"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                            lineNumber: 224,
+                                                            lineNumber: 225,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1271,19 +1271,19 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                             children: t.deselect
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                            lineNumber: 225,
+                                                            lineNumber: 226,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 216,
+                                                    lineNumber: 217,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 212,
+                                            lineNumber: 213,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1298,7 +1298,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                            lineNumber: 240,
+                                                            lineNumber: 241,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1306,32 +1306,32 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                                             children: user.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                            lineNumber: 246,
+                                                            lineNumber: 247,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, user.id, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                                    lineNumber: 236,
+                                                    lineNumber: 237,
                                                     columnNumber: 37
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 234,
+                                            lineNumber: 235,
                                             columnNumber: 29
                                         }, this),
                                         splitBetween.length > 0 && amount && parseFloat(amount) > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-xs text-muted-foreground mt-2",
-                                            children: t.splitPerPerson((parseFloat(amount) / splitBetween.length).toFixed(2))
+                                            children: t.splitPerPerson((parseFloat(amount) / splitBetween.length).toFixed(2), baseCurrency)
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 251,
+                                            lineNumber: 252,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 211,
+                                    lineNumber: 212,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1345,7 +1345,7 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             children: t.cancel
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 259,
+                                            lineNumber: 260,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1354,36 +1354,36 @@ function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }) {
                                             children: submitting ? t.adding : t.addExpense
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                            lineNumber: 267,
+                                            lineNumber: 268,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                                    lineNumber: 258,
+                                    lineNumber: 259,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                            lineNumber: 145,
+                            lineNumber: 146,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-                    lineNumber: 129,
+                    lineNumber: 130,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-            lineNumber: 120,
+            lineNumber: 121,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/dashboard/[groupId]/costs/components/CreateExpenseDialog.tsx",
-        lineNumber: 119,
+        lineNumber: 120,
         columnNumber: 9
     }, this);
 }
@@ -1680,7 +1680,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled }) {
+function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, baseCurrency, onSettled }) {
     _s();
     const { lang } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$context$2f$LanguageContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useI18n"])();
     const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$translations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCostsTranslations"])(lang);
@@ -1696,7 +1696,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
             return;
         }
         if (amountNum > Math.abs(expense.balance)) {
-            alert(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2)));
+            alert(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2), baseCurrency));
             return;
         }
         try {
@@ -1740,7 +1740,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                     className: "absolute inset-0 bg-black/50"
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                    lineNumber: 73,
+                    lineNumber: 74,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1766,7 +1766,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                     children: t.markAsSettled
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 88,
+                                    lineNumber: 89,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1776,18 +1776,18 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                        lineNumber: 93,
+                                        lineNumber: 94,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 89,
+                                    lineNumber: 90,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                            lineNumber: 87,
+                            lineNumber: 88,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1802,7 +1802,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             children: expense.expenseTitle
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 100,
+                                            lineNumber: 101,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1815,7 +1815,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                             children: t.totalAmount
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                            lineNumber: 103,
+                                                            lineNumber: 104,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1823,17 +1823,17 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                             children: [
                                                                 expense.totalAmount.toFixed(2),
                                                                 " ",
-                                                                t.pln
+                                                                baseCurrency
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                            lineNumber: 104,
+                                                            lineNumber: 105,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 102,
+                                                    lineNumber: 103,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1843,7 +1843,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                             children: t.myShare
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                            lineNumber: 107,
+                                                            lineNumber: 108,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1851,17 +1851,17 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                             children: [
                                                                 expense.myShare.toFixed(2),
                                                                 " ",
-                                                                t.pln
+                                                                baseCurrency
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                            lineNumber: 108,
+                                                            lineNumber: 109,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 106,
+                                                    lineNumber: 107,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1871,7 +1871,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                             children: t.iPaid
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                            lineNumber: 111,
+                                                            lineNumber: 112,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1879,29 +1879,29 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                             children: [
                                                                 expense.iPaid.toFixed(2),
                                                                 " ",
-                                                                t.pln
+                                                                baseCurrency
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                            lineNumber: 112,
+                                                            lineNumber: 113,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 110,
+                                                    lineNumber: 111,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 101,
+                                            lineNumber: 102,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 99,
+                                    lineNumber: 100,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1914,7 +1914,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                     className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-5 h-5", iOwe && "text-destructive", theyOweMe && "text-green-600 dark:text-green-400")
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 124,
+                                                    lineNumber: 125,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1925,13 +1925,13 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 129,
+                                                    lineNumber: 130,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 123,
+                                            lineNumber: 124,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1944,23 +1944,23 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                     children: [
                                                         Math.abs(expense.balance).toFixed(2),
                                                         " ",
-                                                        t.pln
+                                                        baseCurrency
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 137,
+                                                    lineNumber: 138,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 134,
+                                            lineNumber: 135,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 119,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1975,13 +1975,13 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                     children: "*"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 150,
+                                                    lineNumber: 151,
                                                     columnNumber: 52
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 149,
+                                            lineNumber: 150,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1996,7 +1996,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             autoFocus: true
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 152,
+                                            lineNumber: 153,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2004,13 +2004,13 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             children: t.canSettlePartial
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 163,
+                                            lineNumber: 164,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 148,
+                                    lineNumber: 149,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2025,7 +2025,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             children: t.half
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 170,
+                                            lineNumber: 171,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2037,13 +2037,13 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             children: t.full
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 179,
+                                            lineNumber: 180,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 169,
+                                    lineNumber: 170,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2054,7 +2054,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             children: t.information
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 192,
+                                            lineNumber: 193,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2065,13 +2065,13 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 194,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 191,
+                                    lineNumber: 192,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2086,7 +2086,7 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                             children: t.cancel
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 202,
+                                            lineNumber: 203,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2098,43 +2098,43 @@ function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled 
                                                     className: "w-4 h-4 mr-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                                    lineNumber: 219,
+                                                    lineNumber: 220,
                                                     columnNumber: 33
                                                 }, this),
                                                 submitting ? t.saving : t.markAsSettled
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                            lineNumber: 211,
+                                            lineNumber: 212,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                                    lineNumber: 201,
+                                    lineNumber: 202,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                            lineNumber: 97,
+                            lineNumber: 98,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-                    lineNumber: 81,
+                    lineNumber: 82,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-            lineNumber: 72,
+            lineNumber: 73,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/dashboard/[groupId]/costs/components/SettleBalanceDialog.tsx",
-        lineNumber: 71,
+        lineNumber: 72,
         columnNumber: 9
     }, this);
 }
@@ -2175,7 +2175,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function PersonBalanceItem({ person, onSettleExpense, tripId }) {
+function PersonBalanceItem({ person, onSettleExpense, tripId, baseCurrency }) {
     _s();
     const { lang } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$context$2f$LanguageContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useI18n"])();
     const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$translations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCostsTranslations"])(lang);
@@ -2197,7 +2197,7 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                 children: person.userName.split(' ').map((n)=>n[0]).join('')
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 40,
+                                lineNumber: 41,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2208,7 +2208,7 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                         children: person.userName
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 48,
+                                        lineNumber: 49,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2220,19 +2220,19 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 49,
+                                        lineNumber: 50,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 47,
+                                lineNumber: 48,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                        lineNumber: 39,
+                        lineNumber: 40,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2244,36 +2244,36 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                     isOwed ? '+' : '',
                                     person.balance.toFixed(2),
                                     " ",
-                                    t.pln
+                                    baseCurrency
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 56,
+                                lineNumber: 57,
                                 columnNumber: 21
                             }, this),
                             expanded ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$up$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronUp$3e$__["ChevronUp"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 63,
+                                lineNumber: 64,
                                 columnNumber: 33
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 63,
+                                lineNumber: 64,
                                 columnNumber: 69
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                        lineNumber: 55,
+                        lineNumber: 56,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                lineNumber: 31,
+                lineNumber: 32,
                 columnNumber: 13
             }, this),
             expanded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2292,7 +2292,7 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                         children: exp.expenseTitle
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 82,
+                                        lineNumber: 83,
                                         columnNumber: 37
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2301,17 +2301,17 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                             expenseIsOwed ? '+' : '',
                                             exp.balance.toFixed(2),
                                             " ",
-                                            t.pln
+                                            baseCurrency
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 83,
+                                        lineNumber: 84,
                                         columnNumber: 37
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 81,
+                                lineNumber: 82,
                                 columnNumber: 33
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2324,24 +2324,24 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                                 children: t.myShare
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                                lineNumber: 95,
+                                                lineNumber: 96,
                                                 columnNumber: 41
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: [
                                                     exp.myShare.toFixed(2),
                                                     " ",
-                                                    t.pln
+                                                    baseCurrency
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                                lineNumber: 96,
+                                                lineNumber: 97,
                                                 columnNumber: 41
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 94,
+                                        lineNumber: 95,
                                         columnNumber: 37
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2351,7 +2351,7 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                                 children: t.iPaid
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                                lineNumber: 99,
+                                                lineNumber: 100,
                                                 columnNumber: 41
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2359,23 +2359,23 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                                 children: [
                                                     exp.iPaid.toFixed(2),
                                                     " ",
-                                                    t.pln
+                                                    baseCurrency
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                                lineNumber: 100,
+                                                lineNumber: 101,
                                                 columnNumber: 41
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 98,
+                                        lineNumber: 99,
                                         columnNumber: 37
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 93,
+                                lineNumber: 94,
                                 columnNumber: 33
                             }, this),
                             expenseIsOwed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2388,11 +2388,11 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                     " ",
                                     exp.balance.toFixed(2),
                                     " ",
-                                    t.pln
+                                    baseCurrency
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 106,
+                                lineNumber: 107,
                                 columnNumber: 37
                             }, this),
                             expenseIOwe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2405,11 +2405,11 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                     " ",
                                     Math.abs(exp.balance).toFixed(2),
                                     " ",
-                                    t.pln
+                                    baseCurrency
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 111,
+                                lineNumber: 112,
                                 columnNumber: 37
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2425,32 +2425,32 @@ function PersonBalanceItem({ person, onSettleExpense, tripId }) {
                                         className: "w-3 h-3 mr-2"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 127,
                                         columnNumber: 37
                                     }, this),
                                     expenseIOwe ? t.markAsPaid : t.markAsReceived
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                                lineNumber: 117,
+                                lineNumber: 118,
                                 columnNumber: 33
                             }, this)
                         ]
                     }, exp.expenseId, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                        lineNumber: 75,
+                        lineNumber: 76,
                         columnNumber: 29
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-                lineNumber: 69,
+                lineNumber: 70,
                 columnNumber: 17
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalanceItem.tsx",
-        lineNumber: 25,
+        lineNumber: 26,
         columnNumber: 9
     }, this);
 }
@@ -2750,7 +2750,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
+function PersonalBalance({ myBalance, loading, onRefresh, tripId, baseCurrency }) {
     _s();
     const { lang } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$context$2f$LanguageContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useI18n"])();
     const t = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$translations$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCostsTranslations"])(lang);
@@ -2765,12 +2765,12 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                         children: t.myBalance
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                        lineNumber: 35,
+                        lineNumber: 36,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                    lineNumber: 34,
+                    lineNumber: 35,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2781,7 +2781,7 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                 className: "h-48 bg-muted rounded-lg animate-pulse"
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                lineNumber: 39,
+                                lineNumber: 40,
                                 columnNumber: 25
                             }, this),
                             [
@@ -2791,24 +2791,24 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                     className: "h-20 bg-muted rounded-lg animate-pulse"
                                 }, n, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                    lineNumber: 41,
+                                    lineNumber: 42,
                                     columnNumber: 29
                                 }, this))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                        lineNumber: 38,
+                        lineNumber: 39,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                    lineNumber: 37,
+                    lineNumber: 38,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-            lineNumber: 33,
+            lineNumber: 34,
             columnNumber: 13
         }, this);
     }
@@ -2821,12 +2821,12 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                         children: t.myBalance
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                        lineNumber: 53,
+                        lineNumber: 54,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                    lineNumber: 52,
+                    lineNumber: 53,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2835,18 +2835,18 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                         children: t.noDataToShow
                     }, void 0, false, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                        lineNumber: 56,
+                        lineNumber: 57,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                    lineNumber: 55,
+                    lineNumber: 56,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-            lineNumber: 51,
+            lineNumber: 52,
             columnNumber: 13
         }, this);
     }
@@ -2876,14 +2876,14 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                        lineNumber: 77,
+                                        lineNumber: 78,
                                         columnNumber: 25
                                     }, this),
                                     t.myBalance
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                lineNumber: 76,
+                                lineNumber: 77,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2894,18 +2894,18 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                    lineNumber: 81,
+                                    lineNumber: 82,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                lineNumber: 80,
+                                lineNumber: 81,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                        lineNumber: 75,
+                        lineNumber: 76,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2917,7 +2917,7 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                 totalTheyOweMe: myBalance.totalTheyOweMe
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                lineNumber: 87,
+                                lineNumber: 88,
                                 columnNumber: 25
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "py-12 text-center",
@@ -2928,12 +2928,12 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                             className: "w-8 h-8 text-green-600 dark:text-green-400"
                                         }, void 0, false, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                            lineNumber: 95,
+                                            lineNumber: 96,
                                             columnNumber: 33
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                        lineNumber: 94,
+                                        lineNumber: 95,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2944,7 +2944,7 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                        lineNumber: 97,
+                                        lineNumber: 98,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2952,13 +2952,13 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                         children: t.noOutstandingPayments
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                        lineNumber: 100,
+                                        lineNumber: 101,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                lineNumber: 93,
+                                lineNumber: 94,
                                 columnNumber: 25
                             }, this),
                             myBalance.balances.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2970,7 +2970,7 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                                lineNumber: 110,
+                                                lineNumber: 111,
                                                 columnNumber: 33
                                             }, this),
                                             t.settlementsWithPeople,
@@ -2980,7 +2980,7 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                        lineNumber: 109,
+                                        lineNumber: 110,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2988,33 +2988,34 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                                         children: myBalance.balances.map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$components$2f$PersonalBalanceItem$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                 person: person,
                                                 tripId: tripId,
+                                                baseCurrency: baseCurrency,
                                                 onSettleExpense: (exp, name)=>handleSettleExpense(exp, name, person.userId, tripId)
                                             }, person.userId, false, {
                                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                                lineNumber: 115,
+                                                lineNumber: 116,
                                                 columnNumber: 37
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                        lineNumber: 113,
+                                        lineNumber: 114,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                                lineNumber: 108,
+                                lineNumber: 109,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                        lineNumber: 84,
+                        lineNumber: 85,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                lineNumber: 74,
+                lineNumber: 75,
                 columnNumber: 13
             }, this),
             selectedExpense && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$components$2f$SettleBalanceDialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3022,10 +3023,11 @@ function PersonalBalance({ myBalance, loading, onRefresh, tripId }) {
                 onOpenChange: setSettleDialogOpen,
                 expense: selectedExpense,
                 myUserId: myBalance.myUserId,
+                baseCurrency: baseCurrency,
                 onSettled: onRefresh
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/components/PersonalBalance.tsx",
-                lineNumber: 131,
+                lineNumber: 133,
                 columnNumber: 17
             }, this)
         ]
@@ -3093,6 +3095,19 @@ function CostsPage() {
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [createExpenseOpen, setCreateExpenseOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [myBalance, setMyBalance] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [baseCurrency, setBaseCurrency] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("PLN"); // Default, will be loaded from trip
+    const loadTripInfo = async ()=>{
+        try {
+            // TODO: Replace with actual API call when backend is ready
+            // const tripData = await fetchAuth<{ baseCurrency: string }>(apiUrl(`/api/trips/${tripId}`), {});
+            // setBaseCurrency(tripData.baseCurrency);
+            // MOCK - default to PLN for now
+            setBaseCurrency("PLN");
+        } catch (err) {
+            console.error("Error loading trip info:", err);
+            setBaseCurrency("PLN"); // fallback
+        }
+    };
     const loadExpenses = async ()=>{
         try {
             setLoading(true);
@@ -3365,6 +3380,7 @@ function CostsPage() {
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "CostsPage.useEffect": ()=>{
             if (tripId) {
+                loadTripInfo();
                 loadExpenses();
                 loadBalance();
                 loadMyBalance();
@@ -3400,7 +3416,7 @@ function CostsPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                lineNumber: 321,
+                lineNumber: 337,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -3417,14 +3433,14 @@ function CostsPage() {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                    lineNumber: 330,
+                                    lineNumber: 346,
                                     columnNumber: 25
                                 }, this),
                                 t.backToGroup
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                            lineNumber: 325,
+                            lineNumber: 341,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -3452,12 +3468,12 @@ function CostsPage() {
                                                                 className: "w-6 h-6 text-white"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                                lineNumber: 344,
+                                                                lineNumber: 360,
                                                                 columnNumber: 45
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                            lineNumber: 343,
+                                                            lineNumber: 359,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3467,7 +3483,7 @@ function CostsPage() {
                                                                     children: t.costSettlements
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                                    lineNumber: 347,
+                                                                    lineNumber: 363,
                                                                     columnNumber: 45
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3475,19 +3491,19 @@ function CostsPage() {
                                                                     children: t.manageExpenses
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                                    lineNumber: 348,
+                                                                    lineNumber: 364,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                            lineNumber: 346,
+                                                            lineNumber: 362,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                    lineNumber: 342,
+                                                    lineNumber: 358,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -3499,25 +3515,25 @@ function CostsPage() {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                            lineNumber: 358,
+                                                            lineNumber: 374,
                                                             columnNumber: 41
                                                         }, this),
                                                         t.newExpense
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                    lineNumber: 353,
+                                                    lineNumber: 369,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                            lineNumber: 341,
+                                            lineNumber: 357,
                                             columnNumber: 33
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                        lineNumber: 340,
+                                        lineNumber: 356,
                                         columnNumber: 29
                                     }, this),
                                     balance && balance.totalExpenses !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -3529,7 +3545,7 @@ function CostsPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                    lineNumber: 366,
+                                                    lineNumber: 382,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3542,39 +3558,39 @@ function CostsPage() {
                                                             children: [
                                                                 balance.totalExpenses.toFixed(2),
                                                                 " ",
-                                                                t.pln
+                                                                baseCurrency
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                            lineNumber: 368,
+                                                            lineNumber: 384,
                                                             columnNumber: 64
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                                    lineNumber: 367,
+                                                    lineNumber: 383,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                            lineNumber: 365,
+                                            lineNumber: 381,
                                             columnNumber: 37
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                        lineNumber: 364,
+                                        lineNumber: 380,
                                         columnNumber: 33
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                lineNumber: 339,
+                                lineNumber: 355,
                                 columnNumber: 25
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                            lineNumber: 335,
+                            lineNumber: 351,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3586,15 +3602,16 @@ function CostsPage() {
                                         expenses: expenses,
                                         loading: loading,
                                         onDelete: handleDeleteExpense,
-                                        onRefresh: handleRefreshExpenses
+                                        onRefresh: handleRefreshExpenses,
+                                        baseCurrency: baseCurrency
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                        lineNumber: 380,
+                                        lineNumber: 396,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                    lineNumber: 379,
+                                    lineNumber: 395,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3603,51 +3620,53 @@ function CostsPage() {
                                         myBalance: myBalance,
                                         loading: loading,
                                         onRefresh: handleRefreshMyBalance,
-                                        tripId: tripId
+                                        tripId: tripId,
+                                        baseCurrency: baseCurrency
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                        lineNumber: 390,
+                                        lineNumber: 407,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                                    lineNumber: 389,
+                                    lineNumber: 406,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                            lineNumber: 377,
+                            lineNumber: 393,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                    lineNumber: 323,
+                    lineNumber: 339,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                lineNumber: 322,
+                lineNumber: 338,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$costs$2f$components$2f$CreateExpenseDialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 open: createExpenseOpen,
                 onOpenChange: setCreateExpenseOpen,
                 tripId: tripId,
+                baseCurrency: baseCurrency,
                 onCreated: ()=>{
                     loadExpenses();
                     loadBalance();
                 }
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/costs/page.tsx",
-                lineNumber: 402,
+                lineNumber: 420,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true);
 }
-_s(CostsPage, "fuPsJvXPvexnPlo/PA/LzZBBiUk=", false, function() {
+_s(CostsPage, "t2adBHBNTIF5dOso58HeV/jxhWw=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$context$2f$LanguageContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useI18n"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useParams"],

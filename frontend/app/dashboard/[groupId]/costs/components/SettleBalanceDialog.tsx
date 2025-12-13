@@ -15,10 +15,11 @@ interface Props {
     onOpenChange: (open: boolean) => void;
     expense: ExpenseBreakdown & { personName: string; personUserId: string; tripId: string };
     myUserId: string;
+    baseCurrency: string;
     onSettled?: () => void;
 }
 
-export default function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, onSettled }: Props) {
+export default function SettleBalanceDialog({ open, onOpenChange, expense, myUserId, baseCurrency, onSettled }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
     const [amount, setAmount] = useState(Math.abs(expense.balance).toFixed(2));
@@ -37,7 +38,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
         }
 
         if (amountNum > Math.abs(expense.balance)) {
-            alert(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2)));
+            alert(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2), baseCurrency));
             return;
         }
 
@@ -101,15 +102,15 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                             <div className="text-sm text-muted-foreground space-y-1">
                                 <div className="flex justify-between">
                                     <span>{t.totalAmount}</span>
-                                    <span className="font-medium">{expense.totalAmount.toFixed(2)} {t.pln}</span>
+                                    <span className="font-medium">{expense.totalAmount.toFixed(2)} {baseCurrency}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>{t.myShare}</span>
-                                    <span className="font-medium">{expense.myShare.toFixed(2)} {t.pln}</span>
+                                    <span className="font-medium">{expense.myShare.toFixed(2)} {baseCurrency}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>{t.iPaid}</span>
-                                    <span className="font-medium">{expense.iPaid.toFixed(2)} {t.pln}</span>
+                                    <span className="font-medium">{expense.iPaid.toFixed(2)} {baseCurrency}</span>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +140,7 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
                                     iOwe && "text-destructive",
                                     theyOweMe && "text-green-600 dark:text-green-400"
                                 )}>
-                                    {Math.abs(expense.balance).toFixed(2)} {t.pln}
+                                    {Math.abs(expense.balance).toFixed(2)} {baseCurrency}
                                 </span>
                             </p>
                         </div>
