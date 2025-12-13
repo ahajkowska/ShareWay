@@ -1,0 +1,7 @@
+{
+  "/dashboard/[groupId]/checklist/page": "app/dashboard/[groupId]/checklist/page.js",
+  "/dashboard/[groupId]/costs/page": "app/dashboard/[groupId]/costs/page.js",
+  "/dashboard/[groupId]/page": "app/dashboard/[groupId]/page.js",
+  "/dashboard/[groupId]/schedule/page": "app/dashboard/[groupId]/schedule/page.js",
+  "/dashboard/[groupId]/voting/page": "app/dashboard/[groupId]/voting/page.js"
+}
