@@ -12,9 +12,10 @@ interface Props {
     person: PersonalBalanceDto;
     onSettleExpense: (expense: ExpenseBreakdown, personName: string) => void;
     tripId: string;
+    baseCurrency: string;
 }
 
-export default function PersonBalanceItem({ person, onSettleExpense, tripId }: Props) {
+export default function PersonBalanceItem({ person, onSettleExpense, tripId, baseCurrency }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
     const [expanded, setExpanded] = useState(false);
@@ -58,7 +59,7 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                         isOwed && "text-green-600 dark:text-green-400",
                         iOwe && "text-destructive"
                     )}>
-                        {isOwed ? '+' : ''}{person.balance.toFixed(2)} {t.pln}
+                        {isOwed ? '+' : ''}{person.balance.toFixed(2)} {baseCurrency}
                     </span>
                     {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </div>
@@ -85,7 +86,7 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                                         expenseIsOwed && "text-green-600 dark:text-green-400",
                                         expenseIOwe && "text-destructive"
                                     )}>
-                                        {expenseIsOwed ? '+' : ''}{exp.balance.toFixed(2)} {t.pln}
+                                        {expenseIsOwed ? '+' : ''}{exp.balance.toFixed(2)} {baseCurrency}
                                     </span>
                                 </div>
 
@@ -93,23 +94,23 @@ export default function PersonBalanceItem({ person, onSettleExpense, tripId }: P
                                 <div className="text-xs text-muted-foreground space-y-0.5">
                                     <div className="flex justify-between">
                                         <span>{t.myShare}</span>
-                                        <span>{exp.myShare.toFixed(2)} {t.pln}</span>
+                                        <span>{exp.myShare.toFixed(2)} {baseCurrency}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>{t.iPaid}</span>
-                                        <span className="font-medium">{exp.iPaid.toFixed(2)} {t.pln}</span>
+                                        <span className="font-medium">{exp.iPaid.toFixed(2)} {baseCurrency}</span>
                                     </div>
                                 </div>
 
                                 {/* Status Info */}
                                 {expenseIsOwed && (
                                     <div className="text-xs text-green-600 dark:text-green-400 pt-2 border-t">
-                                        → {person.userName} {t.owesMe} {exp.balance.toFixed(2)} {t.pln}
+                                        → {person.userName} {t.owesMe} {exp.balance.toFixed(2)} {baseCurrency}
                                     </div>
                                 )}
                                 {expenseIOwe && (
                                     <div className="text-xs text-destructive pt-2 border-t">
-                                        → {t.iOwe} {person.userName} {Math.abs(exp.balance).toFixed(2)} {t.pln}
+                                        → {t.iOwe} {person.userName} {Math.abs(exp.balance).toFixed(2)} {baseCurrency}
                                     </div>
                                 )}
 

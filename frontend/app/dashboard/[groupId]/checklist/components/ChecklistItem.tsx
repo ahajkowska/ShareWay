@@ -68,12 +68,6 @@ export default function ChecklistItem({ item, onToggle, onDelete }: Props) {
                 >
                     {item.text}
                 </span>
-
-                {item.createdByName && (
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {t.addedBy}: {item.createdByName}
-                    </span>
-                )}
             </label>
 
             {/* Delete Button */}

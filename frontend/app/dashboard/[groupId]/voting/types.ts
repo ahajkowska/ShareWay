@@ -20,11 +20,7 @@ export interface Voting {
     title: string;
     description?: string;
     createdBy: string;
-    createdByName: string;
     createdAt: Date;
-    allowAddingOptions: boolean;
-    allowMultipleVotes: boolean;
-    showResultsBeforeVoting: boolean;
     endsAt: Date;
     status: "open" | "closed";
     options: VotingOption[];
@@ -35,9 +31,6 @@ export interface Voting {
 export interface VotingFormData {
     title: string;
     description: string;
-    allowAddingOptions: boolean;
-    allowMultipleVotes: boolean;
-    showResultsBeforeVoting: boolean;
     endsAt?: Date;
     initialOptions: string[];
 }

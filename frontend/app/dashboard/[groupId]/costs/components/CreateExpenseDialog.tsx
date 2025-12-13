@@ -13,10 +13,11 @@ interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     tripId: string;
+    baseCurrency: string;
     onCreated?: () => void;
 }
 
-export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCreated }: Props) {
+export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCurrency, onCreated }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
 
@@ -172,7 +173,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                         {/* Amount */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
-                                {t.amountLabel} ({t.pln}) <span className="text-destructive">*</span>
+                                {t.amountLabel} ({baseCurrency}) <span className="text-destructive">*</span>
                             </label>
                             <input 
                                 type="number"
@@ -249,7 +250,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, onCrea
                             </div>
                             {splitBetween.length > 0 && amount && parseFloat(amount) > 0 && (
                                 <p className="text-xs text-muted-foreground mt-2">
-                                    {t.splitPerPerson(((parseFloat(amount) / splitBetween.length)).toFixed(2))}
+                                    {t.splitPerPerson(((parseFloat(amount) / splitBetween.length)).toFixed(2), baseCurrency)}
                                 </p>
                             )}
                         </div>

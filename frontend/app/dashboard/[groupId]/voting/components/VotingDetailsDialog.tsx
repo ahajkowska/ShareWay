@@ -171,72 +171,10 @@ export default function VotingDetailsDialog({
 
               {/* Ranking wszystkich opcji */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader>
                   <CardTitle>{t.allOptions}</CardTitle>
-                  {voting.allowAddingOptions && !showAddOption && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowAddOption(true)}
-                      className="gap-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                      {t.addOption}
-                    </Button>
-                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Formularz dodawania opcji */}
-                  {voting.allowAddingOptions && showAddOption && (
-                    <form onSubmit={handleAddOption} className="p-4 bg-muted/50 rounded-lg space-y-3">
-                      <div>
-                        <Label htmlFor="optionText">
-                          {t.optionName} *
-                        </Label>
-                        <Input
-                          id="optionText"
-                          value={newOptionText}
-                          onChange={(e) => setNewOptionText(e.target.value)}
-                          placeholder={t.optionPlaceholder}
-                          required
-                          disabled={submitting}
-                          autoFocus
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="optionDescription">
-                          {t.description} ({t.optional})
-                        </Label>
-                        <Textarea
-                          id="optionDescription"
-                          value={newOptionDescription}
-                          onChange={(e) => setNewOptionDescription(e.target.value)}
-                          placeholder={t.additionalInfo}
-                          rows={2}
-                          disabled={submitting}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button type="submit" disabled={submitting} size="sm">
-                          {submitting ? t.adding : t.add}
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setShowAddOption(false);
-                            setNewOptionText("");
-                            setNewOptionDescription("");
-                          }}
-                          disabled={submitting}
-                          size="sm"
-                        >
-                          {t.cancel}
-                        </Button>
-                      </div>
-                    </form>
-                  )}
-
                   {/* Lista opcji */}
                   {sortedOptions.map((option, index) => {
                     const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
@@ -301,10 +239,7 @@ export default function VotingDetailsDialog({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <p>{t.createdBy}: <strong>{voting.createdByName}</strong></p>
                   <p>{t.creationDate}: <strong>{new Date(voting.createdAt).toLocaleDateString(t.locale)}</strong></p>
-                  <p>{t.allowAddingOptions}: <strong>{voting.allowAddingOptions ? t.yes : t.no}</strong></p>
-                  <p>{t.allowMultipleVotes}: <strong>{voting.allowMultipleVotes ? t.yes : t.no}</strong></p>
                 </CardContent>
               </Card>
             </div>

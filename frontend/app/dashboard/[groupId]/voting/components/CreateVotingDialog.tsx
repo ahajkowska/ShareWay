@@ -24,9 +24,6 @@ export default function CreateVotingDialog({
   const [formData, setFormData] = useState<VotingFormData>({
     title: "",
     description: "",
-    allowAddingOptions: true,
-    allowMultipleVotes: false,
-    showResultsBeforeVoting: false,
     endsAt: undefined,
     initialOptions: ["", ""],
   });
@@ -58,9 +55,6 @@ export default function CreateVotingDialog({
       setFormData({
         title: "",
         description: "",
-        allowAddingOptions: true,
-        allowMultipleVotes: false,
-        showResultsBeforeVoting: false,
         endsAt: undefined,
         initialOptions: ["", ""],
       });
@@ -217,71 +211,6 @@ export default function CreateVotingDialog({
                     {t.addOption}
                   </Button>
                 </div>
-              </div>
-
-              {/* Settings */}
-              <div className="space-y-3 pt-4 border-t">
-                <h3 className="font-semibold mb-3">{t.settings}</h3>
-                
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={formData.allowAddingOptions}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      allowAddingOptions: e.target.checked,
-                    }))}
-                    className="mt-1 w-5 h-5 rounded border-input"
-                  />
-                  <div>
-                    <div className="font-medium group-hover:text-primary transition-colors">
-                      {t.allowNewOptions}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {t.allowNewOptionsDesc}
-                    </div>
-                  </div>
-                </label>
-
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={formData.allowMultipleVotes}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      allowMultipleVotes: e.target.checked,
-                    }))}
-                    className="mt-1 w-5 h-5 rounded border-input"
-                  />
-                  <div>
-                    <div className="font-medium group-hover:text-primary transition-colors">
-                      {t.allowMultipleVotes}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {t.multipleChoiceInfo}
-                    </div>
-                  </div>
-                </label>
-
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={formData.showResultsBeforeVoting}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      showResultsBeforeVoting: e.target.checked,
-                    }))}
-                    className="mt-1 w-5 h-5 rounded border-input"
-                  />
-                  <div>
-                    <div className="font-medium group-hover:text-primary transition-colors">
-                      {t.showResultsBeforeVoting}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {t.showResultsBeforeVotingDesc}
-                    </div>
-                  </div>
-                </label>
               </div>
 
             </div>

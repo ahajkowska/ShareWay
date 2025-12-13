@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Plus, Wallet, TrendingUp } from "lucide-react";
+import { Plus, Wallet, TrendingUp, ArrowLeft } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "./translations";
 import * as api from "@/lib/api";
@@ -19,6 +19,7 @@ export default function CostsPage() {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
     const params = useParams();
+    const router = useRouter();
     const tripId = params.groupId as string;
     
     const [expenses, setExpenses] = useState<ExpenseDto[]>([]);
@@ -26,6 +27,21 @@ export default function CostsPage() {
     const [loading, setLoading] = useState(true);
     const [createExpenseOpen, setCreateExpenseOpen] = useState(false);
     const [myBalance, setMyBalance] = useState<MyBalanceSummaryDto | null>(null);
+    const [baseCurrency, setBaseCurrency] = useState<string>("PLN"); // Default, will be loaded from trip
+
+    const loadTripInfo = async () => {
+        try {
+            // TODO: Replace with actual API call when backend is ready
+            // const tripData = await fetchAuth<{ baseCurrency: string }>(apiUrl(`/api/trips/${tripId}`), {});
+            // setBaseCurrency(tripData.baseCurrency);
+            
+            // MOCK - default to PLN for now
+            setBaseCurrency("PLN");
+        } catch (err: any) {
+            console.error("Error loading trip info:", err);
+            setBaseCurrency("PLN"); // fallback
+        }
+    };
 
     const loadExpenses = async () => {
         try {
@@ -280,6 +296,7 @@ export default function CostsPage() {
 
     useEffect(() => {
         if (tripId) {
+            loadTripInfo();
             loadExpenses();
             loadBalance();
             loadMyBalance();
@@ -320,6 +337,16 @@ export default function CostsPage() {
             <Navbar />
             <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
                 <div className="container mx-auto px-4 max-w-7xl">
+                    {/* Back button */}
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.push(`/dashboard/${tripId}`)}
+                        className="mb-6 gap-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        {t.backToGroup}
+                    </Button>
+
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -354,7 +381,7 @@ export default function CostsPage() {
                                     <div className="flex items-center gap-2 text-muted-foreground">
                                         <TrendingUp className="w-4 h-4" />
                                         <span className="text-sm">
-                                            {t.totalExpenses}: <span className="font-bold text-foreground">{balance.totalExpenses.toFixed(2)} {t.pln}</span>
+                                            {t.totalExpenses}: <span className="font-bold text-foreground">{balance.totalExpenses.toFixed(2)} {baseCurrency}</span>
                                         </span>
                                     </div>
                                 </CardContent>
@@ -371,6 +398,7 @@ export default function CostsPage() {
                                 loading={loading}
                                 onDelete={handleDeleteExpense}
                                 onRefresh={handleRefreshExpenses}
+                                baseCurrency={baseCurrency}
                             />
                         </div>
 
@@ -381,6 +409,7 @@ export default function CostsPage() {
                                 loading={loading} 
                                 onRefresh={handleRefreshMyBalance}
                                 tripId={tripId}
+                                baseCurrency={baseCurrency}
                             />
                         </div>
                     </div>
@@ -392,6 +421,7 @@ export default function CostsPage() {
                 open={createExpenseOpen} 
                 onOpenChange={setCreateExpenseOpen} 
                 tripId={tripId}
+                baseCurrency={baseCurrency}
                 onCreated={() => {
                     loadExpenses();
                     loadBalance();

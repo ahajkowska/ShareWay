@@ -12,9 +12,10 @@ interface Props {
     loading: boolean;
     onDelete: (expenseId: string) => Promise<void>;
     onRefresh: () => Promise<void>;
+    baseCurrency: string;
 }
 
-export default function ExpenseList({ expenses, loading, onDelete, onRefresh }: Props) {
+export default function ExpenseList({ expenses, loading, onDelete, onRefresh, baseCurrency }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
 
