@@ -36,32 +36,24 @@ export default function ChecklistPage() {
                     id: "1",
                     text: "Spakować ubrania",
                     isChecked: false,
-                    createdBy: "user1",
-                    createdByName: "Jan Kowalski",
                     createdAt: new Date("2024-12-01"),
                 },
                 {
                     id: "2",
                     text: "Zarezerwować hotel",
                     isChecked: true,
-                    createdBy: "user2",
-                    createdByName: "Anna Nowak",
                     createdAt: new Date("2024-12-02"),
                 },
                 {
                     id: "3",
                     text: "Kupić bilety lotnicze",
                     isChecked: true,
-                    createdBy: "user1",
-                    createdByName: "Jan Kowalski",
                     createdAt: new Date("2024-12-03"),
                 },
                 {
                     id: "4",
                     text: "Zabrać paszporty",
                     isChecked: false,
-                    createdBy: "user3",
-                    createdByName: "Piotr Wiśniewski",
                     createdAt: new Date("2024-12-04"),
                 },
             ];
@@ -91,8 +83,6 @@ export default function ChecklistPage() {
                 id: `temp-${Date.now()}`,
                 text: text,
                 isChecked: false,
-                createdBy: "current-user",
-                createdByName: "Ty",
                 createdAt: new Date(),
             };
             setItems(prev => [newItem, ...prev]);

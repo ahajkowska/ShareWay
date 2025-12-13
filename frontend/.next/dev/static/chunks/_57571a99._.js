@@ -535,18 +535,6 @@ function ChecklistItem({ item, onToggle, onDelete }) {
                         fileName: "[project]/app/dashboard/[groupId]/checklist/components/ChecklistItem.tsx",
                         lineNumber: 64,
                         columnNumber: 17
-                    }, this),
-                    item.createdByName && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        className: "text-xs text-muted-foreground whitespace-nowrap",
-                        children: [
-                            t.addedBy,
-                            ": ",
-                            item.createdByName
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/dashboard/[groupId]/checklist/components/ChecklistItem.tsx",
-                        lineNumber: 73,
-                        columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
@@ -564,12 +552,12 @@ function ChecklistItem({ item, onToggle, onDelete }) {
                     className: "w-4 h-4"
                 }, void 0, false, {
                     fileName: "[project]/app/dashboard/[groupId]/checklist/components/ChecklistItem.tsx",
-                    lineNumber: 88,
+                    lineNumber: 82,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/checklist/components/ChecklistItem.tsx",
-                lineNumber: 81,
+                lineNumber: 75,
                 columnNumber: 17
             }, this)
         ]
@@ -903,32 +891,24 @@ function ChecklistPage() {
                     id: "1",
                     text: "Spakować ubrania",
                     isChecked: false,
-                    createdBy: "user1",
-                    createdByName: "Jan Kowalski",
                     createdAt: new Date("2024-12-01")
                 },
                 {
                     id: "2",
                     text: "Zarezerwować hotel",
                     isChecked: true,
-                    createdBy: "user2",
-                    createdByName: "Anna Nowak",
                     createdAt: new Date("2024-12-02")
                 },
                 {
                     id: "3",
                     text: "Kupić bilety lotnicze",
                     isChecked: true,
-                    createdBy: "user1",
-                    createdByName: "Jan Kowalski",
                     createdAt: new Date("2024-12-03")
                 },
                 {
                     id: "4",
                     text: "Zabrać paszporty",
                     isChecked: false,
-                    createdBy: "user3",
-                    createdByName: "Piotr Wiśniewski",
                     createdAt: new Date("2024-12-04")
                 }
             ];
@@ -959,8 +939,6 @@ function ChecklistPage() {
                 id: `temp-${Date.now()}`,
                 text: text,
                 isChecked: false,
-                createdBy: "current-user",
-                createdByName: "Ty",
                 createdAt: new Date()
             };
             setItems((prev)=>[
@@ -1002,7 +980,7 @@ function ChecklistPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                lineNumber: 132,
+                lineNumber: 122,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -1019,14 +997,14 @@ function ChecklistPage() {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                    lineNumber: 141,
+                                    lineNumber: 131,
                                     columnNumber: 25
                                 }, this),
                                 t.backToGroup
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                            lineNumber: 136,
+                            lineNumber: 126,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1049,7 +1027,7 @@ function ChecklistPage() {
                                                     children: t.checklistTitle
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                                    lineNumber: 153,
+                                                    lineNumber: 143,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1061,25 +1039,25 @@ function ChecklistPage() {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                                            lineNumber: 159,
+                                                            lineNumber: 149,
                                                             columnNumber: 41
                                                         }, this),
                                                         isAddOpen ? t.cancel : t.addItem
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                                    lineNumber: 154,
+                                                    lineNumber: 144,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                            lineNumber: 152,
+                                            lineNumber: 142,
                                             columnNumber: 33
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                        lineNumber: 151,
+                                        lineNumber: 141,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1090,7 +1068,7 @@ function ChecklistPage() {
                                                 children: t.checklistDescription
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                                lineNumber: 165,
+                                                lineNumber: 155,
                                                 columnNumber: 33
                                             }, this),
                                             totalCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1098,24 +1076,24 @@ function ChecklistPage() {
                                                 children: t.itemsCompleted(completedCount.toString(), totalCount.toString())
                                             }, void 0, false, {
                                                 fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                                lineNumber: 169,
+                                                lineNumber: 159,
                                                 columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                        lineNumber: 164,
+                                        lineNumber: 154,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                lineNumber: 150,
+                                lineNumber: 140,
                                 columnNumber: 25
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                            lineNumber: 146,
+                            lineNumber: 136,
                             columnNumber: 21
                         }, this),
                         isAddOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1137,12 +1115,12 @@ function ChecklistPage() {
                                 onCancel: ()=>setIsAddOpen(false)
                             }, void 0, false, {
                                 fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                                lineNumber: 185,
+                                lineNumber: 175,
                                 columnNumber: 29
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                            lineNumber: 179,
+                            lineNumber: 169,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$dashboard$2f5b$groupId$5d2f$checklist$2f$components$2f$ChecklistList$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1153,18 +1131,18 @@ function ChecklistPage() {
                             error: error
                         }, void 0, false, {
                             fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                            lineNumber: 193,
+                            lineNumber: 183,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                    lineNumber: 134,
+                    lineNumber: 124,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/dashboard/[groupId]/checklist/page.tsx",
-                lineNumber: 133,
+                lineNumber: 123,
                 columnNumber: 13
             }, this)
         ]
