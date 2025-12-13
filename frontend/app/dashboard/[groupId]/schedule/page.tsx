@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { format, isToday } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Plus, Calendar, ChevronDown, MapPinned, Sun, Cloud, Sunrise } from "lucide-react";
+import { Plus, Calendar, ChevronDown, MapPinned, Sun, Cloud, Sunrise, ArrowLeft } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "./translations";
 import type { DayDto } from "./types";
@@ -21,6 +21,7 @@ const dayIcons = [Sun, Cloud, Sunrise];
 
 export default function SchedulePage() {
     const params = useParams();
+    const router = useRouter();
     const tripId = params.groupId as string;
     const { lang } = useI18n();
     const t = getScheduleTranslations(lang);
@@ -95,6 +96,16 @@ export default function SchedulePage() {
             <Navbar />
             <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
                 <div className="container mx-auto px-4 max-w-4xl">
+                    {/* Back button */}
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.push(`/dashboard/${tripId}`)}
+                        className="mb-6 gap-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        {t.backToGroup}
+                    </Button>
+
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

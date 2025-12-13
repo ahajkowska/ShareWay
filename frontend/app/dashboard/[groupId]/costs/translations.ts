@@ -55,6 +55,7 @@ export const costsTranslations = {
     balance: "Bilans",
     theyOweMe: "Mi są winni",
     iOweLabel: "Jestem winien/winna",
+    backToGroup: "Powrót do wyboru modułów",
     
     // CreateExpenseDialog
     expenseTitle: "Tytuł wydatku",
@@ -115,6 +116,7 @@ export const costsTranslations = {
     expenses: "expenses",
     owesMe: "owes me",
     iOwe: "I owe",
+    backToGroup: "Back to module selection",
     markAsPaid: "Mark as Paid",
     markAsReceived: "Mark as Received",
     myBalance: "My Balance",

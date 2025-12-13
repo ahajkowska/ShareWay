@@ -39,6 +39,7 @@ export const scheduleTranslations = {
     edit: "Edytuj",
     delete: "Usuń",
     deleting: "Usuwanie...",
+    backToGroup: "Powrót do wyboru modułów",
   },
   en: {
     schedule: "Trip Schedule",
@@ -80,6 +81,7 @@ export const scheduleTranslations = {
     edit: "Edit",
     delete: "Delete",
     deleting: "Deleting...",
+    backToGroup: "Back to module selection",
   },
 };
 

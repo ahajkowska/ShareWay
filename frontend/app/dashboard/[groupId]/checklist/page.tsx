@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getChecklistTranslations } from "./translations";
 import ChecklistList from "./components/ChecklistList";
@@ -17,6 +17,7 @@ export default function ChecklistPage() {
     const { lang } = useI18n();
     const t = getChecklistTranslations(lang);
     const params = useParams();
+    const router = useRouter();
     const groupId = params.groupId as string;
     const [items, setItems] = useState<ChecklistItemDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -131,6 +132,16 @@ export default function ChecklistPage() {
             <Navbar />
             <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
                 <div className="container mx-auto px-4 max-w-4xl">
+                    {/* Back button */}
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.push(`/dashboard/${groupId}`)}
+                        className="mb-6 gap-2"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        {t.backToGroup}
+                    </Button>
+
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

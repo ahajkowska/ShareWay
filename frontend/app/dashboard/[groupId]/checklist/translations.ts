@@ -25,6 +25,7 @@ export const checklistTranslations = {
     edit: "Edytuj",
     delete: "Usuń",
     deleting: "Usuwanie...",
+    backToGroup: "Powrót do wyboru modułów",
   },
   en: {
     checklist: "Checklist",
@@ -52,6 +53,7 @@ export const checklistTranslations = {
     edit: "Edit",
     delete: "Delete",
     deleting: "Deleting...",
+    backToGroup: "Back to module selection",
   },
 };
 
