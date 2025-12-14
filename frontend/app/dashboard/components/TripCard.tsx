@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MapPin, Calendar, Copy, ChevronRight, Users } from "lucide-react";
@@ -15,6 +15,7 @@ interface TripCardProps {
   trip: Trip;
   index: number;
   onOpen: (trip: Trip) => void;
+  imageUrlFromServer?: string | null; // 👈 NOWE
 }
 
 const accentStyles: Record<
@@ -94,39 +95,6 @@ function getAccentPreset(trip: Trip): TripAccentPreset {
   return "neutral";
 }
 
-const imageUrlCache = new Map<string, string>();
-const LOCAL_CACHE_KEY = "dashboard-destination-image-cache-v2-no-fallback";
-let cacheHydratedFromStorage = false;
-
-function hydrateCacheFromStorage() {
-  if (cacheHydratedFromStorage) return;
-  cacheHydratedFromStorage = true;
-  if (typeof window === "undefined") return;
-
-  try {
-    // Drop legacy cache that could contain fallback images.
-    window.localStorage.removeItem("dashboard-destination-image-cache-v1");
-    const raw = window.localStorage.getItem(LOCAL_CACHE_KEY);
-    if (!raw) return;
-    const parsed = JSON.parse(raw) as Record<string, string>;
-    Object.entries(parsed).forEach(([key, value]) => {
-      if (typeof key === "string" && typeof value === "string") {
-        imageUrlCache.set(key, value);
-      }
-    });
-  } catch {}
-}
-
-function persistCacheToStorage() {
-  if (typeof window === "undefined") return;
-  const entries = Array.from(imageUrlCache.entries());
-  const limited = entries.slice(Math.max(0, entries.length - 50));
-  const asObject = Object.fromEntries(limited);
-  try {
-    window.localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(asObject));
-  } catch {}
-}
-
 const fallbackMembers: TripMember[] = [
   { id: "f1", name: "Alicja Nowak" },
   { id: "f2", name: "Bartek Kowalski" },
@@ -138,25 +106,26 @@ const fallbackMembers: TripMember[] = [
 
 function withFallbackMembers(trip: Trip): TripMember[] {
   if (trip.members.length > 0) return trip.members;
-  // Deterministyczny fallback
   const seed = Number(trip.id) || trip.id.length;
   return fallbackMembers
     .map((m, i) => ({ ...m, id: `${m.id}-${seed + i}` }))
     .slice(seed % 3, (seed % 3) + 4);
 }
 
-export default function TripCard({ trip, index, onOpen }: TripCardProps) {
+export default function TripCard({
+  trip,
+  index,
+  onOpen,
+  imageUrlFromServer,
+}: TripCardProps) {
   const isOrganizer = trip.roleForCurrentUser === "ORGANIZER";
   const isArchived = trip.status === "ARCHIVED";
   const preset = getAccentPreset(trip);
   const style = accentStyles[preset];
-  const cacheKey = useMemo(
-    () => `${preset}:${trip.destination.toLowerCase()}`,
-    [preset, trip.destination]
+
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    imageUrlFromServer ?? null
   );
-  const [imageUrl, setImageUrl] = useState<string | null>(() => {
-    return imageUrlCache.get(cacheKey) ?? null;
-  });
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -181,13 +150,10 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
   useEffect(() => {
     const controller = new AbortController();
     let mounted = true;
-    hydrateCacheFromStorage();
-    const cached = imageUrlCache.get(cacheKey);
-    if (cached) {
-      setImageUrl(cached);
-      return () => {
-        controller.abort();
-      };
+
+    if (imageUrlFromServer) {
+      setImageUrl(imageUrlFromServer);
+      return () => controller.abort();
     }
 
     setImageUrl(null);
@@ -198,6 +164,10 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
           q: trip.destination,
           preset,
         });
+        const context = `${trip.name} ${trip.description ?? ""}`.trim();
+        if (context) {
+          params.set("context", context);
+        }
         const res = await fetch(`/api/destination-image?${params.toString()}`, {
           signal: controller.signal,
         });
@@ -206,8 +176,6 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
         const data = (await res.json()) as { url?: string };
         if (mounted && data?.url) {
           setImageUrl(data.url);
-          imageUrlCache.set(cacheKey, data.url);
-          persistCacheToStorage();
         }
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return;
@@ -220,7 +188,13 @@ export default function TripCard({ trip, index, onOpen }: TripCardProps) {
       mounted = false;
       controller.abort();
     };
-  }, [cacheKey, preset, trip.destination]);
+  }, [
+    preset,
+    trip.destination,
+    imageUrlFromServer,
+    trip.name,
+    trip.description,
+  ]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("pl-PL", {
