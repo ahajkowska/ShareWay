@@ -1,5 +1,11 @@
 import { plainToInstance } from 'class-transformer';
-import { IsNumber, IsString, validateSync } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsOptional,
+  IsBoolean,
+  validateSync,
+} from 'class-validator';
 
 export class EnvironmentalVariables {
   @IsNumber()
@@ -21,7 +27,7 @@ export class EnvironmentalVariables {
   DATABASE_USER: string;
 
   @IsString()
-  DATABASE_PASSWORD: string;
+  POSTGRES_PASSWORD: string;
 
   @IsString()
   DATABASE_NAME: string;
@@ -31,6 +37,34 @@ export class EnvironmentalVariables {
 
   @IsString()
   JWT_REFRESH_SECRET: string;
+
+  @IsString()
+  @IsOptional()
+  MAIL_HOST?: string;
+
+  @IsNumber()
+  @IsOptional()
+  MAIL_PORT?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  MAIL_SECURE?: boolean;
+
+  @IsString()
+  @IsOptional()
+  MAIL_USER?: string;
+
+  @IsString()
+  @IsOptional()
+  MAIL_PASSWORD?: string;
+
+  @IsString()
+  @IsOptional()
+  MAIL_FROM?: string;
+
+  @IsString()
+  @IsOptional()
+  APP_URL?: string;
 }
 
 export function validate(config: Record<string, unknown>) {

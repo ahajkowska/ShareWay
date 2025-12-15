@@ -7,6 +7,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { validate } from './validation/env-validation.js';
 import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
+import { AdminModule } from './admin/admin.module.js';
+import { MailerModuleLocal } from './mailer/mailer.module.js';
 import { User } from './users/entities/user.entity.js';
 import path from 'path';
 
@@ -29,7 +31,7 @@ const envFilePath = isTsRun
         host: configService.getOrThrow<string>('DATABASE_HOST'),
         port: configService.getOrThrow<number>('DATABASE_PORT'),
         username: configService.getOrThrow<string>('DATABASE_USER'),
-        password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
+        password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
         entities: [User],
         synchronize: env === 'development',
@@ -37,8 +39,10 @@ const envFilePath = isTsRun
       }),
       inject: [ConfigService],
     }),
+    MailerModuleLocal,
     AuthModule,
     UsersModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

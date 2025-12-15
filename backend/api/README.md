@@ -9,17 +9,22 @@ ShareWay backend API built with NestJS, TypeORM, PostgreSQL, and Redis.
 - **ORM:** TypeORM
 - **Cache/Session:** Redis (ioredis)
 - **Authentication:** Double-Token Architecture (JWT + Refresh Token)
+- **Email:** @nestjs-modules/mailer with Handlebars templates
 
 ## Project Structure
 
 ```
 src/
+├── admin/                   # Admin module (RBAC protected)
+│   └── dto/                 # Pagination DTOs
 ├── auth/                    # Authentication module
 │   ├── constants/           # Auth constants (token expiry, cookie options)
-│   ├── decorators/          # Custom decorators (@Public, @CurrentUser)
-│   ├── guards/              # Auth guards (JwtAuthGuard, RefreshTokenGuard)
+│   ├── decorators/          # Custom decorators (@Public, @CurrentUser, @Roles)
+│   ├── guards/              # Auth guards (JwtAuthGuard, RefreshTokenGuard, RolesGuard)
 │   ├── interfaces/          # TypeScript interfaces
 │   └── strategies/          # Passport strategies (JWT, Refresh Token)
+├── mailer/                  # Email module
+│   └── templates/           # Handlebars email templates
 ├── redis/                   # Redis module for session management
 ├── users/                   # Users module
 │   ├── dto/                 # Data Transfer Objects
@@ -39,6 +44,7 @@ This API implements a **Double-Token Architecture**:
 - Tokens are transmitted via `HttpOnly`, `Secure` cookies
 - Refresh tokens are hashed and stored in Redis
 - Token rotation on refresh (old token invalidated, new pair issued)
+- RBAC (Role-Based Access Control) with Admin role
 
 ## API Endpoints
 
@@ -53,9 +59,21 @@ This API implements a **Double-Token Architecture**:
 
 ### Users Module
 
-| Method | Endpoint    | Auth      | Description              |
-| ------ | ----------- | --------- | ------------------------ |
-| GET    | `/users/me` | Protected | Get current user profile |
+| Method | Endpoint             | Auth      | Description              |
+| ------ | -------------------- | --------- | ------------------------ |
+| GET    | `/users/me`          | Protected | Get current user profile |
+| PATCH  | `/users/me`          | Protected | Update profile (nickname)|
+| PATCH  | `/users/me/password` | Protected | Change password          |
+
+### Admin Module (Requires Admin Role)
+
+| Method | Endpoint                       | Auth       | Description                    |
+| ------ | ------------------------------ | ---------- | ------------------------------ |
+| GET    | `/admin/users`                 | Admin Only | List all users (paginated)     |
+| GET    | `/admin/users/:id`             | Admin Only | Get user by ID                 |
+| PATCH  | `/admin/users/:id/ban`         | Admin Only | Ban user (deactivate + logout) |
+| PATCH  | `/admin/users/:id/unban`       | Admin Only | Unban user (reactivate)        |
+| POST   | `/admin/users/:id/reset-password` | Admin Only | Send password reset email   |
 
 ## Environment Variables
 
@@ -70,7 +88,7 @@ NODE_ENV=development
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_USER=postgres
-DATABASE_PASSWORD=your_password_here
+POSTGRES_PASSWORD=your_password_here
 DATABASE_NAME=shareway
 
 # Redis Configuration
@@ -80,6 +98,17 @@ REDIS_PORT=6379
 # JWT Secrets
 JWT_SECRET=your-access-token-secret-min-32-chars
 JWT_REFRESH_SECRET=your-refresh-token-secret-min-32-chars
+
+# Mailer Configuration (Development - uses MailHog)
+MAIL_HOST=localhost
+MAIL_PORT=1025
+MAIL_SECURE=false
+MAIL_USER=
+MAIL_PASSWORD=
+MAIL_FROM="ShareWay" <noreply@shareway.app>
+
+# App Configuration
+APP_URL=http://localhost:3000
 ```
 
 ## Setup
@@ -139,8 +168,24 @@ npm run start:prod
   email: string; // Unique
   password: string; // bcrypt hashed
   nickname: string;
+  role: 'user' | 'admin'; // Default: 'user'
   isActive: boolean; // Default: true
+  passwordResetToken: string | null; // For password reset flow
+  passwordResetExpires: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
 ```
+
+## Email Templates
+
+The following email templates are available:
+
+- **welcome.hbs** - Sent after successful registration
+- **reset-password.hbs** - Sent when admin initiates password reset
+- **account-banned.hbs** - Sent when admin bans a user
+
+### Development Email Testing
+
+In development mode, emails are sent to MailHog (included in docker-compose.dev.yml).
+View emails at: `http://localhost:8025`
