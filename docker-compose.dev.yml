@@ -48,6 +48,28 @@ services:
       test: ["CMD", "redis-cli", "ping"]
     networks: [shareway-network]
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - target: 1025
+        published: ${MAIL_PORT:-1025}
+        protocol: tcp
+        mode: host
+      - target: 8025
+        published: ${MAILHOG_UI_PORT:-8025}
+        protocol: tcp
+        mode: host
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 128m
+    cpus: 0.25
+    networks: [shareway-network]
+
 volumes:
   postgres_data:
   redis_data:
