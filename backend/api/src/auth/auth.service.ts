@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service.js';
 import { RedisRepository } from '../redis/redis.repository.js';
+import { MailerService } from '../mailer/mailer.service.js';
 import { RegisterDto, LoginDto } from '../users/dto/index.js';
 import {
   TokenPair,
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly redisRepository: RedisRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly mailerService: MailerService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<{ message: string }> {
@@ -39,6 +41,11 @@ export class AuthService {
 
     this.eventEmitter.emit('user.registered', {
       userId: user.id,
+      email: user.email,
+      nickname: user.nickname,
+    });
+
+    await this.mailerService.sendWelcomeEmail({
       email: user.email,
       nickname: user.nickname,
     });
