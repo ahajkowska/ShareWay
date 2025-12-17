@@ -1,0 +1,42 @@
+import {
+  IsString,
+  IsOptional,
+  IsDateString,
+  MaxLength,
+  MinLength,
+  IsIn,
+} from 'class-validator';
+import { SUPPORTED_CURRENCIES } from '../constants/currencies.js';
+
+export class UpdateTripDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(1, { message: 'Trip name cannot be empty' })
+  @MaxLength(255, { message: 'Trip name must be at most 255 characters' })
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000, { message: 'Description must be at most 2000 characters' })
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255, { message: 'Location must be at most 255 characters' })
+  location?: string;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'Start date must be a valid date' })
+  startDate?: string;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'End date must be a valid date' })
+  endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(SUPPORTED_CURRENCIES, {
+    message: `Currency must be one of: ${SUPPORTED_CURRENCIES.join(', ')}`,
+  })
+  baseCurrency?: string;
+}
