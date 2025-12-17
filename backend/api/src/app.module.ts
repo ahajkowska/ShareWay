@@ -9,7 +9,9 @@ import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { MailerModuleLocal } from './mailer/mailer.module.js';
+import { TripsModule } from './trips/trips.module.js';
 import { User } from './users/entities/user.entity.js';
+import { Trip, Participant } from './trips/entities/index.js';
 import path from 'path';
 
 const env = process.env.NODE_ENV ?? 'development';
@@ -33,7 +35,7 @@ const envFilePath = isTsRun
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [User],
+        entities: [User, Trip, Participant],
         synchronize: env === 'development',
         logging: env === 'development',
       }),
@@ -43,6 +45,7 @@ const envFilePath = isTsRun
     AuthModule,
     UsersModule,
     AdminModule,
+    TripsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
