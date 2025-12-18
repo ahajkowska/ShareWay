@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Vote, VoteOption, VoteCast, ChecklistItem, ChecklistItemState } from './entities/index.js';
 import { CreateVoteDto, CastVoteDto, CreateChecklistItemDto, UpdateChecklistStatusDto } from './dto/index.js';
 import { TripsService } from '../trips/trips.service.js';
@@ -19,6 +19,7 @@ export class EngagementService {
         @InjectRepository(ChecklistItemState)
         private readonly checklistItemStateRepository: Repository<ChecklistItemState>,
         private readonly tripsService: TripsService,
+        private readonly dataSource: DataSource,
     ) { }
 
     // --- Voting ---
@@ -50,40 +51,59 @@ export class EngagementService {
     async castVote(voteId: string, userId: string, castVoteDto: CastVoteDto): Promise<VoteCast> {
         const { optionId } = castVoteDto;
 
-        // Verify option belongs to vote (simple check)
-        const option = await this.voteOptionRepository.findOne({ where: { id: optionId }, relations: ['vote'] });
-        if (!option) {
-            throw new NotFoundException('Option not found');
-        }
-        if (option.voteId !== voteId) {
-            throw new BadRequestException('Option does not belong to the specified vote');
-        }
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
-        // Security Check: Verify user is in trip
-        const isParticipant = await this.tripsService.isParticipant(option.vote.tripId, userId);
-        if (!isParticipant) {
-            throw new ForbiddenException('You must be a participant of the trip to vote');
-        }
+        try {
+            // Verify option belongs to vote
+            const option = await this.voteOptionRepository.findOne({ where: { id: optionId }, relations: ['vote'] });
+            if (!option) {
+                throw new NotFoundException('Option not found');
+            }
+            if (option.voteId !== voteId) {
+                throw new BadRequestException('Option does not belong to the specified vote');
+            }
 
-        // Check if user has already voted for this vote
-        const existingCast = await this.voteCastRepository.findOne({
-            where: {
+            // Security Check: Verify user is in trip
+            const isParticipant = await this.tripsService.isParticipant(option.vote.tripId, userId);
+            if (!isParticipant) {
+                throw new ForbiddenException('You must be a participant of the trip to vote');
+            }
+
+            // Check if user has already voted for this vote
+            // Lock the search to prevent race conditions where user double-votes concurrently
+            // (Note: pessimistic_write might lock more than intended depending on db, but here we scan for specific user/vote)
+            const existingCast = await queryRunner.manager.findOne(VoteCast, {
+                where: {
+                    voterId: userId,
+                    option: { voteId }
+                },
+                relations: ['option'],
+                lock: { mode: 'pessimistic_write' }
+            });
+
+            if (existingCast) {
+                await queryRunner.manager.remove(existingCast);
+            }
+
+            const cast = queryRunner.manager.create(VoteCast, {
+                optionId,
                 voterId: userId,
-                option: { voteId }
-            },
-            relations: ['option'] // needed for where clause
-        });
+            });
 
-        if (existingCast) {
-            await this.voteCastRepository.remove(existingCast);
+            const savedCast = await queryRunner.manager.save(cast);
+            await queryRunner.commitTransaction();
+            return savedCast;
+
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            // Clean up error if it's unrelated to transaction logic?
+            // Just rethrow. check for locking timeouts if extremely high load.
+            throw error;
+        } finally {
+            await queryRunner.release();
         }
-
-        const cast = this.voteCastRepository.create({
-            optionId,
-            voterId: userId,
-        });
-
-        return this.voteCastRepository.save(cast);
     }
 
     async removeVoteCast(voteId: string, userId: string): Promise<void> {
