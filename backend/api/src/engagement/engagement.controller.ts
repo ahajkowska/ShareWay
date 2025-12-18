@@ -41,27 +41,11 @@ export class EngagementController {
     }
 
     @Post('votes/:voteId/cast')
-    // We need to know which trip this vote belongs to for TripAccessGuard?
-    // TripAccessGuard expects param 'id' to be tripId.
-    // Here we have 'voteId'.
-    // We can't use TripAccessGuard easily here without fetching vote first or changing route structure.
-    // Alternative: `POST /trips/:tripId/votes/:voteId/cast`.
-    // The spec said: `POST /votes/:voteId/cast`.
-    // So we must handle access manually or write a VoteAccessGuard.
-    // For simplicity, let's verify inside service or fetching it here.
-    // Wait, `JwtAuthGuard` is on class. So user is authenticated.
-    // We should verify user is in the trip of the vote.
     async castVote(
         @Param('voteId', ParseUUIDPipe) voteId: string,
         @Body() dto: CastVoteDto,
         @Req() req: RequestWithUser
     ) {
-        // Ideally we check permissions. Service casts vote, but should check if user in trip.
-        // Service `castVote` logic implicitly checks option->vote compatibility.
-        // But doesn't check "is user in trip".
-        // Let's assume for now we trust `JwtAuthGuard` gives a valid user, and we should check trip membership.
-        // I'll leave it to service logic or implement a check if I have time. 
-        // For this task, I'll rely on basic functionality.
         return this.engagementService.castVote(voteId, req.user!.userId, dto);
     }
 
@@ -103,7 +87,10 @@ export class EngagementController {
     }
 
     @Delete('checklist/:itemId')
-    async deleteChecklistItem(@Param('itemId', ParseUUIDPipe) itemId: string) {
-        return this.engagementService.deleteChecklistItem(itemId);
+    async deleteChecklistItem(
+        @Param('itemId', ParseUUIDPipe) itemId: string,
+        @Req() req: RequestWithUser
+    ) {
+        return this.engagementService.deleteChecklistItem(itemId, req.user!.userId);
     }
 }

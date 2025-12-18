@@ -70,8 +70,12 @@ export class FinanceService {
     async remove(id: string, userId: string): Promise<void> {
         const expense = await this.findOne(id);
 
-        // Only payer or trip organizer can delete? 
-        // For now, let's say only payer can delete their own expense.
+        const isParticipant = await this.tripsService.isParticipant(expense.tripId, userId);
+        if (!isParticipant) {
+            throw new ForbiddenException('You must be a current participant of the trip to manage expenses');
+        }
+
+        // Only payer or trip organizer can delete
         if (expense.payerId !== userId) {
             // Check if user is organizer of the trip
             const trip = await this.tripsService.findById(expense.tripId);

@@ -59,9 +59,13 @@ export class EngagementService {
             throw new BadRequestException('Option does not belong to the specified vote');
         }
 
+        // Security Check: Verify user is in trip
+        const isParticipant = await this.tripsService.isParticipant(option.vote.tripId, userId);
+        if (!isParticipant) {
+            throw new ForbiddenException('You must be a participant of the trip to vote');
+        }
+
         // Check if user has already voted for this vote
-        // We need to look up all options for this vote, then check casts for this user.
-        // Or doing a count query.
         const existingCast = await this.voteCastRepository.findOne({
             where: {
                 voterId: userId,
@@ -71,9 +75,6 @@ export class EngagementService {
         });
 
         if (existingCast) {
-            // Option: Update vote or throw? "Cast" implies making a mark. Maybe update?
-            // Let's assume re-vote is allowed -> Delete old, add new. Or just Update.
-            // Let's remove old first.
             await this.voteCastRepository.remove(existingCast);
         }
 
@@ -91,10 +92,14 @@ export class EngagementService {
                 voterId: userId,
                 option: { voteId }
             },
-            relations: ['option']
+            relations: ['option', 'option.vote']
         });
 
         if (existingCast) {
+            const isParticipant = await this.tripsService.isParticipant(existingCast.option.vote.tripId, userId);
+            if (!isParticipant) {
+                throw new ForbiddenException('You must be a participant of the trip to manage votes');
+            }
             await this.voteCastRepository.remove(existingCast);
         }
     }
@@ -129,6 +134,16 @@ export class EngagementService {
     }
 
     async updateChecklistStatus(itemId: string, userId: string, dto: UpdateChecklistStatusDto): Promise<ChecklistItemState> {
+        const item = await this.checklistItemRepository.findOne({ where: { id: itemId } });
+        if (!item) {
+            throw new NotFoundException('Checklist item not found');
+        }
+
+        const isParticipant = await this.tripsService.isParticipant(item.tripId, userId);
+        if (!isParticipant) {
+            throw new ForbiddenException('You must be a participant of the trip');
+        }
+
         let state = await this.checklistItemStateRepository.findOne({
             where: { itemId, userId }
         });
@@ -144,9 +159,17 @@ export class EngagementService {
         return this.checklistItemStateRepository.save(state);
     }
 
-    async deleteChecklistItem(itemId: string): Promise<void> {
-        // Just delete. Guard protects trip access.
-        // Ideally verify trip again?
+    async deleteChecklistItem(itemId: string, userId: string): Promise<void> {
+        const item = await this.checklistItemRepository.findOne({ where: { id: itemId } });
+        if (!item) {
+            throw new NotFoundException('Checklist item not found');
+        }
+
+        const isParticipant = await this.tripsService.isParticipant(item.tripId, userId);
+        if (!isParticipant) {
+            throw new ForbiddenException('You must be a participant of the trip');
+        }
+
         await this.checklistItemRepository.delete(itemId);
     }
 }
