@@ -14,6 +14,10 @@ import { PlanningModule } from './planning/planning.module.js';
 import { User } from './users/entities/user.entity.js';
 import { Trip, Participant } from './trips/entities/index.js';
 import { Day, Activity } from './planning/entities/index.js';
+import { FinanceModule } from './finance/finance.module.js';
+import { Expense, ExpenseDebtor } from './finance/entities/index.js';
+import { EngagementModule } from './engagement/engagement.module.js';
+import { Vote, VoteOption, VoteCast, ChecklistItem, ChecklistItemState } from './engagement/entities/index.js';
 import path from 'path';
 
 const env = process.env.NODE_ENV ?? 'development';
@@ -37,7 +41,7 @@ const envFilePath = isTsRun
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [User, Trip, Participant, Day, Activity],
+        entities: [User, Trip, Participant, Day, Activity, Expense, ExpenseDebtor, Vote, VoteOption, VoteCast, ChecklistItem, ChecklistItemState],
         synchronize: env === 'development',
         logging: env === 'development',
       }),
@@ -49,8 +53,10 @@ const envFilePath = isTsRun
     AdminModule,
     TripsModule,
     PlanningModule,
+    FinanceModule,
+    EngagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

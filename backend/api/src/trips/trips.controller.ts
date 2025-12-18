@@ -21,7 +21,7 @@ import type { Request as ExpressRequest } from 'express';
 import type { AuthenticatedUser } from '../auth/interfaces/auth.interfaces.js';
 import { Participant, Trip } from './entities/index.js';
 
-interface RequestWithUser extends ExpressRequest {
+export interface RequestWithUser extends ExpressRequest {
   user?: AuthenticatedUser;
   participant?: Participant;
 }
@@ -54,7 +54,7 @@ interface TripResponse {
 @Controller('trips')
 @UseGuards(JwtAuthGuard)
 export class TripsController {
-  constructor(private readonly tripsService: TripsService) {}
+  constructor(private readonly tripsService: TripsService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -191,10 +191,10 @@ export class TripsController {
         joinedAt: p.joinedAt,
         user: p.user
           ? {
-              id: p.user.id,
-              email: p.user.email,
-              nickname: p.user.nickname,
-            }
+            id: p.user.id,
+            email: p.user.email,
+            nickname: p.user.nickname,
+          }
           : undefined,
       })),
     };
