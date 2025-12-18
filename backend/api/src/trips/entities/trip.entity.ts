@@ -9,6 +9,11 @@ import {
 } from 'typeorm';
 import { Participant } from './participant.entity.js';
 
+export enum TripStatus {
+  ACTIVE = 'ACTIVE',
+  ARCHIVED = 'ARCHIVED',
+}
+
 @Entity('trips')
 export class Trip {
   @PrimaryGeneratedColumn('uuid')
@@ -38,6 +43,13 @@ export class Trip {
 
   @Column({ type: 'timestamptz', nullable: true })
   inviteCodeExpiry: Date | null;
+
+  @Column({
+    type: 'enum',
+    enum: TripStatus,
+    default: TripStatus.ACTIVE,
+  })
+  status: TripStatus;
 
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;

@@ -1,6 +1,8 @@
-import { IsUUID } from 'class-validator';
+import { IsArray, IsUUID, ArrayMinSize } from 'class-validator';
 
 export class CastVoteDto {
-    @IsUUID('4')
-    optionId: string;
+  @IsArray()
+  @IsUUID('4', { each: true })
+  @ArrayMinSize(1, { message: 'At least one option must be selected' })
+  optionIds: string[];
 }

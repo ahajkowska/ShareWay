@@ -5,6 +5,7 @@ import {
   MaxLength,
   MinLength,
   IsIn,
+  IsNotEmpty,
 } from 'class-validator';
 import { SUPPORTED_CURRENCIES } from '../constants/currencies.js';
 
@@ -30,10 +31,10 @@ export class CreateTripDto {
   @IsDateString({}, { message: 'End date must be a valid date' })
   endDate: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty({ message: 'Base currency is required' })
   @IsIn(SUPPORTED_CURRENCIES, {
     message: `Currency must be one of: ${SUPPORTED_CURRENCIES.join(', ')}`,
   })
-  baseCurrency?: string;
+  baseCurrency: string;
 }

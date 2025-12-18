@@ -7,7 +7,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Trip, Participant, ParticipantRole } from './entities/index.js';
+import {
+  Trip,
+  Participant,
+  ParticipantRole,
+  TripStatus,
+} from './entities/index.js';
 import { CreateTripDto, UpdateTripDto, JoinTripDto } from './dto/index.js';
 
 const INVITE_CODE_LENGTH = 6;
@@ -24,7 +29,7 @@ export class TripsService {
     @InjectRepository(Participant)
     private readonly participantRepository: Repository<Participant>,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async create(userId: string, createTripDto: CreateTripDto): Promise<Trip> {
     const { startDate, endDate, ...rest } = createTripDto;
@@ -45,7 +50,7 @@ export class TripsService {
         ...rest,
         startDate: start,
         endDate: end,
-        baseCurrency: createTripDto.baseCurrency || 'USD',
+        baseCurrency: createTripDto.baseCurrency, // Now required, no fallback needed
       });
 
       const savedTrip = await queryRunner.manager.save(trip);
@@ -266,6 +271,35 @@ export class TripsService {
       where: { tripId, userId },
     });
     return count > 0;
+  }
+
+  async getParticipant(
+    tripId: string,
+    userId: string,
+  ): Promise<Participant | null> {
+    return this.participantRepository.findOne({
+      where: { tripId, userId },
+    });
+  }
+
+  async archiveTrip(tripId: string): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    trip.status = TripStatus.ARCHIVED;
+    await this.tripRepository.save(trip);
+
+    this.logger.log(`Trip archived: ${tripId}`);
+
+    return this.findById(tripId);
+  }
+
+  async unarchiveTrip(tripId: string): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    trip.status = TripStatus.ACTIVE;
+    await this.tripRepository.save(trip);
+
+    this.logger.log(`Trip unarchived: ${tripId}`);
+
+    return this.findById(tripId);
   }
 
   private generateRandomCode(): string {

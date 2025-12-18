@@ -11,6 +11,11 @@ import { User } from '../../users/entities/user.entity.js';
 import { Trip } from '../../trips/entities/trip.entity.js';
 import { ExpenseDebtor } from './expense-debtor.entity.js';
 
+export enum ExpenseStatus {
+  PENDING = 'PENDING',
+  SETTLED = 'SETTLED',
+}
+
 @Entity('expenses')
 export class Expense {
   @PrimaryGeneratedColumn('uuid')
@@ -30,7 +35,10 @@ export class Expense {
   @JoinColumn({ name: 'payer_id' })
   payer: User;
 
-  @Column({ type: 'integer', comment: 'Amount in lowest currency unit (e.g. cents)' })
+  @Column({
+    type: 'integer',
+    comment: 'Amount in lowest currency unit (e.g. cents)',
+  })
   amount: number;
 
   @Column({ length: 3 })
@@ -39,8 +47,18 @@ export class Expense {
   @Column()
   title: string;
 
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
+
   @Column({ type: 'timestamp' })
   date: Date;
+
+  @Column({
+    type: 'enum',
+    enum: ExpenseStatus,
+    default: ExpenseStatus.PENDING,
+  })
+  status: ExpenseStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
