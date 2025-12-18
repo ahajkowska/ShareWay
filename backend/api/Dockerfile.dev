@@ -10,6 +10,7 @@ RUN npm ci
 COPY . .
 
 ENV NODE_ENV=development
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 EXPOSE 4000
 

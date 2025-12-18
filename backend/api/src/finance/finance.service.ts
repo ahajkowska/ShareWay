@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
-import { Expense, ExpenseDebtor } from './entities/index.js';
+import { Expense, ExpenseDebtor, ExpenseStatus } from './entities/index.js';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto/index.js';
 import { TripsService } from '../trips/trips.service.js';
 import { ParticipantRole } from '../trips/entities/participant.entity.js';
@@ -52,6 +52,7 @@ export class FinanceService {
         tripId,
         payerId,
         currency: expenseCurrency,
+        status: expenseData.status as ExpenseStatus | undefined,
       });
 
       const savedExpense = await queryRunner.manager.save(expense);
@@ -91,6 +92,31 @@ export class FinanceService {
     });
 
     return expenses.map((expense) => this.formatExpenseResponse(expense));
+  }
+
+  async findAllByTripPaginated(
+    tripId: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
+    const skip = (page - 1) * limit;
+    const [expenses, total] = await this.expenseRepository.findAndCount({
+      where: { tripId },
+      relations: ['payer', 'debtors', 'debtors.debtor'],
+      order: { date: 'DESC' },
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: expenses.map((expense) => this.formatExpenseResponse(expense)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   private formatExpenseResponse(expense: Expense) {
@@ -194,7 +220,8 @@ export class FinanceService {
       expense.description = updateData.description;
     if (updateData.amount !== undefined) expense.amount = updateData.amount;
     if (updateData.date !== undefined) expense.date = new Date(updateData.date);
-    if (updateData.status !== undefined) expense.status = updateData.status;
+    if (updateData.status !== undefined)
+      expense.status = updateData.status as ExpenseStatus;
 
     await this.expenseRepository.save(expense);
 

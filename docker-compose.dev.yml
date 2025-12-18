@@ -86,8 +86,8 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-    mem_limit: 512m
-    cpus: 1.0
+    mem_limit: 1536m
+    cpus: 1.5
     volumes:
       - ./backend/api/src:/app/src:ro
       - ./backend/api/package.json:/app/package.json:ro

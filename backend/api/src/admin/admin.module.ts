@@ -4,9 +4,15 @@ import { AdminService } from './admin.service.js';
 import { UsersModule } from '../users/users.module.js';
 import { RedisModule } from '../redis/redis.module.js';
 import { MailerModuleLocal } from '../mailer/mailer.module.js';
+import { TripsModule } from '../trips/trips.module.js';
 
 @Module({
-  imports: [UsersModule, RedisModule.register(), MailerModuleLocal],
+  imports: [
+    UsersModule,
+    RedisModule.register(),
+    MailerModuleLocal,
+    TripsModule,
+  ],
   controllers: [AdminController],
   providers: [AdminService],
   exports: [AdminService],

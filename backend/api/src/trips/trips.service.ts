@@ -90,6 +90,36 @@ export class TripsService {
       );
   }
 
+  async findAllPaginated(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [trips, total] = await this.tripRepository.findAndCount({
+      where: { isDeleted: false },
+      relations: ['participants', 'participants.user'],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: trips.map((trip) => ({
+        id: trip.id,
+        name: trip.name,
+        location: trip.location,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        status: trip.status,
+        participantCount: trip.participants?.length ?? 0,
+        createdAt: trip.createdAt,
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findById(tripId: string): Promise<Trip> {
     const trip = await this.tripRepository.findOne({
       where: { id: tripId, isDeleted: false },
@@ -300,6 +330,56 @@ export class TripsService {
     this.logger.log(`Trip unarchived: ${tripId}`);
 
     return this.findById(tripId);
+  }
+
+  async transferRole(
+    tripId: string,
+    targetUserId: string,
+    newRole: ParticipantRole,
+    requesterId: string,
+  ): Promise<{ message: string }> {
+    // Only organizers can transfer roles
+    const requester = await this.participantRepository.findOne({
+      where: { tripId, userId: requesterId },
+    });
+
+    if (!requester || requester.role !== ParticipantRole.ORGANIZER) {
+      throw new ForbiddenException('Only organizers can transfer roles');
+    }
+
+    // Find target participant
+    const target = await this.participantRepository.findOne({
+      where: { tripId, userId: targetUserId },
+    });
+
+    if (!target) {
+      throw new NotFoundException('Target participant not found');
+    }
+
+    // If demoting an organizer, ensure there's at least one other organizer
+    if (
+      target.role === ParticipantRole.ORGANIZER &&
+      newRole === ParticipantRole.PARTICIPANT
+    ) {
+      const organizerCount = await this.participantRepository.count({
+        where: { tripId, role: ParticipantRole.ORGANIZER },
+      });
+
+      if (organizerCount <= 1) {
+        throw new BadRequestException(
+          'Cannot demote the only organizer. Promote another member first.',
+        );
+      }
+    }
+
+    target.role = newRole;
+    await this.participantRepository.save(target);
+
+    this.logger.log(
+      `User ${targetUserId} role changed to ${newRole} in trip ${tripId}`,
+    );
+
+    return { message: `Role updated to ${newRole}` };
   }
 
   private generateRandomCode(): string {

@@ -71,30 +71,38 @@ export class EngagementService {
       order: { createdAt: 'DESC' },
     });
 
-    return votes.map((vote) => ({
-      id: vote.id,
-      title: vote.question,
-      description: vote.description,
-      createdBy: vote.creatorId,
-      createdByName: vote.creator?.nickname ?? null,
-      createdAt: vote.createdAt.toISOString(),
-      endsAt: vote.endsAt?.toISOString() ?? null,
-      status: vote.status,
-      options: vote.options.map((opt) => ({
-        id: opt.id,
-        text: opt.text,
-        description: opt.description ?? null,
-        votes: opt.casts?.length ?? 0,
-        voters: opt.casts?.map((c) => c.voter?.nickname ?? c.voterId) ?? [],
-      })),
-      totalVoters: new Set(
-        vote.options.flatMap((o) => o.casts?.map((c) => c.voterId) ?? []),
-      ).size,
-      userVote:
-        vote.options.find((o) =>
-          o.casts?.some((c) => c.voterId === requestingUserId),
-        )?.id ?? null,
-    }));
+    return votes.map((vote) => {
+      // Auto-compute status: if endsAt is in the past, vote is closed
+      const computedStatus =
+        vote.endsAt && new Date(vote.endsAt) < new Date()
+          ? 'CLOSED'
+          : vote.status;
+
+      return {
+        id: vote.id,
+        title: vote.question,
+        description: vote.description,
+        createdBy: vote.creatorId,
+        createdByName: vote.creator?.nickname ?? null,
+        createdAt: vote.createdAt.toISOString(),
+        endsAt: vote.endsAt?.toISOString() ?? null,
+        status: computedStatus,
+        options: vote.options.map((opt) => ({
+          id: opt.id,
+          text: opt.text,
+          description: opt.description ?? null,
+          votes: opt.casts?.length ?? 0,
+          voters: opt.casts?.map((c) => c.voter?.nickname ?? c.voterId) ?? [],
+        })),
+        totalVoters: new Set(
+          vote.options.flatMap((o) => o.casts?.map((c) => c.voterId) ?? []),
+        ).size,
+        userVote:
+          vote.options.find((o) =>
+            o.casts?.some((c) => c.voterId === requestingUserId),
+          )?.id ?? null,
+      };
+    });
   }
 
   async castVote(

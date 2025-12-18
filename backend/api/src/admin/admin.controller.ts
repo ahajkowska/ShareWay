@@ -29,6 +29,12 @@ export class AdminController {
     return this.adminService.getAllUsers(page, limit);
   }
 
+  @Get('trips')
+  async getAllTrips(@Query() paginationDto: PaginationDto) {
+    const { page, limit } = paginationDto;
+    return this.adminService.getAllTrips(page, limit);
+  }
+
   @Get('users/:id')
   async getUserById(@Param('id', ParseUUIDPipe) userId: string) {
     return this.adminService.getUserById(userId);

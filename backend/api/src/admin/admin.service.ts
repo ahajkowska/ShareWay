@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service.js';
 import { RedisRepository } from '../redis/redis.repository.js';
 import { MailerService } from '../mailer/mailer.service.js';
+import { TripsService } from '../trips/trips.service.js';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -20,6 +21,7 @@ export class AdminService {
     private readonly redisRepository: RedisRepository,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
+    private readonly tripsService: TripsService,
   ) {
     this.appUrl =
       this.configService.get<string>('APP_URL') || 'http://localhost:3000';
@@ -27,6 +29,10 @@ export class AdminService {
 
   async getAllUsers(page: number = 1, limit: number = 20) {
     return this.usersService.findAllPaginated(page, limit);
+  }
+
+  async getAllTrips(page: number = 1, limit: number = 20) {
+    return this.tripsService.findAllPaginated(page, limit);
   }
 
   async banUser(userId: string): Promise<{ message: string }> {

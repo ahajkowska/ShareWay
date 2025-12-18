@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Req,
   HttpCode,
@@ -17,6 +18,7 @@ import { CreateExpenseDto, UpdateExpenseDto } from './dto/index.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { TripAccessGuard } from '../trips/guards/trip-access.guard.js';
 import type { RequestWithUser } from '../trips/trips.controller.js';
+import { PaginationDto } from '../admin/dto/pagination.dto.js';
 
 @Controller()
 @UseGuards(JwtAuthGuard)
@@ -37,8 +39,12 @@ export class FinanceController {
 
   @Get('trips/:id/expenses')
   @UseGuards(TripAccessGuard)
-  async findAll(@Param('id', ParseUUIDPipe) tripId: string) {
-    return this.financeService.findAllByTrip(tripId);
+  async findAll(
+    @Param('id', ParseUUIDPipe) tripId: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    const { page, limit } = paginationDto;
+    return this.financeService.findAllByTripPaginated(tripId, page, limit);
   }
 
   @Get('trips/:id/balance')

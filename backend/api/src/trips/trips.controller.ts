@@ -13,7 +13,12 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { TripsService } from './trips.service.js';
-import { CreateTripDto, UpdateTripDto, JoinTripDto } from './dto/index.js';
+import {
+  CreateTripDto,
+  UpdateTripDto,
+  JoinTripDto,
+  TransferRoleDto,
+} from './dto/index.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { TripAccessGuard } from './guards/trip-access.guard.js';
 import { OrganizerOnly } from './decorators/organizer-only.decorator.js';
@@ -195,6 +200,28 @@ export class TripsController {
     return this.formatTripResponse(trip, req.user?.userId);
   }
 
+  @Patch(':id/participants/:userId/role')
+  @UseGuards(TripAccessGuard)
+  @OrganizerOnly()
+  @HttpCode(HttpStatus.OK)
+  async transferRole(
+    @Param('id', ParseUUIDPipe) tripId: string,
+    @Param('userId', ParseUUIDPipe) targetUserId: string,
+    @Body() dto: TransferRoleDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const requesterId = req.user?.userId;
+    if (!requesterId) {
+      return null;
+    }
+    return this.tripsService.transferRole(
+      tripId,
+      targetUserId,
+      dto.newRole,
+      requesterId,
+    );
+  }
+
   private formatTripResponse(
     trip: Trip,
     requestingUserId?: string,
@@ -214,7 +241,9 @@ export class TripsController {
       inviteCode: trip.inviteCode,
       inviteCodeExpiry: trip.inviteCodeExpiry?.toISOString() ?? null,
       status: trip.status ?? 'ACTIVE',
-      roleForCurrentUser: myParticipant?.role ?? null,
+      roleForCurrentUser: myParticipant?.role
+        ? (myParticipant.role.toUpperCase() as 'ORGANIZER' | 'PARTICIPANT')
+        : null,
       createdAt: trip.createdAt.toISOString(),
       updatedAt: trip.updatedAt.toISOString(),
       members:

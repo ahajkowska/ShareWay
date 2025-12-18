@@ -565,3 +565,21 @@ export async function unarchiveTrip(tripId: string): Promise<Trip> {
     method: "PATCH",
   });
 }
+
+/**
+ * Transfer participant role (organizer only)
+ * Can promote member to organizer or demote organizer to member
+ */
+export async function transferRole(
+  tripId: string,
+  targetUserId: string,
+  newRole: "organizer" | "member"
+): Promise<{ message: string }> {
+  return fetchAuth<{ message: string }>(
+    apiUrl(`/trips/${tripId}/participants/${targetUserId}/role`),
+    {
+      method: "PATCH",
+      body: JSON.stringify({ targetUserId, newRole }),
+    }
+  );
+}
