@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Expense, ExpenseDebtor } from './entities/index.js';
 import { CreateExpenseDto } from './dto/index.js';
 import { TripsService } from '../trips/trips.service.js';
@@ -8,42 +8,57 @@ import { ParticipantRole } from '../trips/entities/participant.entity.js';
 
 @Injectable()
 export class FinanceService {
+    private readonly logger = new Logger(FinanceService.name);
+
     constructor(
         @InjectRepository(Expense)
         private readonly expenseRepository: Repository<Expense>,
         @InjectRepository(ExpenseDebtor)
         private readonly expenseDebtorRepository: Repository<ExpenseDebtor>,
         private readonly tripsService: TripsService,
+        private readonly dataSource: DataSource,
     ) { }
 
     async create(tripId: string, payerId: string, createExpenseDto: CreateExpenseDto): Promise<Expense> {
         const { debtorIds, ...expenseData } = createExpenseDto;
 
-        // Verify trip exists and user is participant (Guards usually handle access, but good to ensure trip exists)
-        // Here we rely on the controller guards to check trip access.
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
-        // Create expense
-        const expense = this.expenseRepository.create({
-            ...expenseData,
-            tripId,
-            payerId,
-        });
+        try {
+            // Create expense
+            const expense = queryRunner.manager.create(Expense, {
+                ...expenseData,
+                tripId,
+                payerId,
+            });
 
-        const savedExpense = await this.expenseRepository.save(expense);
+            const savedExpense = await queryRunner.manager.save(expense);
 
-        // Create debtors
-        if (debtorIds.length > 0) {
-            const debtors = debtorIds.map((debtorId) =>
-                this.expenseDebtorRepository.create({
-                    expenseId: savedExpense.id,
-                    debtorId,
-                }),
-            );
-            await this.expenseDebtorRepository.save(debtors);
+            // Create debtors
+            if (debtorIds.length > 0) {
+                const debtors = debtorIds.map((debtorId) =>
+                    queryRunner.manager.create(ExpenseDebtor, {
+                        expenseId: savedExpense.id,
+                        debtorId,
+                    }),
+                );
+                await queryRunner.manager.save(debtors);
+            }
+
+            await queryRunner.commitTransaction();
+
+            // Return complete expense (fetched normal way after commit)
+            return this.findOne(savedExpense.id);
+
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            this.logger.error(`Failed to create expense: ${error.message}`, error.stack);
+            throw error;
+        } finally {
+            await queryRunner.release();
         }
-
-        // Return complete expense
-        return this.findOne(savedExpense.id);
     }
 
     async findAllByTrip(tripId: string): Promise<Expense[]> {
@@ -70,8 +85,12 @@ export class FinanceService {
     async remove(id: string, userId: string): Promise<void> {
         const expense = await this.findOne(id);
 
-        // Only payer or trip organizer can delete? 
-        // For now, let's say only payer can delete their own expense.
+        const isParticipant = await this.tripsService.isParticipant(expense.tripId, userId);
+        if (!isParticipant) {
+            throw new ForbiddenException('You must be a current participant of the trip to manage expenses');
+        }
+
+        // Only payer or trip organizer can delete
         if (expense.payerId !== userId) {
             // Check if user is organizer of the trip
             const trip = await this.tripsService.findById(expense.tripId);
@@ -100,40 +119,47 @@ export class FinanceService {
 
             const totalAmount = expense.amount; // In cents
             const payerId = expense.payerId;
-            const numberOfSplitters = expense.debtors.length; // Assuming full split including debtors only? 
-            // Logic check: usually the payer is also part of the split if they are in debtors list.
-            // If the implementation expects `debtorIds` to only contain OTHER people, then we need to know if payer is included.
-            // Simple logic for V1: Payer paid X. Debtors owe X / count.
-            // Wait, if I pay for dinner for Me and You, I put You in debtors.
-            // If I put Myself in debtors, then I owe myself.
-            // Let's assume the FE sends ALL participants who share the cost, including the payer if they shared.
+            const debtors = expense.debtors;
+            const numberOfSplitters = debtors.length;
 
-            const splitAmount = Math.floor(totalAmount / numberOfSplitters);
-            // Remainder handling could be added but let's keep it simple for V1.
+            // Logic: Payer paid 'totalAmount'.
+            // This 'totalAmount' is consumed by 'numberOfSplitters'.
+            // Each splitter "consumes" a portion.
 
-            // Payer paid the full amount, so they are "owed" the full amount initially (conceptually)
-            // OR simpler:
-            // Payer gets +totalAmount (they paid it)
-            // Everyone in debtors gets -splitAmount (they consumed it)
-
+            // 1. Credit the payer the full amount they paid.
             addToBalance(payerId, totalAmount);
 
-            for (const debtor of expense.debtors) {
-                addToBalance(debtor.debtorId, -splitAmount);
+            // 2. Debit each splitter their share.
+            const splitAmount = Math.floor(totalAmount / numberOfSplitters);
+            const remainder = totalAmount % numberOfSplitters;
+
+            // Distribute base amount
+            for (let i = 0; i < numberOfSplitters; i++) {
+                const debtor = debtors[i];
+                let amountToDebit = splitAmount;
+
+                // Distribute remainder cents to the first few debtors
+                if (i < remainder) {
+                    amountToDebit += 1;
+                }
+
+                addToBalance(debtor.debtorId, -amountToDebit);
             }
         }
 
         // Now convert balances to "Who owes Whom"
-        // This is a simplified "settle up" algorithm.
+        // Balances > 0 : User is owed money (Creditor)
+        // Balances < 0 : User owes money (Debtor)
+
         const creditors: { userId: string; amount: number }[] = [];
         const debtors: { userId: string; amount: number }[] = [];
 
         for (const [userId, amount] of Object.entries(balances)) {
             if (amount > 0) creditors.push({ userId, amount });
-            if (amount < 0) debtors.push({ userId, amount: -amount });
+            if (amount < 0) debtors.push({ userId, amount: -amount }); // Store positive magnitude
         }
 
-        // Sort by amount descending to minimize transactions
+        // Sort by amount descending to minimize transaction count
         creditors.sort((a, b) => b.amount - a.amount);
         debtors.sort((a, b) => b.amount - a.amount);
 
