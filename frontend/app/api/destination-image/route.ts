@@ -3,6 +3,7 @@ import type { TripAccentPreset } from "@/lib/types/trip";
 import {
   buildDestinationImageCandidates,
   selectCandidate,
+  fetchFallbackPexelsImage,
 } from "@/lib/server/destinationImage";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,10 @@ export async function GET(req: NextRequest) {
   const url = selectCandidate(candidates);
 
   if (!url) {
+    const fallback = await fetchFallbackPexelsImage(q, preset, "no-store");
+    if (fallback) {
+      return NextResponse.json({ url: fallback, reason: "fallback" });
+    }
     return NextResponse.json(
       { url: null, reason: "No photos from Pexels" },
       { status: 404 }

@@ -12,11 +12,12 @@ import Logo from "@/app/components/Logo";
 import { useI18n } from "@/app/context/LanguageContext";
 import { logoutUser } from "@/lib/auth/logout";
 import { toast } from "sonner";
+import type { AuthUser } from "@/lib/types/auth";
 
 export default function DashboardNavbar({
-  user = { name: "Demo User", email: "demo@shareway.app" },
+  user,
 }: {
-  user?: { name: string; email: string };
+  user?: AuthUser;
 }) {
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,11 +25,18 @@ export default function DashboardNavbar({
   const { lang, t } = useI18n();
   const router = useRouter();
 
+  const resolvedUser =
+    user ?? {
+      id: "guest",
+      name: "Demo User",
+      email: "demo@shareway.app",
+    };
+
   const logoutLabel = t.nav.logout;
   const settingsLabel = t.nav.settings;
   const profileLabel = t.nav.profile;
   const initials =
-    user.name
+    resolvedUser.name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
@@ -61,7 +69,7 @@ export default function DashboardNavbar({
       await logoutUser();
 
       toast.success(t.auth.toast.logoutSuccess, {
-        description: user.email,
+        description: resolvedUser.email,
         duration: 2000,
       });
 
@@ -120,10 +128,10 @@ export default function DashboardNavbar({
                 >
                   <div className="p-4 border-b border-border/70 bg-linear-to-r from-primary/8 via-transparent to-secondary/10">
                     <p className="text-sm font-semibold text-foreground">
-                      {user.name}
+                      {resolvedUser.name}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {user.email}
+                      {resolvedUser.email}
                     </p>
                   </div>
 

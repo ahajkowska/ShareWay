@@ -99,7 +99,7 @@ export interface Translations {
       logoutSuccess: string;
     };
     validation: {
-      name: { required: string; min: (n: number) => string };
+      name: { required: string; min: (n: number) => string; max?: (n: number) => string };
       email: { required: string; invalid: string };
       password: {
         required: string;
@@ -348,7 +348,7 @@ export const dict: Record<Lang, Translations> = {
         emailLabel: "E-mail",
         passwordLabel: "Hasło",
         confirmPasswordLabel: "Potwierdź hasło",
-        nameLabel: "Imię",
+        nameLabel: "Nick",
         rememberMe: "Zapamiętaj mnie",
         forgotPassword: "Zapomniałeś hasła?",
         showPassword: "Pokaż hasło",
@@ -365,8 +365,9 @@ export const dict: Record<Lang, Translations> = {
       },
       validation: {
         name: {
-          required: "Imię jest wymagane",
-          min: (n: number) => `Imię musi mieć co najmniej ${n} znaki`,
+          required: "Nick jest wymagany",
+          min: (n: number) => `Nick musi mieć co najmniej ${n} znaki`,
+          max: (n: number) => `Nick może mieć maksymalnie ${n} znaków`,
         },
         email: {
           required: "E-mail jest wymagany",
@@ -638,7 +639,7 @@ export const dict: Record<Lang, Translations> = {
         emailLabel: "Email",
         passwordLabel: "Password",
         confirmPasswordLabel: "Confirm password",
-        nameLabel: "Name",
+        nameLabel: "Nickname",
         rememberMe: "Remember me",
         forgotPassword: "Forgot password?",
         showPassword: "Show password",
@@ -655,8 +656,9 @@ export const dict: Record<Lang, Translations> = {
       },
       validation: {
         name: {
-          required: "Name is required",
-          min: (n: number) => `Name must be at least ${n} characters long`,
+          required: "Nickname is required",
+          min: (n: number) => `Nickname must be at least ${n} characters long`,
+          max: (n: number) => `Nickname must be at most ${n} characters long`,
         },
         email: {
           required: "Email is required",

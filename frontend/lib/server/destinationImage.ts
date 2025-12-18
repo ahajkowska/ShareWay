@@ -1,13 +1,13 @@
-import type { TripAccentPreset } from "@/lib/types/trip";
 import {
   getLocationDetails,
   buildDestinationQueries,
   type LocationDetails,
 } from "@/lib/location";
 import { PRESET_HINTS, ALT_KEYWORD_WEIGHTS } from "@/lib/imagePresets";
+import type { TripAccentPreset } from "@/lib/types/trip";
 
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
-const RERANK_URL = process.env.RERANK_URL;
+const RERANK_URL = process.env.RERANK_URL || process.env.EMBEDDING_RERANKER_URL;
 const MAX_PHOTOS = 40;
 
 type PexelsPhotoBase = {
@@ -166,6 +166,59 @@ async function fetchPhotosForQueries(
   }
 
   return fetchedPhotos;
+}
+
+async function fetchSinglePexelsPhoto(
+  query: string,
+  cache: RequestCacheMode = "force-cache"
+): Promise<string | null> {
+  if (!PEXELS_API_KEY) return null;
+
+  const searchParams = new URLSearchParams({
+    query,
+    per_page: "1",
+    orientation: "landscape",
+  });
+
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?${searchParams.toString()}`,
+      {
+        headers: { Authorization: PEXELS_API_KEY },
+        cache,
+      }
+    );
+
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as { photos?: PexelsPhotoBase[] };
+    const photo = data.photos?.[0];
+    if (!photo) return null;
+    return photo.src.large2x || photo.src.large || photo.src.original || null;
+  } catch (err) {
+    console.warn("Pexels single search failed", err);
+    return null;
+  }
+}
+
+export async function fetchFallbackPexelsImage(
+  destination: string,
+  preset: TripAccentPreset,
+  cache: RequestCacheMode = "no-store"
+): Promise<string | null> {
+  const presetHint = PRESET_HINTS[preset] ?? "";
+  const queries: string[] = [];
+  if (destination) queries.push(destination);
+  if (presetHint) queries.push(`${presetHint} ${destination}`);
+  queries.push("travel landscape");
+  queries.push("travel destination");
+
+  for (const q of queries) {
+    const url = await fetchSinglePexelsPhoto(q, cache);
+    if (url) return url;
+  }
+
+  return null;
 }
 
 async function rerankCandidates(

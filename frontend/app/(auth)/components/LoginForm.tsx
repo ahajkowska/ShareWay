@@ -9,6 +9,7 @@ import { Mail, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { toast } from "sonner";
+import { loginUser } from "@/lib/auth/api";
 
 import { useRememberedEmail } from "../hooks/useRememberedEmail";
 import { useExplainLoginError } from "../hooks/useExplainLoginError";
@@ -46,11 +47,15 @@ export default function LoginForm() {
       onSubmit={async (values, { setSubmitting }) => {
         setServerError(undefined);
         try {
-          console.log("Login attempt:", values);
+          const user = await loginUser({
+            email: values.email,
+            password: values.password,
+          });
+
           update(values.remember, values.email);
 
           toast.success(t.auth.toast.loginSuccess, {
-            description: `${values.email}`,
+            description: user.name || user.email,
             duration: 2000,
           });
 

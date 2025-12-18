@@ -20,7 +20,7 @@ export async function registerUser(data: RegisterData): Promise<AuthUser> {
 
   return {
     id: "NEW-USER-ID",
-    name: data.name,
+    name: data.nickname,
     email: data.email,
   };
 }
