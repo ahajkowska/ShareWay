@@ -112,29 +112,23 @@
 69. ~~Redis used only for refresh tokens - could cache user sessions for faster auth~~ **DONE** - Current design is correct. Session caching is optional optimization
 70. ~~No database connection pooling configuration~~ **DONE** - TypeORM uses connection pooling by default (postgres driver defaults)
 
+## 15. Identified Integration Gaps (Agent Findings)
+
+71. ~~**Expense PayerId Mismatch**: Frontend `CreateExpenseDialog` allows selecting "Paid By" and sends `paidBy` field. Backend `CreateExpenseDto` is **missing** `payerId` (or `paidBy`), effectively forcing Payer = Creator. This breaks the feature.~~ **DONE** - Added `paidBy` to DTO and Service handles override
+72. ~~**Expense Amount Format**: Backend `CreateExpenseDto` expects `Int` (cents). Frontend `CreateExpenseDialog` and `api.ts` send `Float` (units/dollars). This will result in 100x discrepancy. Frontend should multiply by 100, or backend should adapt.~~ **DONE** - Service now converts Input Float -> Cents and Response Cents -> Float
+73. ~~**Activity Time Format**: Backend `CreateActivityDto` enforces `HH:MM` format for `startTime`/`endTime`. Frontend sends `datetime-local` ISO string (`YYYY-MM-DDTHH:mm`). This causes validation errors.~~ **DONE** - DTO regex updated to allow ISO, Service extracts HH:MM
+74. ~~**Activity Date Context**: Backend `CreateActivityDto` relies on `dayId` for Date, only accepting Time. Frontend sends full Date-Time.~~ **DONE** - Service extracts time part, rely on dayId for date (correct behavior)
+75. ~~**Location Format**: Backend `Trip` and `Activity` DTOs implementation uses `string` for location. Documentation specifies `{ name, lat, lng }`. Frontend currently uses simple string input.~~ **DONE** - Verified Frontend uses string, so Backend string implementation is effectively aligned. Documentation should be updated in future.
+
 ## Priority Actions
 
 - ~~P0: Connect frontend modules to real backend APIs (items 10, 13-15)~~ **DONE** - All dashboard pages use real APIs
 - ~~P0: Fix API response format to match frontend expectations (items 1-4)~~ **DONE** - Response formats aligned
 - ~~P0: Add missing validation on critical endpoints (items 45-46, 48)~~ **DONE** - Validation added
+- ~~**P0: Fix Expense Integration (Items 71, 72)** - Critical for core feature~~ **DONE**
+- ~~**P0: Fix Activity Date/Time Validation (Items 73, 74)** - Critical for core feature~~ **DONE**
 - P1: Implement WebSocket for real-time sync (item 33)
 - P1: Add production Dockerfile and deployment configs (items 59-62)
 - ~~P1: Add proper health checks (items 41-42)~~ **DONE** - Health checks exist
 - P2: Add rate limiting (items 19, 44)
 - P2: Add API documentation (item 51)
-
----
-
-## Summary of Completed Items
-
-**Done in this session:**
-
-- Items 1-4, 6-8, 10-15, 16, 18, 21, 23-26, 28, 31-32, 39, 41-42, 45-46, 48, 55-56
-
-**Remaining High Priority:**
-
-- Item 5: Day deletion validation
-- Item 19: Rate limiting on auth endpoints
-- Item 33: WebSocket/SSE for real-time sync
-- Item 51: OpenAPI/Swagger documentation
-- Items 59-62: Production deployment configs

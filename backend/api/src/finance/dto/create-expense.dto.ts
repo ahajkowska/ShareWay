@@ -1,7 +1,7 @@
 import {
   IsArray,
   IsDateString,
-  IsInt,
+  IsNumber,
   IsNotEmpty,
   IsOptional,
   IsPositive,
@@ -12,9 +12,13 @@ import {
 } from 'class-validator';
 
 export class CreateExpenseDto {
-  @IsInt()
+  @IsNumber()
   @IsPositive()
   amount: number;
+
+  @IsOptional()
+  @IsUUID()
+  paidBy?: string;
 
   @IsOptional()
   @IsString()

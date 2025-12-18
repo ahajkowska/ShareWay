@@ -25,14 +25,29 @@ export class FinanceService {
     private readonly userRepository: Repository<User>,
     private readonly tripsService: TripsService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async create(
     tripId: string,
     payerId: string,
     createExpenseDto: CreateExpenseDto,
   ): Promise<Expense> {
-    const { debtorIds, currency, ...expenseData } = createExpenseDto;
+    const { debtorIds, currency, paidBy, ...expenseData } = createExpenseDto;
+
+    // Item #71: Handle explicit payerId (paidBy) from frontend
+    // If paidBy is provided, use it. Otherwise use the requesting user (payerId)
+    const activePayerId = paidBy || payerId;
+
+    // Verify payer is participant if different from requester
+    if (paidBy && paidBy !== payerId) {
+      const isParticipant = await this.tripsService.isParticipant(tripId, paidBy);
+      if (!isParticipant) {
+        throw new ForbiddenException('Payer must be a participant of the trip');
+      }
+    }
+
+    // Item #72: Convert amount from Float (Frontend) to Cents (Backend)
+    const amountInCents = Math.round(expenseData.amount * 100);
 
     // Item #4: Auto-use trip's baseCurrency if currency not provided
     let expenseCurrency = currency;
@@ -49,8 +64,9 @@ export class FinanceService {
       // Create expense with resolved currency
       const expense = queryRunner.manager.create(Expense, {
         ...expenseData,
+        amount: amountInCents, // Store in cents
         tripId,
-        payerId,
+        payerId: activePayerId,
         currency: expenseCurrency,
         status: expenseData.status as ExpenseStatus | undefined,
       });
@@ -125,7 +141,7 @@ export class FinanceService {
       tripId: expense.tripId,
       title: expense.title,
       description: expense.description ?? null,
-      amount: expense.amount,
+      amount: expense.amount / 100, // Return as Float (Item #72)
       currency: expense.currency,
       status: expense.status ?? 'PENDING',
       paidBy: expense.payerId,
@@ -218,7 +234,9 @@ export class FinanceService {
     if (updateData.title !== undefined) expense.title = updateData.title;
     if (updateData.description !== undefined)
       expense.description = updateData.description;
-    if (updateData.amount !== undefined) expense.amount = updateData.amount;
+    if (updateData.amount !== undefined) {
+      expense.amount = Math.round(updateData.amount * 100);
+    }
     if (updateData.date !== undefined) expense.date = new Date(updateData.date);
     if (updateData.status !== undefined)
       expense.status = updateData.status as ExpenseStatus;
@@ -357,9 +375,9 @@ export class FinanceService {
       settlements: transactions.map((t) => ({
         from: userMap.get(t.from) ?? t.from,
         to: userMap.get(t.to) ?? t.to,
-        amount: t.amount,
+        amount: t.amount / 100, // Convert to Float
       })),
-      totalExpenses,
+      totalExpenses: totalExpenses / 100, // Convert to Float
     };
   }
 
@@ -448,7 +466,7 @@ export class FinanceService {
         return {
           userId: otherUserId,
           userName: userMap.get(otherUserId) ?? otherUserId,
-          balance, // positive = they owe me, negative = I owe them
+          balance: balance / 100, // Convert to Float
         };
       },
     );
@@ -457,8 +475,8 @@ export class FinanceService {
       myUserId: userId,
       myUserName: me?.nickname ?? userId,
       balances,
-      totalIOweThem,
-      totalTheyOweMe,
+      totalIOweThem: totalIOweThem / 100, // Convert to Float
+      totalTheyOweMe: totalTheyOweMe / 100, // Convert to Float
     };
   }
 }

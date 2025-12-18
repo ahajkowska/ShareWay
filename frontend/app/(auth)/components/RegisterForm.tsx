@@ -14,6 +14,7 @@ import { PasswordChecklist } from "../hooks/usePasswordChecklist";
 import { FieldError } from "../hooks/useFieldError";
 import { ServerErrorBanner } from "../hooks/useServerErrorBanner";
 import { useExplainRegisterError } from "../hooks/useExplainRegisterError";
+import { registerUser } from "../services/authService";
 
 export default function RegisterForm() {
   const { t } = useI18n();
@@ -91,7 +92,11 @@ export default function RegisterForm() {
         try {
           setServerError(undefined);
 
-          console.log("Register:", values);
+          await registerUser({
+            email: values.email,
+            password: values.password,
+            name: values.name,
+          });
 
           toast.success(t.auth.toast.registerSuccess, {
             description: values.name,
@@ -99,7 +104,7 @@ export default function RegisterForm() {
           });
 
           resetForm();
-          router.replace("/login");
+          router.replace("/dashboard"); // Successful registration logs user in automatically in authService
         } catch (err: any) {
           setServerError(explainRegisterError(err, isPL));
         } finally {
@@ -121,9 +126,8 @@ export default function RegisterForm() {
                 name="name"
                 type="text"
                 autoComplete="name"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.name && errors.name ? "border-destructive" : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.name && errors.name ? "border-destructive" : ""
+                  }`}
                 placeholder={isPL ? "Alex Podróżnik" : "Alex Traveler"}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("name", e.target.value);
@@ -145,9 +149,8 @@ export default function RegisterForm() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.email && errors.email ? "border-destructive" : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.email && errors.email ? "border-destructive" : ""
+                  }`}
                 placeholder="you@example.com"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("email", e.target.value);
@@ -169,11 +172,10 @@ export default function RegisterForm() {
                 name="password"
                 type={showPass ? "text" : "password"}
                 autoComplete="new-password"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.password && errors.password
-                    ? "border-destructive"
-                    : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.password && errors.password
+                  ? "border-destructive"
+                  : ""
+                  }`}
                 placeholder="••••••••"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("password", e.target.value);
@@ -218,9 +220,8 @@ export default function RegisterForm() {
                 name="confirm"
                 type={showConfirm ? "text" : "password"}
                 autoComplete="new-password"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.confirm && errors.confirm ? "border-destructive" : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.confirm && errors.confirm ? "border-destructive" : ""
+                  }`}
                 placeholder="••••••••"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("confirm", e.target.value);

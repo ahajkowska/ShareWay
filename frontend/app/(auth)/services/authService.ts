@@ -31,11 +31,21 @@ export async function loginUser({
     const [cookiePart] = cookieHeader.split(";");
     const [name, value] = cookiePart.split("=");
     if (name && value) {
-      cookieStore.set(name.trim(), value.trim(), {
+      const cleanName = name.trim();
+      let maxAge = undefined;
+
+      if (cleanName === "access_token") {
+        maxAge = 15 * 60; // 15 minutes
+      } else if (cleanName === "refresh_token") {
+        maxAge = 7 * 24 * 60 * 60; // 7 days
+      }
+
+      cookieStore.set(cleanName, value.trim(), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
+        maxAge,
       });
     }
   }

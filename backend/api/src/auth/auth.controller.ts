@@ -11,6 +11,7 @@ import {
 import type { Response, Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service.js';
 import { RegisterDto, LoginDto } from '../users/dto/index.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { Public } from './decorators/public.decorator.js';
 import { RefreshTokenGuard } from './guards/refresh-token.guard.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
@@ -34,7 +35,7 @@ interface RequestWithRefreshUser extends ExpressRequest {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Public()
   @Post('register')
@@ -63,6 +64,16 @@ export class AuthController {
     });
 
     return { message: 'Login successful' };
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

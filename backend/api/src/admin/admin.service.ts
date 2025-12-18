@@ -23,8 +23,13 @@ export class AdminService {
     private readonly configService: ConfigService,
     private readonly tripsService: TripsService,
   ) {
-    this.appUrl =
-      this.configService.get<string>('APP_URL') || 'http://localhost:3000';
+    const configuredUrl = this.configService.get<string>('APP_URL');
+    if (!configuredUrl) {
+      this.logger.warn(
+        'APP_URL is not set. Defaulting to http://localhost:3000. This may cause issues with email links.',
+      );
+    }
+    this.appUrl = configuredUrl || 'http://localhost:3000';
   }
 
   async getAllUsers(page: number = 1, limit: number = 20) {

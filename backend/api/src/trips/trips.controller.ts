@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { TripsService } from './trips.service.js';
 import {
@@ -55,7 +56,7 @@ interface TripResponse {
 @Controller('trips')
 @UseGuards(JwtAuthGuard)
 export class TripsController {
-  constructor(private readonly tripsService: TripsService) {}
+  constructor(private readonly tripsService: TripsService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -65,7 +66,7 @@ export class TripsController {
   ) {
     const userId = req.user?.userId;
     if (!userId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
 
     const trip = await this.tripsService.create(userId, createTripDto);
@@ -90,7 +91,7 @@ export class TripsController {
   async join(@Req() req: RequestWithUser, @Body() joinTripDto: JoinTripDto) {
     const userId = req.user?.userId;
     if (!userId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
 
     const trip = await this.tripsService.joinByCode(userId, joinTripDto);
@@ -170,7 +171,7 @@ export class TripsController {
   ) {
     const requesterId = req.user?.userId;
     if (!requesterId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
 
     return this.tripsService.removeParticipant(tripId, userId, requesterId);
@@ -212,7 +213,7 @@ export class TripsController {
   ) {
     const requesterId = req.user?.userId;
     if (!requesterId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
     return this.tripsService.transferRole(
       tripId,
@@ -235,8 +236,8 @@ export class TripsController {
       name: trip.name,
       description: trip.description,
       destination: trip.location,
-      startDate: trip.startDate.toISOString(),
-      endDate: trip.endDate.toISOString(),
+      startDate: new Date(trip.startDate).toISOString(),
+      endDate: new Date(trip.endDate).toISOString(),
       baseCurrency: trip.baseCurrency,
       inviteCode: trip.inviteCode,
       inviteCodeExpiry: trip.inviteCodeExpiry?.toISOString() ?? null,

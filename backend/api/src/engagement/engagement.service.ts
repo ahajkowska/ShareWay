@@ -37,7 +37,7 @@ export class EngagementService {
     private readonly checklistItemStateRepository: Repository<ChecklistItemState>,
     private readonly tripsService: TripsService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   // --- Voting ---
 
@@ -395,6 +395,20 @@ export class EngagementService {
     );
     if (!isParticipant) {
       throw new ForbiddenException('You must be a participant of the trip');
+    }
+
+    // Security Check: Only Creator or Organizer can delete
+    const participant = await this.tripsService.getParticipant(
+      item.tripId,
+      userId,
+    );
+    const isCreator = item.creatorId === userId;
+    const isOrganizer = participant?.role === 'organizer';
+
+    if (!isCreator && !isOrganizer) {
+      throw new ForbiddenException(
+        'Only the item creator or organizers can delete this item',
+      );
     }
 
     await this.checklistItemRepository.delete(itemId);

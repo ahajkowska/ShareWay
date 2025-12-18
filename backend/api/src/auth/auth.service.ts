@@ -29,7 +29,7 @@ export class AuthService {
     private readonly redisRepository: RedisRepository,
     private readonly eventEmitter: EventEmitter2,
     private readonly mailerService: MailerService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto): Promise<{ message: string }> {
     const existingUser = await this.usersService.emailExists(registerDto.email);
@@ -50,7 +50,7 @@ export class AuthService {
       nickname: user.nickname,
     });
 
-    this.logger.log(`User registered: ${user.email}`);
+    this.logger.log(`User registered: ${user.id}`);
 
     return { message: 'Registration successful' };
   }
@@ -79,7 +79,7 @@ export class AuthService {
 
     await this.redisRepository.storeRefreshToken(user.id, tokens.refreshToken);
 
-    this.logger.log(`User logged in: ${user.email}`);
+    this.logger.log(`User logged in: ${user.id}`);
 
     return tokens;
   }
@@ -104,7 +104,7 @@ export class AuthService {
       newTokens.refreshToken,
     );
 
-    this.logger.log(`Tokens refreshed for user: ${user.email}`);
+    this.logger.log(`Tokens refreshed for user: ${user.id}`);
 
     return newTokens;
   }
@@ -138,5 +138,23 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByPasswordResetToken(token);
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    if (user.passwordResetExpires && user.passwordResetExpires < new Date()) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    await this.usersService.resetPassword(user.id, newPassword);
+
+    this.logger.log(`Password reset successful for user ID: ${user.id}`);
+
+    return { message: 'Password has been reset successfully' };
   }
 }

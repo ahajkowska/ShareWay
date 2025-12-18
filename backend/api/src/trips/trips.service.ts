@@ -14,6 +14,7 @@ import {
   TripStatus,
 } from './entities/index.js';
 import { CreateTripDto, UpdateTripDto, JoinTripDto } from './dto/index.js';
+import { randomBytes } from 'crypto';
 
 const INVITE_CODE_LENGTH = 6;
 const INVITE_CODE_EXPIRY_DAYS = 7;
@@ -29,7 +30,7 @@ export class TripsService {
     @InjectRepository(Participant)
     private readonly participantRepository: Repository<Participant>,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async create(userId: string, createTripDto: CreateTripDto): Promise<Trip> {
     const { startDate, endDate, ...rest } = createTripDto;
@@ -384,10 +385,10 @@ export class TripsService {
 
   private generateRandomCode(): string {
     let code = '';
+    const bytes = randomBytes(INVITE_CODE_LENGTH);
     for (let i = 0; i < INVITE_CODE_LENGTH; i++) {
-      code += INVITE_CODE_CHARS.charAt(
-        Math.floor(Math.random() * INVITE_CODE_CHARS.length),
-      );
+      const index = bytes[i] % INVITE_CODE_CHARS.length;
+      code += INVITE_CODE_CHARS.charAt(index);
     }
     return code;
   }

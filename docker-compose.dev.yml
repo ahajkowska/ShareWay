@@ -112,6 +112,8 @@ services:
       dockerfile: Dockerfile.dev
     restart: unless-stopped
     env_file: .env.development
+    environment:
+      - BACKEND_API_URL=http://api:4000/api/v1
     ports:
       - target: 3000
         published: ${FRONTEND_PORT:-3000}

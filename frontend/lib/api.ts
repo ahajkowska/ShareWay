@@ -583,3 +583,15 @@ export async function transferRole(
     }
   );
 }
+/**
+ * Reset password using token
+ */
+export async function resetPassword(
+  token: string,
+  newPassword: string
+): Promise<{ message: string }> {
+  return fetchAuth<{ message: string }>(apiUrl("/auth/reset-password"), {
+    method: "POST",
+    body: JSON.stringify({ token, newPassword }),
+  });
+}
