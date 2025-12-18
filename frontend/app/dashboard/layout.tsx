@@ -1,20 +1,20 @@
 import DashboardNavbar from "@/app/dashboard/components/DashboardNavbar";
+import { requireUser } from "@/lib/auth/requireUser";
+import { SessionProvider } from "@/app/context/SessionContext";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = {
-    id: "TEMP-ID",
-    name: "Demo User",
-    email: "demo@shareway.app",
-  };
+  const user = await requireUser("/dashboard");
 
   return (
     <>
       <DashboardNavbar user={user} />
-      <main className="pt-16">{children}</main>
+      <SessionProvider initialUser={user}>
+        <main className="pt-16">{children}</main>
+      </SessionProvider>
     </>
   );
 }

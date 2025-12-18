@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import DashboardFiltersSidebar from "@/app/dashboard/components/filters/DashboardFiltersSidebar";
 import TripCard from "@/app/dashboard/components/TripCard";
-import { useTrips } from "@/app/dashboard/hooks/useTrips";
 import { useSidebar } from "@/app/dashboard/hooks/useSidebar";
 import { useFilteredTrips } from "@/app/dashboard/hooks/useFilteredTrips";
 import { useDashboardState } from "@/app/dashboard/hooks/useDashboardState";
 import { cn, normalizeSearchText } from "@/lib/utils";
-import { SlidersHorizontal, SearchX, Loader2 } from "lucide-react";
+import { SlidersHorizontal, SearchX } from "lucide-react";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import type { Trip } from "@/lib/types/trip";
@@ -39,11 +38,17 @@ const t = {
   },
 };
 
+type DashboardPageClientProps = {
+  initialSidebarOpen: boolean;
+  initialTrips: Trip[];
+  initialTripImages: Record<string, string | null>;
+};
+
 export default function DashboardPageClient({
   initialSidebarOpen,
-}: {
-  initialSidebarOpen: boolean;
-}) {
+  initialTrips,
+  initialTripImages,
+}: DashboardPageClientProps) {
   const router = useRouter();
   const {
     filters,
@@ -58,15 +63,13 @@ export default function DashboardPageClient({
   const { isSidebarOpen, setIsSidebarOpen, isMobile, sidebarWidth } =
     useSidebar(initialSidebarOpen);
 
-  const {
-    trips,
-    loading: tripsLoading,
-    error: tripsError,
-    reload: reloadTrips,
-  } = useTrips();
+  // 🔥 dane i obrazki, które przyszły z serwera
+  const [trips] = useState<Trip[]>(initialTrips);
+  const [tripImages] =
+    useState<Record<string, string | null>>(initialTripImages);
 
-  const filteredTrips = useFilteredTrips(trips, filters, sortMode);
   const searchActive = filters.search.trim().length > 0;
+  const filteredTrips = useFilteredTrips(trips, filters, sortMode);
   const filtersActive =
     filters.status !== "ALL" ||
     filters.role !== "ALL" ||
@@ -74,6 +77,7 @@ export default function DashboardPageClient({
     filters.dateTo ||
     filters.minParticipants ||
     filters.maxParticipants;
+
   const [joinOpen, setJoinOpen] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -86,6 +90,7 @@ export default function DashboardPageClient({
   });
   const [createImage, setCreateImage] = useState<string | null>(null);
   const [createImageLoading, setCreateImageLoading] = useState(false);
+
   const searchOptions = useMemo(() => {
     const seen = new Map<string, string>();
 
@@ -136,6 +141,7 @@ export default function DashboardPageClient({
     return "neutral";
   };
 
+  // Podgląd obrazka w modalu "Nowa podróż" (tu zostaje, jak miałaś – klient pyta /api/destination-image)
   useEffect(() => {
     if (!createOpen) return;
     const destination = createForm.destination.trim();
@@ -215,6 +221,10 @@ export default function DashboardPageClient({
       for (const q of uniqueQueries) {
         if (controller.signal.aborted) break;
         const params = new URLSearchParams({ q, preset, stable: "1" });
+        const context = `${createForm.name} ${createForm.description}`.trim();
+        if (context) {
+          params.set("context", context);
+        }
         try {
           const res = await fetch(
             `/api/destination-image?${params.toString()}`,
@@ -251,6 +261,17 @@ export default function DashboardPageClient({
   const handleOpenTrip = (trip: Trip) => {
     const targetId = trip.groupId ?? trip.id;
     router.push(`/dashboard/${targetId}`);
+  };
+
+  const closeJoinModal = () => {
+    setJoinOpen(false);
+    setJoinCode("");
+  };
+
+  const handleJoinTrip = () => {
+    if (!joinCode.trim()) return;
+    // TODO: podłącz logikę dołączania do podróży przez API
+    closeJoinModal();
   };
 
   return (
@@ -349,31 +370,7 @@ export default function DashboardPageClient({
             </div>
           )}
 
-          {tripsLoading ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-12 text-center min-h-[40vh]">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                Ładuję Twoje podróże...
-              </p>
-            </div>
-          ) : tripsError ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-12 text-center min-h-[40vh]">
-              <SearchX className="h-7 w-7 text-muted-foreground" />
-              <div className="space-y-1">
-                <p className="text-lg font-semibold">Nie udało się pobrać podróży</p>
-                <p className="text-sm text-muted-foreground">
-                  {tripsError}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={reloadTrips}
-                className="mt-2"
-              >
-                Spróbuj ponownie
-              </Button>
-            </div>
-          ) : filteredTrips.length === 0 ? (
+          {filteredTrips.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-12 text-center min-h-[60vh]">
               <SearchX className="h-7 w-7 text-muted-foreground" />
               <div className="space-y-1">
@@ -393,12 +390,14 @@ export default function DashboardPageClient({
                   trip={trip}
                   index={index}
                   onOpen={handleOpenTrip}
+                  imageUrlFromServer={tripImages[trip.id] ?? null}
                 />
               ))}
             </div>
           )}
         </div>
 
+        {/* MODAL: Nowa podróż */}
         <AnimatePresence>
           {createOpen && (
             <motion.div
@@ -532,7 +531,7 @@ export default function DashboardPageClient({
                     <Button
                       className="w-full h-12 rounded-2xl text-base font-semibold bg-primary text-primary-foreground hover:brightness-95 active:scale-[0.99] transition"
                       onClick={() => {
-                        console.log("Create trip", createForm, createImage);
+                        // tutaj podłączysz wywołanie API do stworzenia tripa
                         setCreateOpen(false);
                       }}
                       disabled={
@@ -549,7 +548,7 @@ export default function DashboardPageClient({
                       Podgląd karty
                     </p>
                     <div className="rounded-2xl border border-border/60 bg-card/80 p-3">
-                      <div className="rounded-[18px] border border-border/60 overflow-hidden bg-gradient-to-br from-background via-muted/40 to-background shadow-sm">
+                      <div className="rounded-[18px] border border-border/60 overflow-hidden bg-linear-to-brfrom-background via-muted/40 to-background shadow-sm">
                         <div
                           className="relative h-40"
                           style={{
@@ -560,7 +559,7 @@ export default function DashboardPageClient({
                             backgroundPosition: "center",
                           }}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-br from-background/70 via-background/10 to-background/70" />
+                          <div className="absolute inset-0 bg-linear-to-br from-background/70 via-background/10 to-background/70" />
                           {createImageLoading && (
                             <div className="absolute inset-0 bg-background/60 flex items-center justify-center text-xs text-muted-foreground">
                               Ładowanie zdjęcia...
@@ -596,6 +595,7 @@ export default function DashboardPageClient({
           )}
         </AnimatePresence>
 
+        {/* MODAL: Dołącz do podróży */}
         <AnimatePresence>
           {joinOpen && (
             <motion.div
@@ -608,7 +608,7 @@ export default function DashboardPageClient({
             >
               <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                onClick={() => setJoinOpen(false)}
+                onClick={closeJoinModal}
               />
               <motion.div
                 initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -629,14 +629,14 @@ export default function DashboardPageClient({
                   </div>
                   <button
                     className="text-lg text-muted-foreground hover:text-foreground"
-                    onClick={() => setJoinOpen(false)}
+                    onClick={closeJoinModal}
                     aria-label="Zamknij"
                   >
                     ×
                   </button>
                 </div>
 
-                <div className="mt-5 space-y-6">
+                <div className="mt-5 space-y-5">
                   <label className="text-sm font-semibold text-foreground block">
                     Kod zaproszenia
                   </label>
@@ -645,20 +645,30 @@ export default function DashboardPageClient({
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                     placeholder="NP. TRIP-2025-ABC"
                     className="uppercase tracking-[0.08em] h-12 rounded-xl border border-border/70 bg-card/80 focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-                    autoFocus
                   />
-                </div>
 
-                <Button
-                  className="mt-6 w-full h-12 rounded-2xl text-base font-semibold bg-primary text-primary-foreground hover:brightness-95 active:scale-[0.99] transition"
-                  onClick={() => {
-                    console.log("Join with code", joinCode);
-                    setJoinOpen(false);
-                  }}
-                  disabled={!joinCode.trim()}
-                >
-                  Dołącz
-                </Button>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button
+                      variant="ghost"
+                      className="flex-1 h-11 rounded-2xl text-xs font-semibold uppercase tracking-[0.2em]"
+                      onClick={closeJoinModal}
+                    >
+                      Anuluj
+                    </Button>
+                    <Button
+                      className="flex-1 h-11 rounded-2xl text-sm font-semibold bg-primary text-primary-foreground hover:brightness-95 active:scale-[0.99] transition"
+                      onClick={handleJoinTrip}
+                      disabled={!joinCode.trim()}
+                    >
+                      Dołącz
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    Kod znajdziesz w zaproszeniu od organizatora lub lidera
+                    grupy.
+                  </p>
+                </div>
               </motion.div>
             </motion.div>
           )}

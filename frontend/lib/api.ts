@@ -13,17 +13,24 @@ export class AuthError extends Error {
 }
 
 /**
+ * API base URL from environment
+ */
+const PUBLIC_API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
+
+export const API_BASE_URL =
+  typeof window === "undefined"
+    ? INTERNAL_API_URL || PUBLIC_API_URL
+    : PUBLIC_API_URL;
+
+/**
  * Auth constants - configure these based on your backend
  */
 const AUTH_CONSTANTS = {
-  AUTH_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  REFRESH_ACCESS_TOKEN_ENDPOINT: 'auth/refresh',
+  AUTH_URL: API_BASE_URL,
+  REFRESH_ACCESS_TOKEN_ENDPOINT: "auth/refresh",
 };
-
-/**
- * API base URL from environment
- */
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 /**
  * Build full API URL

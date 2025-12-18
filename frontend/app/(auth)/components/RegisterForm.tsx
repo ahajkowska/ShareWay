@@ -9,6 +9,7 @@ import { Mail, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { toast } from "sonner";
+import { registerUser } from "@/lib/auth/api";
 
 import { PasswordChecklist } from "../hooks/usePasswordChecklist";
 import { FieldError } from "../hooks/useFieldError";
@@ -56,8 +57,9 @@ export default function RegisterForm() {
   const schema = useMemo(
     () =>
       Yup.object({
-        name: Yup.string()
+        nickname: Yup.string()
           .min(2, t.auth.validation.name.min(2))
+          .max(50, t.auth.validation.name.max?.(50) ?? "Max 50 characters")
           .required(t.auth.validation.name.required),
         email: Yup.string()
           .email(t.auth.validation.email.invalid)
@@ -80,7 +82,7 @@ export default function RegisterForm() {
   return (
     <Formik
       initialValues={{
-        name: "",
+        nickname: "",
         email: "",
         password: "",
         confirm: "",
@@ -91,10 +93,14 @@ export default function RegisterForm() {
         try {
           setServerError(undefined);
 
-          console.log("Register:", values);
+          await registerUser({
+            nickname: values.nickname,
+            email: values.email,
+            password: values.password,
+          });
 
           toast.success(t.auth.toast.registerSuccess, {
-            description: values.name,
+            description: values.nickname || values.email,
             duration: 2200,
           });
 
@@ -112,27 +118,27 @@ export default function RegisterForm() {
           <ServerErrorBanner message={serverError} />
 
           <div className="space-y-1">
-            <label htmlFor="reg-name" className="text-sm font-medium">
+            <label htmlFor="reg-nickname" className="text-sm font-medium">
               {t.auth.common.nameLabel}
             </label>
             <div className="relative">
               <Field
-                id="reg-name"
-                name="name"
+                id="reg-nickname"
+                name="nickname"
                 type="text"
                 autoComplete="name"
                 className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.name && errors.name ? "border-destructive" : ""
+                  touched.nickname && errors.nickname ? "border-destructive" : ""
                 }`}
-                placeholder={isPL ? "Alex Podróżnik" : "Alex Traveler"}
+                placeholder={isPL ? "twój_nick" : "your_nickname"}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setFieldValue("name", e.target.value);
+                  setFieldValue("nickname", e.target.value);
                   setServerError(undefined);
                 }}
               />
               <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <FieldError name="name" id="reg-name-error" />
+            <FieldError name="nickname" id="reg-nickname-error" />
           </div>
 
           <div className="space-y-1">

@@ -57,7 +57,7 @@ Aby połączyć frontend z backendem, upewnij się że:
 1. **API URL jest poprawnie skonfigurowany:**
    ```bash
    # .env.local
-   NEXT_PUBLIC_API_URL=http://localhost:4000
+   NEXT_PUBLIC_API_URL=http://localhost:4001
    ```
 
 2. **CORS jest skonfigurowany w backendzie:**
@@ -81,7 +81,7 @@ Aby połączyć frontend z backendem, upewnij się że:
 3. Uruchom: `npm run dev`
 
 #### Z prawdziwym backendem
-1. Upewnij się że backend działa na `http://localhost:4000`
+1. Upewnij się że backend działa na `http://localhost:4001`
 2. Zakomentuj mock data w `page.tsx`
 3. Odkomentuj prawdziwe wywołania API (już zrobione)
 4. Uruchom: `npm run dev`
@@ -131,7 +131,7 @@ Upewnij się że backend endpoint jest poprawny:
 ```typescript
 // lib/api.ts
 const AUTH_CONSTANTS = {
-  AUTH_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+  AUTH_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001',
   REFRESH_ACCESS_TOKEN_ENDPOINT: 'auth/refresh', // Zmień jeśli inny
 };
 ```
@@ -164,4 +164,3 @@ await fetchAuth(apiUrl('/auth/login'), {
 });
 // Backend automatycznie ustawia httpOnly cookies
 ```
-

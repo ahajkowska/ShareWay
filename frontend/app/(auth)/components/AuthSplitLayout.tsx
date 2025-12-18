@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 type Props = {
   title: string;
@@ -26,6 +28,14 @@ export default function AuthSplitLayout({
 }: Props) {
   return (
     <section className="relative min-h-dvh w-full flex items-center justify-center overflow-hidden">
+      <Link
+        href="/"
+        aria-label="Wróć na stronę główną"
+        className="absolute top-6 left-6 z-20 inline-flex h-14 w-14 items-center justify-center rounded-full border-2 border-border bg-background/80 text-foreground shadow-lg backdrop-blur transition hover:bg-background/90 hover:scale-[1.03]"
+      >
+        <ArrowLeft className="h-6 w-6" aria-hidden />
+      </Link>
+
       <div className="absolute inset-0 z-0">
         <Image
           src={bgSrcLight}
@@ -74,7 +84,7 @@ export default function AuthSplitLayout({
           </div>
 
           <div className="p-6 sm:p-10 bg-card">
-            <div className="mb-8">
+            <div className="mb-8 space-y-3">
               <h1 className="text-3xl font-extrabold tracking-tight">
                 {title}
               </h1>
