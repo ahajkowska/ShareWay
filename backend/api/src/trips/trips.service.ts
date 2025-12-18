@@ -24,7 +24,7 @@ export class TripsService {
     @InjectRepository(Participant)
     private readonly participantRepository: Repository<Participant>,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async create(userId: string, createTripDto: CreateTripDto): Promise<Trip> {
     const { startDate, endDate, ...rest } = createTripDto;
@@ -259,6 +259,13 @@ export class TripsService {
     this.logger.log(`User ${userId} removed from trip ${tripId}`);
 
     return { message: 'Participant removed successfully' };
+  }
+
+  async isParticipant(tripId: string, userId: string): Promise<boolean> {
+    const count = await this.participantRepository.count({
+      where: { tripId, userId },
+    });
+    return count > 0;
   }
 
   private generateRandomCode(): string {

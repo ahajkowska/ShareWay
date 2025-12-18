@@ -14,6 +14,8 @@ import { User } from './users/entities/user.entity.js';
 import { Trip, Participant } from './trips/entities/index.js';
 import { FinanceModule } from './finance/finance.module.js';
 import { Expense, ExpenseDebtor } from './finance/entities/index.js';
+import { EngagementModule } from './engagement/engagement.module.js';
+import { Vote, VoteOption, VoteCast, ChecklistItem, ChecklistItemState } from './engagement/entities/index.js';
 import path from 'path';
 
 const env = process.env.NODE_ENV ?? 'development';
@@ -37,7 +39,7 @@ const envFilePath = isTsRun
         username: configService.getOrThrow<string>('DATABASE_USER'),
         password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-        entities: [User, Trip, Participant, Expense, ExpenseDebtor],
+        entities: [User, Trip, Participant, Expense, ExpenseDebtor, Vote, VoteOption, VoteCast, ChecklistItem, ChecklistItemState],
         synchronize: env === 'development',
         logging: env === 'development',
       }),
@@ -49,6 +51,7 @@ const envFilePath = isTsRun
     AdminModule,
     TripsModule,
     FinanceModule,
+    EngagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
