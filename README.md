@@ -25,25 +25,9 @@ Aplikacja do wspólnego organizowania i planowania podróży grupowych - od wsp�
 
 ### Frontend
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 14
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-
-### Backend (Mikroserwisy)
-
-- **Auth Service**: ?
-- **Cost Split**: ?
-- **Schedule**: ?
-- **Checklist**: ?
-- **Voting**: ?
-
-### Infrastructure
-
-- **Containerization**: Docker + Docker Compose
-- **API Gateway**: ?
-- **Databases**:
-  - ?
-- **Authentication**: ?
 
 ## Quick Start
 
@@ -96,7 +80,7 @@ docker-compose down -v
 
 ## Team
 
-- [@ahajkowskaa](https://github.com/ahajkowskaa)
+- [@ahajkowskaa](https://github.com/ahajkowska)
 - [@azegler](https://github.com/azegler)
 - [@ksvcchh](https://github.com/ksvcchh)
 - [@khumianka](https://github.com/khumianka)
