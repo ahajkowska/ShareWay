@@ -19,6 +19,7 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+  app.setGlobalPrefix('api/v1');
 
   // TODO: CHANGE ORIGIN FOR PRODUCTION NODE_ENV WHEN WE WOULD HAVE DEPLOYMENT
   const corsConf =

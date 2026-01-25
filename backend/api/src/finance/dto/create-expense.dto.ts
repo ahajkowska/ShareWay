@@ -1,22 +1,28 @@
-import { IsArray, IsDateString, IsInt, IsNotEmpty, IsPositive, IsString, IsUUID, Length } from 'class-validator';
+import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Length, MaxLength } from 'class-validator';
 
 export class CreateExpenseDto {
-    @IsInt()
-    @IsPositive()
-    amount: number;
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
-    @IsString()
-    @Length(3, 3)
-    currency: string;
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  description?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+  @IsNumber()
+  @IsPositive()
+  amount: number;
 
-    @IsDateString()
-    date: Date;
+  @IsString()
+  @Length(3, 3)
+  currency: string;
 
-    @IsArray()
-    @IsUUID('4', { each: true })
-    debtorIds: string[];
+  @IsOptional()
+  @IsDateString()
+  date?: string;
+
+  @IsArray()
+  @IsUUID('4', { each: true })
+  splitBetween: string[];
 }

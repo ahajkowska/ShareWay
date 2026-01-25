@@ -26,6 +26,11 @@ export class UpdateTripDto {
   location?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(255, { message: 'Destination must be at most 255 characters' })
+  destination?: string;
+
+  @IsOptional()
   @IsDateString({}, { message: 'Start date must be a valid date' })
   startDate?: string;
 
@@ -39,4 +44,20 @@ export class UpdateTripDto {
     message: `Currency must be one of: ${SUPPORTED_CURRENCIES.join(', ')}`,
   })
   baseCurrency?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn([
+    'mountains',
+    'beach',
+    'city',
+    'neutral',
+    'desert',
+    'tropical',
+    'winter',
+    'lake',
+    'countryside',
+    'adventure',
+  ])
+  accentPreset?: string;
 }

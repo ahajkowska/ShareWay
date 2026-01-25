@@ -24,10 +24,11 @@ export class TripsService {
     @InjectRepository(Participant)
     private readonly participantRepository: Repository<Participant>,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async create(userId: string, createTripDto: CreateTripDto): Promise<Trip> {
-    const { startDate, endDate, ...rest } = createTripDto;
+    const { startDate, endDate, destination, accentPreset, ...rest } =
+      createTripDto;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -45,7 +46,10 @@ export class TripsService {
         ...rest,
         startDate: start,
         endDate: end,
+        location: destination || rest.location,
         baseCurrency: createTripDto.baseCurrency || 'USD',
+        accentPreset: accentPreset || 'neutral',
+        status: 'ACTIVE',
       });
 
       const savedTrip = await queryRunner.manager.save(trip);
@@ -101,7 +105,7 @@ export class TripsService {
   async update(tripId: string, updateTripDto: UpdateTripDto): Promise<Trip> {
     const trip = await this.findById(tripId);
 
-    const { startDate, endDate, ...rest } = updateTripDto;
+    const { startDate, endDate, destination, ...rest } = updateTripDto;
 
     const newStartDate = startDate ? new Date(startDate) : trip.startDate;
     const newEndDate = endDate ? new Date(endDate) : trip.endDate;
@@ -114,6 +118,7 @@ export class TripsService {
       ...rest,
       startDate: newStartDate,
       endDate: newEndDate,
+      location: destination !== undefined ? destination : trip.location,
     });
 
     await this.tripRepository.save(trip);

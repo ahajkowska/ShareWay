@@ -39,6 +39,9 @@ export class Expense {
   @Column()
   title: string;
 
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
+
   @Column({ type: 'timestamp' })
   date: Date;
 

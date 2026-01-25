@@ -42,6 +42,12 @@ export class Trip {
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  accentPreset: string | null;
+
+  @Column({ type: 'varchar', length: 20, default: 'ACTIVE' })
+  status: string;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 

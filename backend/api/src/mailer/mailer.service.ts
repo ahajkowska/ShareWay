@@ -70,10 +70,7 @@ export class MailerService {
     }
   }
 
-  async sendAccountBannedEmail(
-    email: string,
-    nickname: string,
-  ): Promise<void> {
+  async sendAccountBannedEmail(email: string, nickname: string): Promise<void> {
     try {
       await this.mailerService.sendMail({
         to: email,

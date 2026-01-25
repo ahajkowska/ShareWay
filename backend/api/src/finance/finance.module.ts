@@ -6,12 +6,9 @@ import { Expense, ExpenseDebtor } from './entities/index.js';
 import { TripsModule } from '../trips/trips.module.js';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Expense, ExpenseDebtor]),
-        TripsModule, // To use TripsService logic if needed (e.g. checking organizer status)
-    ],
-    controllers: [FinanceController],
-    providers: [FinanceService],
-    exports: [FinanceService],
+  imports: [TypeOrmModule.forFeature([Expense, ExpenseDebtor]), TripsModule],
+  controllers: [FinanceController],
+  providers: [FinanceService],
+  exports: [FinanceService],
 })
-export class FinanceModule { }
+export class FinanceModule {}

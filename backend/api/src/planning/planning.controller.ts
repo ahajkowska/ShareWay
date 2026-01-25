@@ -168,22 +168,17 @@ export class PlanningController {
   }) {
     return {
       id: activity.id,
+      dayId: (activity as any).dayId,
       type: activity.type,
       title: activity.title,
       description: activity.description,
-      startTime: activity.startTime,
-      endTime: activity.endTime,
+      startTime: activity.startTime ? activity.startTime : null,
+      endTime: activity.endTime ? activity.endTime : null,
       location: activity.location,
-      creatorId: activity.creatorId,
+      createdBy: activity.creatorId,
+      createdByName: activity.creator?.nickname || 'Unknown',
       createdAt: activity.createdAt,
       updatedAt: activity.updatedAt,
-      creator: activity.creator
-        ? {
-            id: activity.creator.id,
-            email: activity.creator.email,
-            nickname: activity.creator.nickname,
-          }
-        : null,
     };
   }
 }
