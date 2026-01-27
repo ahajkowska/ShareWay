@@ -8,7 +8,7 @@ import { pl, enUS } from "date-fns/locale";
 import Navbar from "@/app/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Plus, Calendar, ChevronDown, MapPinned, Sun, Cloud, Sunrise, ArrowLeft } from "lucide-react";
+import { Plus, Calendar, ChevronDown, MapPinned, Sun, Cloud, Sunrise, ArrowLeft, Trash2 } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "./translations";
 import type { DayDto } from "./types";
@@ -16,6 +16,7 @@ import ActivityTimeline from "./components/ActivityTimeline";
 import CreateDayDialog from "./components/CreateDayDialog";
 import CreateActivityDialog from "./components/CreateActivityDialog";
 import { cn } from "@/lib/utils";
+import * as api from "@/lib/api";
 
 const dayIcons = [Sun, Cloud, Sunrise];
 
@@ -40,11 +41,16 @@ export default function SchedulePage() {
             setLoading(true);
             setError(null);
             
-            // TODO: Replace with actual API call
-            // const data = await fetchAuth<DayDto[]>(apiUrl(`/api/trips/${tripId}/schedule`), {});
-            // setDays(data);
+            // Validate UUID format
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(tripId)) {
+                setError(t.invalidTripId || "Invalid trip ID format. Please select a valid trip.");
+                setLoading(false);
+                return;
+            }
             
-            setDays([]);
+            const data = await api.fetchPlan(tripId);
+            setDays(Array.isArray(data) ? data : []);
         } catch (err: any) {
             console.error("Error loading schedule:", err);
             setError(err.message || t.loadError);
@@ -62,23 +68,31 @@ export default function SchedulePage() {
 
     const handleCreateDay = async (date: string) => {
         try {
-            // TODO: Replace with actual API call
-            // await fetchAuth(apiUrl(`/api/trips/${tripId}/schedule/days`), {
-            //     method: 'POST',
-            //     body: JSON.stringify({ date }),
-            // });
-            
-            const newDay: DayDto = {
-                id: `day-${Date.now()}`,
-                tripId: tripId,
-                date: date,
-                activities: [],
-            };
-            setDays(prev => [...prev, newDay].sort((a, b) => a.date.localeCompare(b.date)));
+            const newDay = await api.createDay(tripId, { date });
+            setDays(prev => {
+                const currentDays = [...prev, newDay] as DayDto[];
+                return currentDays.sort((a, b) => a.date.localeCompare(b.date));
+            });
             setCreateDayOpen(false);
         } catch (err: any) {
             console.error("Error creating day:", err);
             alert(err.message || t.createDayError);
+        }
+    };
+
+    const handleDeleteDay = async (dayId: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        if (!confirm(t.deleteDayConfirm)) return;
+        
+        try {
+            await api.deleteDay(dayId);
+            setDays(prev => prev.filter(d => d.id !== dayId));
+            if (expandedDayId === dayId) {
+                setExpandedDayId(null);
+            }
+        } catch (err: any) {
+            console.error("Error deleting day:", err);
+            alert(err.message || t.deleteDayError);
         }
     };
 
@@ -155,7 +169,10 @@ export default function SchedulePage() {
                         <Card className="border-destructive">
                             <CardContent className="pt-6">
                                 <p className="text-destructive text-center">{error}</p>
-                                <div className="flex justify-center mt-4">
+                                <div className="flex justify-center gap-3 mt-4">
+                                    <Button onClick={() => router.push('/dashboard')} variant="outline">
+                                        {t.backToGroup}
+                                    </Button>
                                     <Button onClick={load} variant="outline">
                                         {t.tryAgain}
                                     </Button>
@@ -198,7 +215,7 @@ export default function SchedulePage() {
                                         transition={{ delay: index * 0.05 }}
                                     >
                                         <Card className={cn(
-                                            "overflow-hidden transition-all duration-200",
+                                            "overflow-hidden transition-all duration-200 group",
                                             isCurrentDay && "border-primary/40 shadow-lg ring-2 ring-primary/20",
                                             isExpanded && "shadow-xl"
                                         )}>
@@ -237,10 +254,21 @@ export default function SchedulePage() {
                                                     </div>
                                                 </div>
 
-                                                <ChevronDown className={cn(
-                                                    "w-5 h-5 text-muted-foreground transition-transform duration-200",
-                                                    isExpanded && "rotate-180"
-                                                )} />
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleDeleteDay(day.id, e)}
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
+                                                        title={t.deleteDay}
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                    <ChevronDown className={cn(
+                                                        "w-5 h-5 text-muted-foreground transition-transform duration-200",
+                                                        isExpanded && "rotate-180"
+                                                    )} />
+                                                </div>
                                             </button>
 
                                             {/* Expanded Content - Timeline */}

@@ -68,10 +68,10 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                             {activity.startTime && (
                                 <div className="absolute left-12 top-0 flex items-center gap-1.5 text-xs font-mono font-medium text-primary">
                                     <Clock className="w-3.5 h-3.5" />
-                                    {format(new Date(activity.startTime), "HH:mm")}
+                                    {activity.startTime}
                                     {activity.endTime && (
                                         <span className="text-muted-foreground">
-                                            - {format(new Date(activity.endTime), "HH:mm")}
+                                            - {activity.endTime}
                                         </span>
                                     )}
                                 </div>
@@ -103,10 +103,10 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                                 )}
 
                                 {/* Created By */}
-                                {activity.createdBy && (
+                                {activity.createdByName && (
                                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                                         <User className="w-3.5 h-3.5" />
-                                        <span>{t.addedBy}: {activity.createdBy}</span>
+                                        <span>{t.addedBy}: {activity.createdByName}</span>
                                     </div>
                                 )}
 
