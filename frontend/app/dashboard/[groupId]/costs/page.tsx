@@ -25,17 +25,18 @@ export default function CostsPage() {
     const [expenses, setExpenses] = useState<ExpenseDto[]>([]);
     const [balance, setBalance] = useState<BalanceGraphDto | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [createExpenseOpen, setCreateExpenseOpen] = useState(false);
     const [myBalance, setMyBalance] = useState<MyBalanceSummaryDto | null>(null);
     const [baseCurrency, setBaseCurrency] = useState<string>("PLN"); // Default, will be loaded from trip
 
     const loadTripInfo = async () => {
         try {
-            // TODO: Replace with actual API call when backend is ready
-            // const tripData = await fetchAuth<{ baseCurrency: string }>(apiUrl(`/api/trips/${tripId}`), {});
+            // TODO: Replace with actual API call when backend has trip details endpoint
+            // const tripData = await api.fetchTripDetails(tripId);
             // setBaseCurrency(tripData.baseCurrency);
             
-            // MOCK - default to PLN for now
+            // Default to PLN for now
             setBaseCurrency("PLN");
         } catch (err: any) {
             console.error("Error loading trip info:", err);
@@ -46,93 +47,22 @@ export default function CostsPage() {
     const loadExpenses = async () => {
         try {
             setLoading(true);
+            setError(null);
             
-            // MOCK DATA - usuń gdy backend będzie gotowy
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Validate UUID format
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(tripId)) {
+                setError("Invalid trip ID format. Please select a valid trip.");
+                setLoading(false);
+                return;
+            }
             
-            const mockExpenses: ExpenseDto[] = [
-                {
-                    id: "exp-1",
-                    tripId: tripId,
-                    title: "Zakwaterowanie - Hotel Aurora",
-                    description: "3 noce, pokoje 2-osobowe",
-                    amount: 1200.00,
-                    paidBy: "user-1",
-                    paidByName: "Jan Kowalski",
-                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
-                    date: "2024-12-15T14:00:00",
-                    createdAt: "2024-12-15T14:00:00",
-                },
-                {
-                    id: "exp-2",
-                    tripId: tripId,
-                    title: "Bilety autokarowe",
-                    description: "Warszawa → Zakopane → Warszawa",
-                    amount: 480.00,
-                    paidBy: "user-2",
-                    paidByName: "Anna Nowak",
-                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
-                    date: "2024-12-15T08:00:00",
-                    createdAt: "2024-12-15T08:00:00",
-                },
-                {
-                    id: "exp-3",
-                    tripId: tripId,
-                    title: "Obiad - Restauracja Góralska",
-                    description: "Tradycyjna kuchnia podhalańska",
-                    amount: 280.00,
-                    paidBy: "user-3",
-                    paidByName: "Piotr Wiśniewski",
-                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
-                    date: "2024-12-15T18:00:00",
-                    createdAt: "2024-12-15T18:00:00",
-                },
-                {
-                    id: "exp-4",
-                    tripId: tripId,
-                    title: "Bilety na Gubałówkę",
-                    description: "Kolejka linowa - 4 osoby",
-                    amount: 120.00,
-                    paidBy: "user-4",
-                    paidByName: "Maria Zielińska",
-                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
-                    date: "2024-12-16T10:00:00",
-                    createdAt: "2024-12-16T10:00:00",
-                },
-                {
-                    id: "exp-5",
-                    tripId: tripId,
-                    title: "Zakupy na ognisko",
-                    description: "Kiełbaski, chleb, napoje",
-                    amount: 85.00,
-                    paidBy: "user-1",
-                    paidByName: "Jan Kowalski",
-                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
-                    date: "2024-12-16T17:00:00",
-                    createdAt: "2024-12-16T17:00:00",
-                },
-                {
-                    id: "exp-6",
-                    tripId: tripId,
-                    title: "Śniadania w hotelu",
-                    description: "Bufet szwedzki - 3 dni",
-                    amount: 360.00,
-                    paidBy: "user-2",
-                    paidByName: "Anna Nowak",
-                    splitBetween: ["Jan Kowalski", "Anna Nowak", "Piotr Wiśniewski", "Maria Zielińska"],
-                    date: "2024-12-15T14:30:00",
-                    createdAt: "2024-12-15T14:30:00",
-                },
-            ];
-            
-            setExpenses(mockExpenses);
-            
-            // PRAWDZIWE API - odkomentuj gdy backend działa
-            // const data = await api.fetchExpenses(tripId);
-            // setExpenses(data);
+            const data = await api.fetchExpenses(tripId);
+            setExpenses(Array.isArray(data) ? data : []);
         } catch (err: any) {
             console.error("Error loading expenses:", err);
-            alert(err.message || t.loadError);
+            setError(err.message || t.loadError || "Failed to load expenses");
+            setExpenses([]);
         } finally {
             setLoading(false);
         }
@@ -140,35 +70,8 @@ export default function CostsPage() {
 
     const loadBalance = async () => {
         try {
-            // MOCK DATA
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            const mockBalance: BalanceGraphDto = {
-                settlements: [
-                    {
-                        from: "Jan Kowalski",
-                        to: "Anna Nowak",
-                        amount: 45.00,
-                    },
-                    {
-                        from: "Piotr Wiśniewski",
-                        to: "Anna Nowak",
-                        amount: 135.00,
-                    },
-                    {
-                        from: "Maria Zielińska",
-                        to: "Jan Kowalski",
-                        amount: 281.25,
-                    },
-                ],
-                totalExpenses: 2525.00,
-            };
-            
-            setBalance(mockBalance);
-            
-            // PRAWDZIWE API - odkomentuj gdy backend działa
-            // const data = await api.fetchBalanceGraph(tripId);
-            // setBalance(data);
+            const data = await api.fetchBalanceGraph(tripId);
+            setBalance(data);
         } catch (err: any) {
             console.error("Error loading balance:", err);
         }
@@ -176,119 +79,8 @@ export default function CostsPage() {
 
     const loadMyBalance = async () => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            const mockMyBalance: MyBalanceSummaryDto = {
-                myUserId: "user-1",
-                myUserName: "Jan Kowalski",
-                balances: [
-                    {
-                        userId: "user-2",
-                        userName: "Anna Nowak",
-                        balance: 135.00,
-                        expenses: [
-                            {
-                                expenseId: "exp-2",
-                                expenseTitle: "Bilety autokarowe",
-                                totalAmount: 480.00,
-                                myShare: 120.00,
-                                iPaid: 0.00,
-                                balance: -120.00,
-                            },
-                            {
-                                expenseId: "exp-6",
-                                expenseTitle: "Śniadania w hotelu",
-                                totalAmount: 360.00,
-                                myShare: 90.00,
-                                iPaid: 0.00,
-                                balance: -90.00,
-                            },
-                            {
-                                expenseId: "exp-1",
-                                expenseTitle: "Zakwaterowanie - Hotel Aurora",
-                                totalAmount: 1200.00,
-                                myShare: 300.00,
-                                iPaid: 1200.00,
-                                balance: 300.00,
-                            },
-                            {
-                                expenseId: "exp-5",
-                                expenseTitle: "Zakupy na ognisko",
-                                totalAmount: 85.00,
-                                myShare: 21.25,
-                                iPaid: 85.00,
-                                balance: 21.25,
-                            },
-                        ],
-                    },
-                    {
-                        userId: "user-3",
-                        userName: "Piotr Wiśniewski",
-                        balance: 230.00,
-                        expenses: [
-                            {
-                                expenseId: "exp-3",
-                                expenseTitle: "Obiad - Restauracja Góralska",
-                                totalAmount: 280.00,
-                                myShare: 70.00,
-                                iPaid: 0.00,
-                                balance: -70.00,
-                            },
-                            {
-                                expenseId: "exp-1",
-                                expenseTitle: "Zakwaterowanie - Hotel Aurora",
-                                totalAmount: 1200.00,
-                                myShare: 300.00,
-                                iPaid: 1200.00,
-                                balance: 300.00,
-                            },
-                            {
-                                expenseId: "exp-5",
-                                expenseTitle: "Zakupy na ognisko",
-                                totalAmount: 85.00,
-                                myShare: 21.25,
-                                iPaid: 85.00,
-                                balance: 21.25,
-                            },
-                        ],
-                    },
-                    {
-                        userId: "user-4",
-                        userName: "Maria Zielińska",
-                        balance: 291.25,
-                        expenses: [
-                            {
-                                expenseId: "exp-4",
-                                expenseTitle: "Bilety na Gubałówkę",
-                                totalAmount: 120.00,
-                                myShare: 30.00,
-                                iPaid: 0.00,
-                                balance: -30.00,
-                            },
-                            {
-                                expenseId: "exp-1",
-                                expenseTitle: "Zakwaterowanie - Hotel Aurora",
-                                totalAmount: 1200.00,
-                                myShare: 300.00,
-                                iPaid: 1200.00,
-                                balance: 300.00,
-                            },
-                            {
-                                expenseId: "exp-5",
-                                expenseTitle: "Zakupy na ognisko",
-                                totalAmount: 85.00,
-                                myShare: 21.25,
-                                iPaid: 85.00,
-                                balance: 21.25,
-                            },
-                        ],
-                    },
-                ],
-                totalIOweThem: 310.00,
-                totalTheyOweMe: 963.75,
-            };
-            
-            setMyBalance(mockMyBalance);
+            const data = await api.fetchMyBalanceSummary(tripId);
+            setMyBalance(data);
         } catch (err: any) {
             console.error("Error loading my balance:", err);
         }
@@ -307,13 +99,10 @@ export default function CostsPage() {
         if (!confirm(t.deleteConfirm)) return;
         
         try {
-            // MOCK - usuń lokalnie
-            setExpenses(prev => prev.filter(exp => exp.id !== expenseId));
-            
-            // PRAWDZIWE API
-            // await api.deleteExpense(expenseId);
-            // await loadExpenses();
-            // await loadBalance();
+            await api.deleteExpense(expenseId);
+            await loadExpenses();
+            await loadBalance();
+            await loadMyBalance();
         } catch (err: any) {
             console.error("Error deleting expense:", err);
             alert(err.message || t.deleteError);
@@ -388,6 +177,24 @@ export default function CostsPage() {
                             )}
                         </Card>
                     </motion.div>
+
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mb-8 p-6 bg-destructive/10 border border-destructive/20 rounded-lg"
+                        >
+                            <p className="text-destructive font-medium mb-4">{error}</p>
+                            <Button
+                                variant="outline"
+                                onClick={() => router.push('/dashboard')}
+                                className="gap-2"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                {t.backToGroup || "Back to Dashboard"}
+                            </Button>
+                        </motion.div>
+                    )}
 
                     {/* Main Content - Two Columns */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
