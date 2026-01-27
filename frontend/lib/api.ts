@@ -1,8 +1,4 @@
 /**
- * API helper functions with Double-Token Authentication
- */
-
-/**
  * Custom error class for authentication errors
  */
 export class AuthError extends Error {
@@ -48,14 +44,14 @@ export function apiUrl(path: string): string {
  */
 const updateOptions = (options: RequestInit): RequestInit => {
     const update = { ...options };
-    update.credentials = "include"; // CRITICAL: Ensures Cookies are sent
+    update.credentials = "include";
 
     const existingHeaders = (update.headers || {}) as Record<string, string>;
 
     if (!(update.body instanceof FormData)) {
         update.headers = {
             "Content-Type": "application/json",
-            ...existingHeaders, // Preserves custom headers (e.g. trace-id)
+            ...existingHeaders,
         };
     }
     return update;
@@ -83,7 +79,6 @@ export async function fetchAuth<T>(
         throw new Error(`Network request failed: ${message}`);
     }
 
-    // Intercept 401 and try to Refresh Token
     if (!response.ok && response.status === 401) {
         if (retryCount === 0) {
             try {
@@ -98,7 +93,6 @@ export async function fetchAuth<T>(
                 if (!refreshResponse.ok) {
                     throw new AuthError("Session expired", 401);
                 }
-                // Retry original request with new cookies
                 return fetchAuth<T>(fetchUrl, requestOptions, retryCount + 1);
             } catch (error) {
                 throw error;
@@ -132,15 +126,11 @@ export async function fetchAuth<T>(
     return json as T;
 }
 
-// ============================================
 // TYPE IMPORTS
-// ============================================
 
 import type { ExpenseDto, BalanceGraphDto } from "@/app/dashboard/[groupId]/costs/types";
 
-// ============================================
 // VOTING API
-// ============================================
 
 /**
  * Fetch all votings for a trip
@@ -190,9 +180,8 @@ export async function addVotingOption(voteId: string, text: string, description?
     });
 }
 
-// ============================================
+
 // CHECKLIST API
-// ============================================
 
 /**
  * Fetch checklist for a trip
@@ -232,9 +221,7 @@ export async function deleteChecklistItem(itemId: string) {
     });
 }
 
-// ============================================
 // COSTS/EXPENSES API
-// ============================================
 
 /**
  * Fetch all expenses for a trip
@@ -273,9 +260,26 @@ export async function fetchBalanceGraph(tripId: string): Promise<BalanceGraphDto
     });
 }
 
-// ============================================
+/**
+ * Fetch my balance summary for a trip
+ */
+export async function fetchMyBalanceSummary(tripId: string): Promise<any> {
+    return fetchAuth(apiUrl(`/trips/${tripId}/balance-summary`), {
+        method: "GET",
+    });
+}
+
+/**
+ * Fetch trip participants/members
+ */
+export async function fetchTripParticipants(tripId: string): Promise<any[]> {
+    return fetchAuth<any[]>(apiUrl(`/trips/${tripId}/participants`), {
+        method: "GET",
+    });
+}
+
+
 // PLAN API (Days + Activities)
-// ============================================
 
 /**
  * Fetch plan (days + activities) for a trip
@@ -293,6 +297,15 @@ export async function createDay(tripId: string, payload: { date: string }) {
     return fetchAuth(apiUrl(`/trips/${tripId}/days`), {
         method: "POST",
         body: JSON.stringify(payload),
+    });
+}
+
+/**
+ * Delete a day
+ */
+export async function deleteDay(dayId: string) {
+    return fetchAuth(apiUrl(`/days/${dayId}`), {
+        method: "DELETE",
     });
 }
 

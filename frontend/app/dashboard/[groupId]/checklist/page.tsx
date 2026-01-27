@@ -12,6 +12,7 @@ import { getChecklistTranslations } from "./translations";
 import ChecklistList from "./components/ChecklistList";
 import AddItemForm from "./components/AddItemForm";
 import type { ChecklistItemDto } from "./types";
+import * as api from "@/lib/api";
 
 export default function ChecklistPage() {
     const { lang } = useI18n();
@@ -29,39 +30,16 @@ export default function ChecklistPage() {
             setLoading(true);
             setError(null);
             
-            // MOCK DATA - do odkomentowania gdy backend będzie gotowy
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const mockData: ChecklistItemDto[] = [
-                {
-                    id: "1",
-                    text: "Spakować ubrania",
-                    isChecked: false,
-                    createdAt: new Date("2024-12-01"),
-                },
-                {
-                    id: "2",
-                    text: "Zarezerwować hotel",
-                    isChecked: true,
-                    createdAt: new Date("2024-12-02"),
-                },
-                {
-                    id: "3",
-                    text: "Kupić bilety lotnicze",
-                    isChecked: true,
-                    createdAt: new Date("2024-12-03"),
-                },
-                {
-                    id: "4",
-                    text: "Zabrać paszporty",
-                    isChecked: false,
-                    createdAt: new Date("2024-12-04"),
-                },
-            ];
-            setItems(mockData);
+            // Validate UUID format
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(groupId)) {
+                setError("Invalid trip ID format. Please select a valid trip.");
+                setLoading(false);
+                return;
+            }
             
-            // API - zakomentowane do momentu działającego backendu
-            // const data = await api.fetchChecklist(groupId);
-            // setItems(Array.isArray(data) ? data : []);
+            const data = await api.fetchChecklist(groupId);
+            setItems(Array.isArray(data) ? data : []);
         } catch (err: any) {
             console.error("Error loading checklist:", err);
             setError(err.message || t.loadError);
@@ -78,20 +56,9 @@ export default function ChecklistPage() {
 
     const handleAdd = async (text: string) => {
         try {
-            // MOCK - tymczasowe dodawanie lokalnie
-            const newItem: ChecklistItemDto = {
-                id: `temp-${Date.now()}`,
-                text: text,
-                isChecked: false,
-                createdAt: new Date(),
-            };
-            setItems(prev => [newItem, ...prev]);
+            const newItem = await api.addChecklistItem(groupId, text);
+            setItems((prev: ChecklistItemDto[]) => [newItem, ...prev] as ChecklistItemDto[]);
             setIsAddOpen(false);
-            
-            // API - zakomentowane
-            // const newItem = await api.addChecklistItem(groupId, text);
-            // setItems(prev => [newItem, ...prev]);
-            // setIsAddOpen(false);
         } catch (err: any) {
             console.error("Error adding item:", err);
             alert(err.message || t.addError);
@@ -99,18 +66,26 @@ export default function ChecklistPage() {
     };
 
     const handleToggle = async (itemId: string, newChecked: boolean) => {
+        // Optimistic update
         setItems(prev => prev.map(i => (i.id === itemId ? { ...i, isChecked: newChecked } : i)));
         
         try {
-            // MOCK
-            console.log(`Toggle item ${itemId} to ${newChecked}`);
-            
-            // PRAWDZIWE API - zakomentowane
-            // await api.toggleChecklistItemStatus(itemId, newChecked);
+            await api.toggleChecklistItemStatus(itemId, newChecked);
         } catch (err: any) {
             console.error("Error toggling item:", err);
+            // Revert on error
             setItems(prev => prev.map(i => (i.id === itemId ? { ...i, isChecked: !newChecked } : i)));
             alert(err.message || t.toggleError);
+        }
+    };
+
+    const handleDelete = async (itemId: string) => {
+        try {
+            await api.deleteChecklistItem(itemId);
+            setItems(prev => prev.filter(i => i.id !== itemId));
+        } catch (err: any) {
+            console.error("Error deleting item:", err);
+            alert(err.message || t.deleteError);
         }
     };
 
@@ -184,6 +159,7 @@ export default function ChecklistPage() {
                         items={items}
                         loading={loading}
                         onToggle={handleToggle}
+                        onDelete={handleDelete}
                         onRefresh={load}
                         error={error}
                     />

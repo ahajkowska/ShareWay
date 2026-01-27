@@ -52,7 +52,6 @@ export default function EditActivityDialog({ open, onOpenChange, activity, onUpd
             await api.updateActivity(activity.id, payload);
             onUpdated?.();
             onOpenChange(false);
-            window.location.reload();
         } catch (err: any) {
             console.error(err);
             alert(err.message || t.updateError);
@@ -115,7 +114,7 @@ export default function EditActivityDialog({ open, onOpenChange, activity, onUpd
                             <div>
                                 <label className="block text-sm font-medium mb-2">{t.startTime}</label>
                                 <input 
-                                    type="datetime-local" 
+                                    type="time" 
                                     value={startTime} 
                                     onChange={(e) => setStartTime(e.target.value)} 
                                     className="w-full px-4 py-3 rounded-xl border border-input" 
@@ -124,7 +123,7 @@ export default function EditActivityDialog({ open, onOpenChange, activity, onUpd
                             <div>
                                 <label className="block text-sm font-medium mb-2">{t.endTime}</label>
                                 <input 
-                                    type="datetime-local" 
+                                    type="time" 
                                     value={endTime} 
                                     onChange={(e) => setEndTime(e.target.value)} 
                                     className="w-full px-4 py-3 rounded-xl border border-input" 

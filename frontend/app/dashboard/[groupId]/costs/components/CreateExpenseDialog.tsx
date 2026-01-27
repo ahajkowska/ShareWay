@@ -27,14 +27,31 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
     const [paidBy, setPaidBy] = useState("");
     const [splitBetween, setSplitBetween] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
+    const [users, setUsers] = useState<Array<{ id: string; name: string }>>([]);
+    const [loadingUsers, setLoadingUsers] = useState(false);
 
-    // Mock users - zamień na prawdziwe dane z API
-    const mockUsers = [
-        { id: "user-1", name: "Jan Kowalski" },
-        { id: "user-2", name: "Anna Nowak" },
-        { id: "user-3", name: "Piotr Wiśniewski" },
-        { id: "user-4", name: "Maria Zielińska" },
-    ];
+    useEffect(() => {
+        if (open && tripId) {
+            loadParticipants();
+        }
+    }, [open, tripId]);
+
+    const loadParticipants = async () => {
+        try {
+            setLoadingUsers(true);
+            const participants = await api.fetchTripParticipants(tripId);
+            const formattedUsers = participants.map((p: any) => ({
+                id: p.userId,
+                name: p.user?.nickname || p.user?.email || 'Unknown',
+            }));
+            setUsers(formattedUsers);
+        } catch (err: any) {
+            console.error("Error loading participants:", err);
+            setUsers([]);
+        } finally {
+            setLoadingUsers(false);
+        }
+    };
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -68,8 +85,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
                 date: new Date().toISOString(),
             };
 
-            // MOCK - tylko zamknij dialog
-            console.log("Creating expense:", payload);
+            await api.createExpense(tripId, payload);
             
             // Reset form
             setTitle("");
@@ -80,16 +96,6 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
             
             onCreated?.();
             onOpenChange(false);
-            
-            // PRAWDZIWE API - odkomentuj gdy backend działa
-            // await api.createExpense(tripId, payload);
-            // setTitle("");
-            // setDescription("");
-            // setAmount("");
-            // setPaidBy("");
-            // setSplitBetween([]);
-            // onCreated?.();
-            // onOpenChange(false);
         } catch (err: any) {
             console.error(err);
             alert(err.message || t.createExpenseError);
@@ -107,7 +113,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
     };
 
     const selectAllUsers = () => {
-        setSplitBetween(mockUsers.map(u => u.id));
+        setSplitBetween(users.map(u => u.id));
     };
 
     const deselectAllUsers = () => {
@@ -195,9 +201,10 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
                                 value={paidBy}
                                 onChange={(e) => setPaidBy(e.target.value)}
                                 className="w-full px-4 py-3 rounded-xl border border-input bg-background text-foreground"
+                                disabled={loadingUsers}
                             >
-                                <option value="">{t.choosePersonPlaceholder}</option>
-                                {mockUsers.map(user => (
+                                <option value="">{loadingUsers ? t.loading || "Loading..." : t.choosePersonPlaceholder}</option>
+                                {users.map(user => (
                                     <option 
                                         key={user.id} 
                                         value={user.id}
@@ -233,20 +240,26 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
                                 </div>
                             </div>
                             <div className="space-y-2 border rounded-xl p-3">
-                                {mockUsers.map(user => (
-                                    <label 
-                                        key={user.id}
-                                        className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={splitBetween.includes(user.id)}
-                                            onChange={() => toggleUserInSplit(user.id)}
-                                            className="w-4 h-4"
-                                        />
-                                        <span className="text-sm">{user.name}</span>
-                                    </label>
-                                ))}
+                                {loadingUsers ? (
+                                    <p className="text-sm text-muted-foreground text-center py-4">{t.loading || "Loading participants..."}</p>
+                                ) : users.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground text-center py-4">{t.noParticipants || "No participants found"}</p>
+                                ) : (
+                                    users.map(user => (
+                                        <label 
+                                            key={user.id}
+                                            className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg cursor-pointer"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={splitBetween.includes(user.id)}
+                                                onChange={() => toggleUserInSplit(user.id)}
+                                                className="w-4 h-4"
+                                            />
+                                            <span className="text-sm">{user.name}</span>
+                                        </label>
+                                    ))
+                                )}
                             </div>
                             {splitBetween.length > 0 && amount && parseFloat(amount) > 0 && (
                                 <p className="text-xs text-muted-foreground mt-2">

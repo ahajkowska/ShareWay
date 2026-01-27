@@ -11,11 +11,12 @@ interface Props {
     items: ChecklistItemDto[];
     loading: boolean;
     onToggle: (itemId: string, newChecked: boolean) => void;
+    onDelete?: (itemId: string) => void;
     onRefresh: () => void;
     error?: string | null;
 }
 
-export default function ChecklistList({ items, loading, onToggle, onRefresh, error }: Props) {
+export default function ChecklistList({ items, loading, onToggle, onDelete, onRefresh, error }: Props) {
     const { lang } = useI18n();
     const t = getChecklistTranslations(lang);
 
@@ -56,7 +57,8 @@ export default function ChecklistList({ items, loading, onToggle, onRefresh, err
                 <ChecklistItem 
                     key={item.id} 
                     item={item} 
-                    onToggle={onToggle} 
+                    onToggle={onToggle}
+                    onDelete={onDelete}
                 />
             ))}
         </div>
