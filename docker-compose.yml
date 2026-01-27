@@ -2,31 +2,63 @@ services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: shareway
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    env_file: .env
     ports:
-      - "55432:5432"
+      - "${POSTGRES_HOST_PORT:-55432}:5432"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    mem_limit: 1g
+    cpus: 0.75
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d shareway"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks: [shareway-network]
 
   redis:
     image: redis:8-alpine
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    env_file: .env
     ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    mem_limit: 256m
+    cpus: 0.5
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [shareway-network]
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "${MAIL_PORT:-1025}:1025"
+      - "${MAILHOG_UI_PORT:-8025}:8025"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 128m
+    cpus: 0.25
     networks: [shareway-network]
 
   api:
@@ -34,15 +66,14 @@ services:
       context: ./backend/api
       dockerfile: Dockerfile
     restart: unless-stopped
-    env_file:
-      - .env.development
+    env_file: .env
     environment:
-      NODE_ENV: development
-      API_PORT: 4001
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      - NODE_ENV=development
+      - API_PORT=4001
+      - DATABASE_HOST=db      # Nazwa serwisu bazy
+      - DATABASE_PORT=5432    # Wewnętrzny port kontenera
+      - REDIS_HOST=redis      # Nazwa serwisu redis
+      - REDIS_PORT=6379
     depends_on:
       db:
         condition: service_healthy
@@ -70,8 +101,8 @@ services:
       - PORT=3000
       - NEXT_PUBLIC_API_URL=http://localhost:4000/api
       - INTERNAL_API_URL=http://api-gateway/api
-      - PEXELS_API_KEY=${PEXELS_API_KEY:-}
-      - EMBEDDING_RERANKER_URL=${EMBEDDING_RERANKER_URL:-}
+      - PEXELS_API_KEY=${PEXELS_API_KEY}
+      - EMBEDDING_RERANKER_URL=http://embedding-reranker:8000/rerank
     depends_on:
       - api
       - embedding-reranker
@@ -97,14 +128,6 @@ services:
       - MODEL_ID=${EMBEDDING_MODEL_ID:-openai/clip-vit-base-patch32}
     networks:
       - shareway-network
-
-  # Dodamy później:
-  # auth-service:
-  # cost-split-service:
-  # schedule-service:
-  # checklist-service:
-  # poll-service:
-  # trip-service:
 
 networks:
   shareway-network:
