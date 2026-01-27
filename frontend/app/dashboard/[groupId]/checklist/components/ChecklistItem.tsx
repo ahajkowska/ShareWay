@@ -77,7 +77,8 @@ export default function ChecklistItem({ item, onToggle, onDelete }: Props) {
                     size="icon"
                     onClick={handleDelete}
                     disabled={saving}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 text-destructive hover:text-destructive"
+                    className="h-8 w-8 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all group-hover:text-muted-foreground"
+                    title={t.delete}
                 >
                     <Trash2 className="w-4 h-4" />
                 </Button>
