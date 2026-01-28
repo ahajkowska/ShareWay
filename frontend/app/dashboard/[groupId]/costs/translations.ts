@@ -78,6 +78,11 @@ export const costsTranslations = {
     createExpenseError: "Błąd tworzenia wydatku",
     addExpense: "Dodaj wydatek",
     adding: "Dodawanie...",
+    editExpense: "Edytuj wydatek",
+    updateExpenseError: "Błąd aktualizacji wydatku",
+    saveChanges: "Zapisz zmiany",
+    updating: "Aktualizacja...",
+    cannotChangePayer: "Nie można zmienić osoby płacącej",
   },
   en: {
     costs: "Settlements",
@@ -158,6 +163,11 @@ export const costsTranslations = {
     createExpenseError: "Error creating expense",
     addExpense: "Add Expense",
     adding: "Adding...",
+    editExpense: "Edit Expense",
+    updateExpenseError: "Error updating expense",
+    saveChanges: "Save Changes",
+    updating: "Updating...",
+    cannotChangePayer: "Cannot change who paid",
   },
 };
 

@@ -47,7 +47,7 @@ export default function LoginForm() {
       onSubmit={async (values, { setSubmitting }) => {
         setServerError(undefined);
         try {
-          await loginUser({
+          const response = await loginUser({
             email: values.email,
             password: values.password,
           });
@@ -59,7 +59,9 @@ export default function LoginForm() {
             duration: 2000,
           });
 
-          router.replace(from || "/dashboard");
+          // Redirect admins to admin panel, others to dashboard
+          const redirectPath = response?.user?.role === 'admin' ? '/admin' : (from || '/dashboard');
+          router.replace(redirectPath);
         } catch (err: any) {
           const pretty = explainLoginError(err, t);
           setServerError(pretty);

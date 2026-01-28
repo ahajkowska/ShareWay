@@ -189,10 +189,10 @@ export interface VotingDto {
  * Create voting request payload
  */
 export interface CreateVotingPayload {
-  title: string;
+  question: string;
   description?: string;
-  endsAt?: string;
-  initialOptions: string[];
+  endDate?: string;
+  options: string[];
 }
 
 /**
@@ -271,6 +271,12 @@ export async function addVotingOption(
     body: JSON.stringify({ text, description }),
   });
 }
+
+export const removeVote = async (votingId: string): Promise<void> => {
+  await fetchAuth(apiUrl(`/votes/${votingId}/cast`), {
+    method: "DELETE",
+  });
+};
 
 // ============================================
 // CHECKLIST API
@@ -602,7 +608,7 @@ export async function removeParticipant(
 }
 
 /**
- * Archive a trip (organizer only)
+ * Archive a trip (organizer or admin)
  */
 export async function archiveTrip(tripId: string): Promise<Trip> {
   return fetchAuth<Trip>(apiUrl(`/trips/${tripId}/archive`), {
@@ -611,7 +617,7 @@ export async function archiveTrip(tripId: string): Promise<Trip> {
 }
 
 /**
- * Unarchive a trip (organizer only)
+ * Unarchive a trip (organizer or admin)
  */
 export async function unarchiveTrip(tripId: string): Promise<Trip> {
   return fetchAuth<Trip>(apiUrl(`/trips/${tripId}/unarchive`), {
@@ -647,4 +653,125 @@ export async function resetPassword(
     method: "POST",
     body: JSON.stringify({ token, newPassword }),
   });
+}
+
+// ============================================
+// ADMIN API
+// ============================================
+
+/**
+ * Admin user response type
+ */
+export interface AdminUserDto {
+  id: string;
+  email: string;
+  nickname: string;
+  role: "user" | "admin";
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Admin trip response type
+ */
+export interface AdminTripDto {
+  id: string;
+  name: string;
+  description?: string;
+  destination?: string;
+  startDate?: string;
+  endDate?: string;
+  createdBy: string;
+  participantCount: number;
+  status: "ACTIVE" | "ARCHIVED";
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Paginated response type
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+/**
+ * Get all users (admin only)
+ */
+export async function adminGetAllUsers(
+  page: number = 1,
+  limit: number = 20
+): Promise<{ users: AdminUserDto[]; total: number; page: number; limit: number }> {
+  return fetchAuth<{ users: AdminUserDto[]; total: number; page: number; limit: number }>(
+    apiUrl(`/admin/users?page=${page}&limit=${limit}`),
+    { method: "GET" }
+  );
+}
+
+/**
+ * Get all trips (admin only)
+ */
+export async function adminGetAllTrips(
+  page: number = 1,
+  limit: number = 20
+): Promise<PaginatedResponse<AdminTripDto>> {
+  return fetchAuth<PaginatedResponse<AdminTripDto>>(
+    apiUrl(`/admin/trips?page=${page}&limit=${limit}`),
+    { method: "GET" }
+  );
+}
+
+/**
+ * Get user by ID (admin only)
+ */
+export async function adminGetUserById(
+  userId: string
+): Promise<AdminUserDto> {
+  return fetchAuth<AdminUserDto>(apiUrl(`/admin/users/${userId}`), {
+    method: "GET",
+  });
+}
+
+/**
+ * Ban user (admin only)
+ */
+export async function adminBanUser(
+  userId: string
+): Promise<{ message: string }> {
+  return fetchAuth<{ message: string }>(apiUrl(`/admin/users/${userId}/ban`), {
+    method: "PATCH",
+  });
+}
+
+/**
+ * Unban user (admin only)
+ */
+export async function adminUnbanUser(
+  userId: string
+): Promise<{ message: string }> {
+  return fetchAuth<{ message: string }>(
+    apiUrl(`/admin/users/${userId}/unban`),
+    {
+      method: "PATCH",
+    }
+  );
+}
+
+/**
+ * Reset user password (admin only)
+ */
+export async function adminResetUserPassword(
+  userId: string
+): Promise<{ message: string }> {
+  return fetchAuth<{ message: string }>(
+    apiUrl(`/admin/users/${userId}/reset-password`),
+    {
+      method: "POST",
+    }
+  );
 }

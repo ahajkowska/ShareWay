@@ -107,31 +107,31 @@ export default function GroupDashboard() {
 
     const modules = [
         {
-            name: t.dashboard.modules.voting.name,
+            name: t.dashboard.modules?.voting.name,
             icon: Vote,
             href: `/dashboard/${groupId}/voting`,
-            description: t.dashboard.modules.voting.description,
+            description: t.dashboard.modules?.voting.description,
             color: "from-blue-500 to-cyan-500",
         },
         {
-            name: t.dashboard.modules.costs.name,
+            name: t.dashboard.modules?.costs.name,
             icon: Wallet,
             href: `/dashboard/${groupId}/costs`,
-            description: t.dashboard.modules.costs.description,
+            description: t.dashboard.modules?.costs.description,
             color: "from-blue-500 to-cyan-500",
         },
         {
-            name: t.dashboard.modules.schedule.name,
+            name: t.dashboard.modules?.schedule.name,
             icon: Calendar,
             href: `/dashboard/${groupId}/schedule`,
-            description: t.dashboard.modules.schedule.description,
+            description: t.dashboard.modules?.schedule.description,
             color: "from-blue-500 to-cyan-500",
         },
         {
-            name: t.dashboard.modules.checklist.name,
+            name: t.dashboard.modules?.checklist.name,
             icon: ListChecks,
             href: `/dashboard/${groupId}/checklist`,
-            description: t.dashboard.modules.checklist.description,
+            description: t.dashboard.modules?.checklist.description,
             color: "from-blue-500 to-cyan-500",
         },
     ];

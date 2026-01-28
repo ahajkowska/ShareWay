@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Shield } from "lucide-react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 import LanguageToggle from "@/app/components/LanguageToggle";
 import { Avatar, AvatarFallback } from "@/app/components/ui/avatar";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 export default function DashboardNavbar({
   user = { name: "Demo User", email: "demo@shareway.app" },
 }: {
-  user?: { name: string; email: string };
+  user?: { name: string; email: string; role?: 'user' | 'admin' };
 }) {
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -135,6 +135,18 @@ export default function DashboardNavbar({
                       <User className="h-4 w-4 text-muted-foreground" />{" "}
                       <span className="text-foreground">{profileLabel}</span>
                     </Link>
+                    {user.role === 'admin' && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted/70 transition-colors border-t border-border/70"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Shield className="h-4 w-4 text-purple-600 dark:text-purple-400" />{" "}
+                        <span className="text-foreground">
+                          {lang === 'pl' ? 'Panel Admina' : 'Admin Panel'}
+                        </span>
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors border-t border-border/70"
@@ -177,6 +189,16 @@ export default function DashboardNavbar({
               >
                 {profileLabel}
               </Link>
+              {user.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="px-6 py-4 text-lg hover:bg-muted/60 transition flex items-center gap-2"
+                  onClick={() => setOpen(false)}
+                >
+                  <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  {lang === 'pl' ? 'Panel Admina' : 'Admin Panel'}
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="px-6 py-4 text-lg text-destructive hover:bg-destructive/10 transition text-left"

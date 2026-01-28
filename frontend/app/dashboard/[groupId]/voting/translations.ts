@@ -66,6 +66,12 @@ export const votingTranslations = {
     additionalInfo: "Dodatkowe informacje...",
     add: "Dodaj",
     adding: "Dodawanie...",
+    save: "Zapisz",
+    saving: "Zapisywanie...",
+    editVoting: "Edytuj głosowanie",
+    unvote: "Cofnij głos",
+    unvoteError: "Błąd podczas cofania głosu",
+    edit: "Edytuj",
   },
   en: {
     voting: "Voting",
@@ -134,6 +140,12 @@ export const votingTranslations = {
     additionalInfo: "Additional info...",
     add: "Add",
     adding: "Adding...",
+    save: "Save",
+    saving: "Saving...",
+    editVoting: "Edit Poll",
+    unvote: "Remove vote",
+    unvoteError: "Error removing vote",
+    edit: "Edit",
   },
 };
 

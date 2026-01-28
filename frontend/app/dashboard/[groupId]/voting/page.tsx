@@ -86,10 +86,10 @@ export default function GroupVotingPage() {
   const handleCreateVoting = async (data: VotingFormData) => {
     try {
       const payload = {
-        title: data.title,
+        question: data.title,
         description: data.description,
-        endsAt: data.endsAt?.toISOString(),
-        initialOptions: data.initialOptions,
+        endDate: data.endsAt?.toISOString(),
+        options: data.initialOptions,
       };
 
       await api.createVoting(groupId, payload);
@@ -105,6 +105,17 @@ export default function GroupVotingPage() {
     try {
       await api.castVote(votingId, [optionId]);
       await fetchVotings();
+      
+      // Odśwież selectedVoting jeśli dialog szczegółów jest otwarty
+      if (selectedVoting && selectedVoting.id === votingId) {
+        setTimeout(() => {
+          setVotings(prev => {
+            const updated = prev.find(v => v.id === votingId);
+            if (updated) setSelectedVoting(updated);
+            return prev;
+          });
+        }, 100);
+      }
     } catch (error) {
       console.error("Error voting:", error);
       alert(t.voteError);
@@ -140,6 +151,28 @@ export default function GroupVotingPage() {
   const handleViewDetails = (voting: Voting) => {
     setSelectedVoting(voting);
     setIsDetailsOpen(true);
+  };
+
+  const handleUnvote = async (votingId: string) => {
+    try {
+      await api.removeVote(votingId);
+      await fetchVotings();
+      
+      // Odśwież selectedVoting po pobraniu nowych danych
+      if (selectedVoting && selectedVoting.id === votingId) {
+        // Musimy poczekać na następny render cycle
+        setTimeout(() => {
+          setVotings(prev => {
+            const updated = prev.find(v => v.id === votingId);
+            if (updated) setSelectedVoting(updated);
+            return prev;
+          });
+        }, 100);
+      }
+    } catch (error) {
+      console.error("Error removing vote:", error);
+      alert(t.unvoteError || "Nie udało się cofnąć głosu.");
+    }
   };
 
   return (
@@ -207,6 +240,7 @@ export default function GroupVotingPage() {
           onClose={() => setIsDetailsOpen(false)}
           onVote={handleVote}
           onAddOption={handleAddOption}
+          onUnvote={handleUnvote}
         />
       </main>
     </>

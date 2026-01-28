@@ -45,6 +45,7 @@ export async function loginUser({
     id: user.id,
     name: user.nickname,
     email: user.email,
+    role: user.role,
   };
 }
 

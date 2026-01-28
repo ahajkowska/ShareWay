@@ -19,6 +19,7 @@ export interface TokenPair {
 export interface AuthenticatedUser {
   userId: string;
   email: string;
+  role?: string;
 }
 
 export interface RefreshTokenUser {
