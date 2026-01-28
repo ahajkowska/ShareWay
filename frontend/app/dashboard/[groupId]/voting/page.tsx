@@ -8,6 +8,7 @@ import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getVotingTranslations } from "./translations";
 import * as api from "@/lib/api";
+import { toast } from "sonner";
 import VotingList from "./components/VotingList";
 import CreateVotingDialog from "./components/CreateVotingDialog";
 import VotingDetailsDialog from "./components/VotingDetailsDialog";
@@ -95,9 +96,10 @@ export default function GroupVotingPage() {
       await api.createVoting(groupId, payload);
       await fetchVotings();
       setIsCreateDialogOpen(false);
+      toast.success(t.createSuccess || "Głosowanie utworzone");
     } catch (error) {
       console.error("Error creating voting:", error);
-      alert(t.createError);
+      toast.error(t.createError);
     }
   };
 
@@ -116,9 +118,10 @@ export default function GroupVotingPage() {
           });
         }, 100);
       }
+      toast.success(t.voteSuccess || "Głos oddany");
     } catch (error) {
       console.error("Error voting:", error);
-      alert(t.voteError);
+      toast.error(t.voteError);
     }
   };
 
@@ -137,15 +140,21 @@ export default function GroupVotingPage() {
   };
 
   const handleDeleteVoting = async (votingId: string) => {
-    try {
-      if (!confirm(t.deleteConfirm)) return;
-
-      await api.deleteVoting(votingId);
-      setVotings(votings.filter((v) => v.id !== votingId));
-    } catch (error) {
-      console.error("Error deleting voting:", error);
-      alert(t.deleteError);
-    }
+    toast.info(t.deleteConfirm, {
+      action: {
+        label: "Usuń",
+        onClick: async () => {
+          try {
+            await api.deleteVoting(votingId);
+            setVotings(votings.filter((v) => v.id !== votingId));
+            toast.success("Głosowanie usunięte");
+          } catch (error: any) {
+            console.error("Error deleting voting:", error);
+            toast.error(error.message || t.deleteError);
+          }
+        },
+      },
+    });
   };
 
   const handleViewDetails = (voting: Voting) => {

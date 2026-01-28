@@ -7,6 +7,7 @@ import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "../translations";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import type { ExpenseBreakdown } from "../types";
 import * as api from "@/lib/api";
 
@@ -31,36 +32,47 @@ export default function SettleBalanceDialog({ open, onOpenChange, expense, myUse
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         
-        const amountNum = parseFloat(amount);
+        let amountNum = parseFloat(amount);
         if (isNaN(amountNum) || amountNum <= 0) {
-            alert(t.enterValidAmount);
+            toast.error(t.enterValidAmount);
             return;
         }
 
+        // Round to 2 decimal places
+        amountNum = Math.round(amountNum * 100) / 100;
+
         if (amountNum > Math.abs(expense.balance)) {
-            alert(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2), baseCurrency));
+            toast.error(t.amountCannotExceed(Math.abs(expense.balance).toFixed(2), baseCurrency));
             return;
         }
 
         try {
             setSubmitting(true);
 
+            const debtorId = iOwe ? myUserId : expense.personUserId;
+            const creditorId = iOwe ? expense.personUserId : myUserId;
+
             const settlementPayload = {
-                amount: Math.round(amountNum * 100),
-                description: iOwe 
-                    ? `${t.settlement}: ${expense.expenseTitle}` 
-                    : `${t.received}: ${expense.expenseTitle}`,
+                amount: amountNum,
+                title: `Rozliczenie z ${expense.personName}`,
+                description: `Spłata salda z użytkownikiem ${expense.personName}`,
                 date: new Date().toISOString(),
-                debtorIds: iOwe ? [expense.personUserId] : [myUserId],
+                paidBy: debtorId, // Person who owes pays
+                debtorIds: [creditorId], // Person who is owed receives
+                status: "SETTLED" as const,
             };
 
             await api.createExpense(expense.tripId, settlementPayload);
             
-            onSettled?.();
+            // Wait a bit for database to process the settlement
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            toast.success(t.settlementSuccess || "Rozliczenie zapisane");
+            await onSettled?.();
             onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || t.settlementError);
+            toast.error(err.message || t.settlementError);
         } finally {
             setSubmitting(false);
         }

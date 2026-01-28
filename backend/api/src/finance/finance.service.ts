@@ -368,8 +368,10 @@ export class FinanceService {
     });
     const userMap = new Map(users.map((u) => [u.id, u.nickname]));
 
-    // Calculate total expenses
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+    // Calculate total expenses (exclude settlements)
+    const totalExpenses = expenses
+      .filter((e) => e.status !== ExpenseStatus.SETTLED)
+      .reduce((sum, e) => sum + e.amount, 0);
 
     return {
       settlements: transactions.map((t) => ({

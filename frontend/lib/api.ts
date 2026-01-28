@@ -352,6 +352,7 @@ export async function createExpense(
     title: string;
     date: string;
     debtorIds: string[];
+    paidBy?: string;
     currency?: string;
     description?: string;
     status?: "PENDING" | "SETTLED";
@@ -587,9 +588,20 @@ export async function fetchParticipants(tripId: string): Promise<
     user: { id: string; email: string; nickname: string };
   }>
 > {
-  return fetchAuth(apiUrl(`/trips/${tripId}/participants`), {
+  const data = await fetchAuth<Array<{
+    id: string;
+    userId: string;
+    role: string;
+    joinedAt: string;
+    user: { id: string; email: string; nickname: string };
+  }>>(apiUrl(`/trips/${tripId}/participants`), {
     method: "GET",
   });
+  
+  return data.map(p => ({
+    ...p,
+    role: p.role.toUpperCase() as "ORGANIZER" | "PARTICIPANT"
+  }));
 }
 
 /**
@@ -638,7 +650,7 @@ export async function transferRole(
     apiUrl(`/trips/${tripId}/participants/${targetUserId}/role`),
     {
       method: "PATCH",
-      body: JSON.stringify({ targetUserId, newRole }),
+      body: JSON.stringify({ targetUserId, newRole: newRole.toLowerCase() }),
     }
   );
 }

@@ -7,6 +7,7 @@ import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getVotingTranslations } from "../translations";
 import type { VotingFormData } from "../types";
+import { toast } from "sonner";
 
 interface CreateVotingDialogProps {
   open: boolean;
@@ -34,13 +35,13 @@ export default function CreateVotingDialog({
     
     // Walidacja
     if (!formData.title.trim()) {
-      alert(t.titleRequired);
+      toast.error(t.titleRequired);
       return;
     }
 
     const validOptions = formData.initialOptions.filter(opt => opt.trim());
     if (validOptions.length < 2) {
-      alert(t.minOptionsRequired);
+      toast.error(t.minOptionsRequired);
       return;
     }
 
@@ -60,7 +61,7 @@ export default function CreateVotingDialog({
       });
     } catch (error) {
       console.error("Error creating voting:", error);
-      alert(t.createError);
+      toast.error(t.createError);
     } finally {
       setSubmitting(false);
     }

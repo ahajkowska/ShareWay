@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Trash2, RefreshCw, Pencil } from "lucide-react";
+import { Trash2, RefreshCw, Pencil, Filter } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "../translations";
 import type { ExpenseDto } from "../types";
@@ -21,6 +22,12 @@ export default function ExpenseList({ expenses, loading, onDelete, onEdit, onRef
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
     const { user } = useSession();
+    const [showSettlements, setShowSettlements] = useState(false);
+    
+    // Filter out settlement expenses unless showSettlements is true
+    const filteredExpenses = showSettlements 
+        ? expenses 
+        : expenses.filter(e => e.status !== 'SETTLED' && !e.title.startsWith('Rozliczenie z'));
 
     if (loading) {
         return (
@@ -58,17 +65,30 @@ export default function ExpenseList({ expenses, loading, onDelete, onEdit, onRef
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{t.expenses} ({expenses.length})</CardTitle>
-                <Button variant="ghost" size="sm" onClick={onRefresh}>
-                    <RefreshCw className="w-4 h-4" />
-                </Button>
+                <CardTitle>{t.expenses} ({filteredExpenses.length})</CardTitle>
+                <div className="flex items-center gap-2">
+                    <Button 
+                        variant={showSettlements ? "default" : "outline"} 
+                        size="sm" 
+                        onClick={() => setShowSettlements(!showSettlements)}
+                        className="gap-2"
+                    >
+                        <Filter className="w-4 h-4" />
+                        {showSettlements ? t.hideSettlements : t.showSettlements}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={onRefresh}>
+                        <RefreshCw className="w-4 h-4" />
+                    </Button>
+                </div>
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
-                    {expenses.map((expense) => (
+                    {filteredExpenses.map((expense) => {
+                        const isSettlement = expense.status === 'SETTLED' || expense.title.startsWith('Rozliczenie z');
+                        return (
                         <div
                             key={expense.id}
-                            className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                            className={`flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors ${isSettlement ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : ''}`}
                         >
                             <div className="flex-1">
                                 <h4 className="font-medium">{expense.title}</h4>
@@ -109,7 +129,8 @@ export default function ExpenseList({ expenses, loading, onDelete, onEdit, onRef
                                 </Button>
                             </div>
                         </div>
-                    ))}
+                    );
+                    })}
                 </div>
             </CardContent>
         </Card>
