@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   db:
     image: postgres:17-alpine
@@ -29,6 +31,15 @@ services:
       - redis_data:/data
     networks: [shareway-network]
 
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    platform: linux/amd64
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - shareway-network
+
   api:
     build:
       context: ./backend/api
@@ -41,13 +52,34 @@ services:
       API_PORT: 4001
       DATABASE_HOST: db
       DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: shareway
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_FROM: "ShareWay <no-reply@shareway.local>"
+      APP_URL: http://localhost:3001
+    ports:
+      - "4001:4001"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    networks:
+      - shareway-network
+
+  api-gateway:
+    image: nginx:alpine
+    ports:
+      - "4000:80"
+    volumes:
+      - ./backend/api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - frontend
     networks:
       - shareway-network
 
@@ -70,22 +102,12 @@ services:
       - PORT=3000
       - NEXT_PUBLIC_API_URL=http://localhost:4000/api
       - INTERNAL_API_URL=http://api-gateway/api
+      - BACKEND_API_URL=http://api-gateway/api
       - PEXELS_API_KEY=${PEXELS_API_KEY:-}
-      - EMBEDDING_RERANKER_URL=${EMBEDDING_RERANKER_URL:-}
+      - EMBEDDING_RERANKER_URL=${EMBEDDING_RERANKER_URL:-http://embedding-reranker:5005/rerank}
     depends_on:
       - api
       - embedding-reranker
-    networks:
-      - shareway-network
-
-  api-gateway:
-    image: nginx:alpine
-    ports:
-      - "4000:80"
-    volumes:
-      - ./backend/api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - api
     networks:
       - shareway-network
 
@@ -95,16 +117,10 @@ services:
       dockerfile: Dockerfile
     environment:
       - MODEL_ID=${EMBEDDING_MODEL_ID:-openai/clip-vit-base-patch32}
+    ports:
+      - "5005:5005"
     networks:
       - shareway-network
-
-  # Dodamy później:
-  # auth-service:
-  # cost-split-service:
-  # schedule-service:
-  # checklist-service:
-  # poll-service:
-  # trip-service:
 
 networks:
   shareway-network:
