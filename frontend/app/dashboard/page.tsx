@@ -1,8 +1,5 @@
 import { headers } from "next/headers";
 import DashboardPageClient from "./DashboardPageClient";
-import type { Trip } from "@/lib/types/trip";
-import { getImagesForTrips } from "@/lib/server/tripImages";
-import { tripsMock } from "@/app/dashboard/hooks/useTripsMock";
 
 async function getInitialSidebarOpen(): Promise<boolean> {
   const cookieHeader = (await headers()).get("cookie");
@@ -22,16 +19,5 @@ async function getInitialSidebarOpen(): Promise<boolean> {
 
 export default async function DashboardPage() {
   const initialSidebarOpen = await getInitialSidebarOpen();
-
-  const initialTrips = tripsMock;
-
-  const initialTripImages = await getImagesForTrips(initialTrips);
-
-  return (
-    <DashboardPageClient
-      initialSidebarOpen={initialSidebarOpen}
-      initialTrips={initialTrips}
-      initialTripImages={initialTripImages}
-    />
-  );
+  return <DashboardPageClient initialSidebarOpen={initialSidebarOpen} />;
 }

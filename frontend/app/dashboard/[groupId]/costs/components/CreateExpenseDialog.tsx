@@ -8,6 +8,7 @@ import * as api from "@/lib/api";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "../translations";
 import type { CreateExpenseDto } from "../types";
+import { useSession } from "@/app/context/SessionContext";
 
 interface Props {
     open: boolean;
@@ -20,6 +21,7 @@ interface Props {
 export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCurrency, onCreated }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
+    const { user } = useSession();
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -27,31 +29,38 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
     const [paidBy, setPaidBy] = useState("");
     const [splitBetween, setSplitBetween] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
-    const [users, setUsers] = useState<Array<{ id: string; name: string }>>([]);
-    const [loadingUsers, setLoadingUsers] = useState(false);
+    const [participants, setParticipants] = useState<Array<{ id: string; name: string }>>([]);
+    const [loadingParticipants, setLoadingParticipants] = useState(false);
 
     useEffect(() => {
-        if (open && tripId) {
-            loadParticipants();
-        }
-    }, [open, tripId]);
+        if (!open) return;
 
-    const loadParticipants = async () => {
-        try {
-            setLoadingUsers(true);
-            const participants = await api.fetchTripParticipants(tripId);
-            const formattedUsers = participants.map((p: any) => ({
-                id: p.userId,
-                name: p.user?.nickname || p.user?.email || 'Unknown',
-            }));
-            setUsers(formattedUsers);
-        } catch (err: any) {
-            console.error("Error loading participants:", err);
-            setUsers([]);
-        } finally {
-            setLoadingUsers(false);
-        }
-    };
+        const loadParticipants = async () => {
+            try {
+                setLoadingParticipants(true);
+                const data = await api.fetchParticipants(tripId);
+                const mapped = (data || []).map((p) => ({
+                    id: p.userId,
+                    name: p.user?.nickname || p.user?.email || t.unknownUser,
+                }));
+                setParticipants(mapped);
+                if (mapped.length > 0) {
+                    setSplitBetween((prev) =>
+                        prev.length === 0 ? mapped.map((p) => p.id) : prev
+                    );
+                    if (user?.id && mapped.some((p) => p.id === user.id)) {
+                        setPaidBy((prev) => (prev ? prev : user.id));
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading participants:", err);
+            } finally {
+                setLoadingParticipants(false);
+            }
+        };
+
+        void loadParticipants();
+    }, [open, tripId, user?.id]);
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -80,13 +89,14 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
                 title: title.trim(),
                 description: description.trim() || undefined,
                 amount: parseFloat(amount),
-                paidBy: paidBy,
-                splitBetween: splitBetween,
+                paidBy: paidBy || undefined,
+                debtorIds: splitBetween,
+                currency: baseCurrency,
                 date: new Date().toISOString(),
             };
-
-            await api.createExpense(tripId, payload);
             
+            await api.createExpense(tripId, payload);
+
             // Reset form
             setTitle("");
             setDescription("");
@@ -113,7 +123,7 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
     };
 
     const selectAllUsers = () => {
-        setSplitBetween(users.map(u => u.id));
+        setSplitBetween(participants.map(u => u.id));
     };
 
     const deselectAllUsers = () => {
@@ -200,11 +210,11 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
                             <select
                                 value={paidBy}
                                 onChange={(e) => setPaidBy(e.target.value)}
+                                disabled={loadingParticipants}
                                 className="w-full px-4 py-3 rounded-xl border border-input bg-background text-foreground"
-                                disabled={loadingUsers}
                             >
-                                <option value="">{loadingUsers ? t.loading || "Loading..." : t.choosePersonPlaceholder}</option>
-                                {users.map(user => (
+                                <option value="">{t.choosePersonPlaceholder}</option>
+                                {participants.map(user => (
                                     <option 
                                         key={user.id} 
                                         value={user.id}
@@ -240,27 +250,27 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
                                 </div>
                             </div>
                             <div className="space-y-2 border rounded-xl p-3">
-                                {loadingUsers ? (
-                                    <p className="text-sm text-muted-foreground text-center py-4">{t.loading || "Loading participants..."}</p>
-                                ) : users.length === 0 ? (
-                                    <p className="text-sm text-muted-foreground text-center py-4">{t.noParticipants || "No participants found"}</p>
-                                ) : (
-                                    users.map(user => (
-                                        <label 
-                                            key={user.id}
-                                            className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg cursor-pointer"
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={splitBetween.includes(user.id)}
-                                                onChange={() => toggleUserInSplit(user.id)}
-                                                className="w-4 h-4"
-                                            />
-                                            <span className="text-sm">{user.name}</span>
-                                        </label>
-                                    ))
-                                )}
+                                {participants.map(user => (
+                                    <label 
+                                        key={user.id}
+                                        className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={splitBetween.includes(user.id)}
+                                            onChange={() => toggleUserInSplit(user.id)}
+                                            disabled={loadingParticipants}
+                                            className="w-4 h-4"
+                                        />
+                                        <span className="text-sm">{user.name}</span>
+                                    </label>
+                                ))}
                             </div>
+                            {loadingParticipants && (
+                                <p className="text-xs text-muted-foreground mt-2">
+                                    {t.loadingParticipants}
+                                </p>
+                            )}
                             {splitBetween.length > 0 && amount && parseFloat(amount) > 0 && (
                                 <p className="text-xs text-muted-foreground mt-2">
                                     {t.splitPerPerson(((parseFloat(amount) / splitBetween.length)).toFixed(2), baseCurrency)}

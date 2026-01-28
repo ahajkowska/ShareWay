@@ -17,6 +17,7 @@ import {
 } from './interfaces/auth.interfaces.js';
 import { TOKEN_EXPIRY } from './constants/auth.constants.js';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,7 @@ export class AuthService {
     private readonly redisRepository: RedisRepository,
     private readonly eventEmitter: EventEmitter2,
     private readonly mailerService: MailerService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto): Promise<{ message: string }> {
     const existingUser = await this.usersService.emailExists(registerDto.email);
@@ -50,7 +51,7 @@ export class AuthService {
       nickname: user.nickname,
     });
 
-    this.logger.log(`User registered: ${user.email}`);
+    this.logger.log(`User registered: ${user.id}`);
 
     return { message: 'Registration successful' };
   }
@@ -79,7 +80,7 @@ export class AuthService {
 
     await this.redisRepository.storeRefreshToken(user.id, tokens.refreshToken);
 
-    this.logger.log(`User logged in: ${user.email}`);
+    this.logger.log(`User logged in: ${user.id}`);
 
     return tokens;
   }
@@ -104,7 +105,7 @@ export class AuthService {
       newTokens.refreshToken,
     );
 
-    this.logger.log(`Tokens refreshed for user: ${user.email}`);
+    this.logger.log(`Tokens refreshed for user: ${user.id}`);
 
     return newTokens;
   }
@@ -138,5 +139,51 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user || !user.isActive) {
+      // Do not reveal whether the email exists
+      return { message: 'If the account exists, a reset email has been sent' };
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await this.usersService.setPasswordResetToken(user.id, resetToken, expires);
+
+    const appUrl =
+      this.configService.get<string>('APP_URL') || 'http://localhost:3000';
+    const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
+
+    await this.mailerService.sendPasswordResetEmail({
+      email: user.email,
+      nickname: user.nickname,
+      resetToken,
+      resetUrl,
+    });
+
+    this.logger.log(`Password reset requested for user: ${user.id}`);
+
+    return { message: 'If the account exists, a reset email has been sent' };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByPasswordResetToken(token);
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    if (user.passwordResetExpires && user.passwordResetExpires < new Date()) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    await this.usersService.resetPassword(user.id, newPassword);
+
+    this.logger.log(`Password reset successful for user ID: ${user.id}`);
+
+    return { message: 'Password has been reset successfully' };
   }
 }

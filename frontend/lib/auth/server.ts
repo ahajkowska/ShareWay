@@ -1,56 +1,46 @@
-import { cookies, headers } from "next/headers";
-import type { ApiUser } from "@/lib/auth/api";
-import { apiUrl } from "@/lib/api";
+import { cookies } from "next/headers";
 import type { AuthUser } from "@/lib/types/auth";
-import { buildAuthError, mapApiUser, readJson } from "./api";
+
+const normalizeApiBase = (base: string) => {
+  const trimmed = base.replace(/\/+$/, "");
+  if (trimmed.endsWith("/api") || trimmed.endsWith("/api/v1")) {
+    return trimmed;
+  }
+  return `${trimmed}/api/v1`;
+};
+
+const RAW_API_URL =
+  process.env.INTERNAL_API_URL ||
+  process.env.BACKEND_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:4001/api/v1";
+const API_URL = normalizeApiBase(RAW_API_URL);
 
 export async function getCurrentUserServer(): Promise<AuthUser | null> {
-  let sessionCookies = "";
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  try {
-    const cookieStore = await cookies();
-    if (cookieStore && typeof (cookieStore as any).get === "function") {
-      sessionCookies = ["access_token", "refresh_token"]
-        .map((name) => cookieStore.get(name as any))
-        .filter(Boolean)
-        .map((cookie) => `${cookie!.name}=${cookie!.value}`)
-        .join("; ");
-    }
-  } catch {}
+  if (!accessToken) return null;
 
-  if (!sessionCookies) {
-    try {
-      const headerList = await headers();
-      const raw =
-        typeof (headerList as any)?.get === "function"
-          ? (headerList as any).get("cookie")
-          : (headerList as any)?.cookie;
-      if (raw) sessionCookies = raw as string;
-    } catch {}
-  }
-
-  if (!sessionCookies) return null;
-
-  const response = await fetch(apiUrl("/users/me"), {
-    method: "GET",
-    headers: { cookie: sessionCookies },
+  const response = await fetch(`${API_URL}/users/me`, {
+    headers: {
+      Cookie: `access_token=${accessToken}; refresh_token=${refreshToken ?? ""}`,
+    },
     credentials: "include",
     cache: "no-store",
   });
 
-  const data = await readJson(response);
+  if (!response.ok) return null;
 
-  if (response.status === 401 || response.status === 403) {
-    return null;
-  }
+  const data = await response.json();
 
-  if (!response.ok) {
-    throw buildAuthError(response, data);
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  return mapApiUser(data as ApiUser);
+  return {
+    id: data.id,
+    name: data.nickname ?? data.name ?? "",
+    email: data.email,
+    isActive: data.isActive,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }

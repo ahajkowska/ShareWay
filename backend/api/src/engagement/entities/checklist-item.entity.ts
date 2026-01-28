@@ -1,33 +1,41 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    OneToMany,
-    CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 import { Trip } from '../../trips/entities/trip.entity.js';
 import { ChecklistItemState } from './checklist-item-state.entity.js';
+import { User } from '../../users/entities/user.entity.js';
 
 @Entity('checklist_items')
 export class ChecklistItem {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({ name: 'trip_id' })
-    tripId: string;
+  @Column({ name: 'trip_id' })
+  tripId: string;
 
-    @ManyToOne(() => Trip, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'trip_id' })
-    trip: Trip;
+  @ManyToOne(() => Trip, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'trip_id' })
+  trip: Trip;
 
-    @Column()
-    text: string;
+  @Column()
+  text: string;
 
-    @OneToMany(() => ChecklistItemState, (state) => state.item)
-    states: ChecklistItemState[];
+  @Column({ name: 'creator_id', nullable: true })
+  creatorId: string | null;
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'creator_id' })
+  creator: User | null;
+
+  @OneToMany(() => ChecklistItemState, (state) => state.item)
+  states: ChecklistItemState[];
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }

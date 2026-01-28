@@ -70,6 +70,71 @@ services:
     cpus: 0.25
     networks: [shareway-network]
 
+  api:
+    build:
+      context: ./backend/api
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    env_file: .env.development
+    ports:
+      - target: 4000
+        published: ${API_PORT:-4000}
+        protocol: tcp
+        mode: host
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    mem_limit: 1536m
+    cpus: 1.5
+    volumes:
+      - ./backend/api/src:/app/src:ro
+      - ./backend/api/package.json:/app/package.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks: [shareway-network]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    env_file: .env.development
+    environment:
+      - BACKEND_API_URL=http://api:4000/api/v1
+    ports:
+      - target: 3000
+        published: ${FRONTEND_PORT:-3000}
+        protocol: tcp
+        mode: host
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    mem_limit: 512m
+    cpus: 0.5
+    volumes:
+      - ./frontend/app:/app/app:ro
+      - ./frontend/lib:/app/lib:ro
+      - ./frontend/public:/app/public:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [shareway-network]
+
 volumes:
   postgres_data:
   redis_data:

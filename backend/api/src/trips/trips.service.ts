@@ -7,8 +7,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Trip, Participant, ParticipantRole } from './entities/index.js';
+import {
+  Trip,
+  Participant,
+  ParticipantRole,
+  TripStatus,
+} from './entities/index.js';
 import { CreateTripDto, UpdateTripDto, JoinTripDto } from './dto/index.js';
+import { randomBytes } from 'crypto';
 
 const INVITE_CODE_LENGTH = 6;
 const INVITE_CODE_EXPIRY_DAYS = 7;
@@ -24,11 +30,10 @@ export class TripsService {
     @InjectRepository(Participant)
     private readonly participantRepository: Repository<Participant>,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async create(userId: string, createTripDto: CreateTripDto): Promise<Trip> {
-    const { startDate, endDate, destination, accentPreset, ...rest } =
-      createTripDto;
+    const { startDate, endDate, ...rest } = createTripDto;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -46,10 +51,7 @@ export class TripsService {
         ...rest,
         startDate: start,
         endDate: end,
-        location: destination || rest.location,
-        baseCurrency: createTripDto.baseCurrency || 'USD',
-        accentPreset: accentPreset || 'neutral',
-        status: 'ACTIVE',
+        baseCurrency: createTripDto.baseCurrency, // Now required, no fallback needed
       });
 
       const savedTrip = await queryRunner.manager.save(trip);
@@ -89,6 +91,36 @@ export class TripsService {
       );
   }
 
+  async findAllPaginated(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [trips, total] = await this.tripRepository.findAndCount({
+      where: { isDeleted: false },
+      relations: ['participants', 'participants.user'],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: trips.map((trip) => ({
+        id: trip.id,
+        name: trip.name,
+        location: trip.location,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        status: trip.status,
+        participantCount: trip.participants?.length ?? 0,
+        createdAt: trip.createdAt,
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findById(tripId: string): Promise<Trip> {
     const trip = await this.tripRepository.findOne({
       where: { id: tripId, isDeleted: false },
@@ -105,7 +137,7 @@ export class TripsService {
   async update(tripId: string, updateTripDto: UpdateTripDto): Promise<Trip> {
     const trip = await this.findById(tripId);
 
-    const { startDate, endDate, destination, ...rest } = updateTripDto;
+    const { startDate, endDate, ...rest } = updateTripDto;
 
     const newStartDate = startDate ? new Date(startDate) : trip.startDate;
     const newEndDate = endDate ? new Date(endDate) : trip.endDate;
@@ -118,7 +150,6 @@ export class TripsService {
       ...rest,
       startDate: newStartDate,
       endDate: newEndDate,
-      location: destination !== undefined ? destination : trip.location,
     });
 
     await this.tripRepository.save(trip);
@@ -273,12 +304,91 @@ export class TripsService {
     return count > 0;
   }
 
+  async getParticipant(
+    tripId: string,
+    userId: string,
+  ): Promise<Participant | null> {
+    return this.participantRepository.findOne({
+      where: { tripId, userId },
+    });
+  }
+
+  async archiveTrip(tripId: string): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    trip.status = TripStatus.ARCHIVED;
+    await this.tripRepository.save(trip);
+
+    this.logger.log(`Trip archived: ${tripId}`);
+
+    return this.findById(tripId);
+  }
+
+  async unarchiveTrip(tripId: string): Promise<Trip> {
+    const trip = await this.findById(tripId);
+    trip.status = TripStatus.ACTIVE;
+    await this.tripRepository.save(trip);
+
+    this.logger.log(`Trip unarchived: ${tripId}`);
+
+    return this.findById(tripId);
+  }
+
+  async transferRole(
+    tripId: string,
+    targetUserId: string,
+    newRole: ParticipantRole,
+    requesterId: string,
+  ): Promise<{ message: string }> {
+    // Only organizers can transfer roles
+    const requester = await this.participantRepository.findOne({
+      where: { tripId, userId: requesterId },
+    });
+
+    if (!requester || requester.role !== ParticipantRole.ORGANIZER) {
+      throw new ForbiddenException('Only organizers can transfer roles');
+    }
+
+    // Find target participant
+    const target = await this.participantRepository.findOne({
+      where: { tripId, userId: targetUserId },
+    });
+
+    if (!target) {
+      throw new NotFoundException('Target participant not found');
+    }
+
+    // If demoting an organizer, ensure there's at least one other organizer
+    if (
+      target.role === ParticipantRole.ORGANIZER &&
+      newRole === ParticipantRole.PARTICIPANT
+    ) {
+      const organizerCount = await this.participantRepository.count({
+        where: { tripId, role: ParticipantRole.ORGANIZER },
+      });
+
+      if (organizerCount <= 1) {
+        throw new BadRequestException(
+          'Cannot demote the only organizer. Promote another member first.',
+        );
+      }
+    }
+
+    target.role = newRole;
+    await this.participantRepository.save(target);
+
+    this.logger.log(
+      `User ${targetUserId} role changed to ${newRole} in trip ${tripId}`,
+    );
+
+    return { message: `Role updated to ${newRole}` };
+  }
+
   private generateRandomCode(): string {
     let code = '';
+    const bytes = randomBytes(INVITE_CODE_LENGTH);
     for (let i = 0; i < INVITE_CODE_LENGTH; i++) {
-      code += INVITE_CODE_CHARS.charAt(
-        Math.floor(Math.random() * INVITE_CODE_CHARS.length),
-      );
+      const index = bytes[i] % INVITE_CODE_CHARS.length;
+      code += INVITE_CODE_CHARS.charAt(index);
     }
     return code;
   }

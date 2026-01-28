@@ -9,6 +9,11 @@ import {
 } from 'typeorm';
 import { Participant } from './participant.entity.js';
 
+export enum TripStatus {
+  ACTIVE = 'ACTIVE',
+  ARCHIVED = 'ARCHIVED',
+}
+
 @Entity('trips')
 export class Trip {
   @PrimaryGeneratedColumn('uuid')
@@ -39,14 +44,15 @@ export class Trip {
   @Column({ type: 'timestamptz', nullable: true })
   inviteCodeExpiry: Date | null;
 
+  @Column({
+    type: 'enum',
+    enum: TripStatus,
+    default: TripStatus.ACTIVE,
+  })
+  status: TripStatus;
+
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
-
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  accentPreset: string | null;
-
-  @Column({ type: 'varchar', length: 20, default: 'ACTIVE' })
-  status: string;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

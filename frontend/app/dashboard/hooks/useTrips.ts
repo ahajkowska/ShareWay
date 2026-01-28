@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Trip } from "@/lib/types/trip";
+import { listTrips } from "@/lib/api";
 
 type UseTripsState = {
   trips: Trip[];
@@ -25,10 +26,8 @@ export function useTrips(): UseTripsState {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/trips", { signal: controller.signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as { trips?: Trip[] };
-        setTrips(Array.isArray(data.trips) ? data.trips : []);
+        const data = await listTrips(controller.signal);
+        setTrips(Array.isArray(data) ? data : []);
       } catch (err) {
         if (controller.signal.aborted) return;
         const message =

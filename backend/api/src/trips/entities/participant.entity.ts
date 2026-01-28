@@ -6,6 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
   Unique,
+  Index,
 } from 'typeorm';
 import { Trip } from './trip.entity.js';
 import { User } from '../../users/entities/user.entity.js';
@@ -17,6 +18,7 @@ export enum ParticipantRole {
 
 @Entity('participants')
 @Unique(['user', 'trip'])
+@Index(['tripId', 'userId']) // Composite index for faster lookups (Item #26)
 export class Participant {
   @PrimaryGeneratedColumn('uuid')
   id: string;

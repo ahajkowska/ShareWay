@@ -7,6 +7,7 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -22,7 +23,7 @@ interface RequestWithUser extends ExpressRequest {
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get('me')
   async getProfile(@Req() req: RequestWithUser) {
@@ -35,7 +36,7 @@ export class UsersController {
     const user = await this.usersService.findById(userId);
 
     if (!user) {
-      return null;
+      throw new NotFoundException('User not found');
     }
 
     return {

@@ -5,14 +5,25 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import DashboardFiltersSidebar from "@/app/dashboard/components/filters/DashboardFiltersSidebar";
 import TripCard from "@/app/dashboard/components/TripCard";
+import { useTrips } from "@/app/dashboard/hooks/useTrips";
 import { useSidebar } from "@/app/dashboard/hooks/useSidebar";
 import { useFilteredTrips } from "@/app/dashboard/hooks/useFilteredTrips";
 import { useDashboardState } from "@/app/dashboard/hooks/useDashboardState";
 import { cn, normalizeSearchText } from "@/lib/utils";
-import { SlidersHorizontal, SearchX } from "lucide-react";
+import { SlidersHorizontal, SearchX, Loader2, Plus, UserPlus } from "lucide-react";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import type { Trip } from "@/lib/types/trip";
+import {
+  createTrip,
+  joinTrip,
+  updateTrip,
+  generateInviteCode,
+  archiveTrip,
+  unarchiveTrip,
+  deleteTrip,
+} from "@/lib/api";
+import { toast } from "sonner";
 
 const t = {
   dashboard: {
@@ -38,17 +49,11 @@ const t = {
   },
 };
 
-type DashboardPageClientProps = {
-  initialSidebarOpen: boolean;
-  initialTrips: Trip[];
-  initialTripImages: Record<string, string | null>;
-};
-
 export default function DashboardPageClient({
   initialSidebarOpen,
-  initialTrips,
-  initialTripImages,
-}: DashboardPageClientProps) {
+}: {
+  initialSidebarOpen: boolean;
+}) {
   const router = useRouter();
   const {
     filters,
@@ -63,13 +68,20 @@ export default function DashboardPageClient({
   const { isSidebarOpen, setIsSidebarOpen, isMobile, sidebarWidth } =
     useSidebar(initialSidebarOpen);
 
-  // 🔥 dane i obrazki, które przyszły z serwera
-  const [trips] = useState<Trip[]>(initialTrips);
-  const [tripImages] =
-    useState<Record<string, string | null>>(initialTripImages);
+  const {
+    trips,
+    loading: tripsLoading,
+    error: tripsError,
+    reload: reloadTrips,
+  } = useTrips();
 
+  const [hiddenTripIds, setHiddenTripIds] = useState<string[]>([]);
+  const visibleTrips = useMemo(
+    () => trips.filter((trip) => !hiddenTripIds.includes(trip.id)),
+    [trips, hiddenTripIds]
+  );
+  const filteredTrips = useFilteredTrips(visibleTrips, filters, sortMode);
   const searchActive = filters.search.trim().length > 0;
-  const filteredTrips = useFilteredTrips(trips, filters, sortMode);
   const filtersActive =
     filters.status !== "ALL" ||
     filters.role !== "ALL" ||
@@ -77,7 +89,6 @@ export default function DashboardPageClient({
     filters.dateTo ||
     filters.minParticipants ||
     filters.maxParticipants;
-
   const [joinOpen, setJoinOpen] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -87,10 +98,19 @@ export default function DashboardPageClient({
     startDate: "",
     endDate: "",
     description: "",
+    baseCurrency: "PLN",
   });
   const [createImage, setCreateImage] = useState<string | null>(null);
   const [createImageLoading, setCreateImageLoading] = useState(false);
-
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTrip, setEditTrip] = useState<Trip | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    destination: "",
+    startDate: "",
+    endDate: "",
+    description: "",
+  });
   const searchOptions = useMemo(() => {
     const seen = new Map<string, string>();
 
@@ -141,7 +161,6 @@ export default function DashboardPageClient({
     return "neutral";
   };
 
-  // Podgląd obrazka w modalu "Nowa podróż" (tu zostaje, jak miałaś – klient pyta /api/destination-image)
   useEffect(() => {
     if (!createOpen) return;
     const destination = createForm.destination.trim();
@@ -221,10 +240,6 @@ export default function DashboardPageClient({
       for (const q of uniqueQueries) {
         if (controller.signal.aborted) break;
         const params = new URLSearchParams({ q, preset, stable: "1" });
-        const context = `${createForm.name} ${createForm.description}`.trim();
-        if (context) {
-          params.set("context", context);
-        }
         try {
           const res = await fetch(
             `/api/destination-image?${params.toString()}`,
@@ -252,6 +267,26 @@ export default function DashboardPageClient({
     return () => controller.abort();
   }, [createForm.destination, createOpen]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem("dashboard-hidden-trips");
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as string[];
+      if (Array.isArray(parsed)) {
+        setHiddenTripIds(parsed);
+      }
+    } catch {}
+  }, []);
+
+  const persistHidden = (ids: string[]) => {
+    setHiddenTripIds(ids);
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("dashboard-hidden-trips", JSON.stringify(ids));
+    } catch {}
+  };
+
   const navGutter = 16;
   const navMargin = `calc((100vw - min(100vw, 1280px))/2 + ${navGutter}px)`;
   const leftPad = isMobile
@@ -263,15 +298,111 @@ export default function DashboardPageClient({
     router.push(`/dashboard/${targetId}`);
   };
 
-  const closeJoinModal = () => {
-    setJoinOpen(false);
-    setJoinCode("");
+  const handleCreateTrip = async () => {
+    if (!createForm.name.trim() || !createForm.destination.trim()) return;
+    try {
+      await createTrip({
+        name: createForm.name.trim(),
+        description: createForm.description?.trim() || undefined,
+        location: createForm.destination.trim(),
+        startDate: createForm.startDate,
+        endDate: createForm.endDate,
+        baseCurrency: createForm.baseCurrency || "PLN",
+      });
+      toast.success("Utworzono podróż");
+      setCreateOpen(false);
+      setCreateForm({
+        name: "",
+        destination: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+        baseCurrency: "PLN",
+      });
+      reloadTrips();
+    } catch (err: any) {
+      toast.error(err?.message || "Nie udało się utworzyć podróży");
+    }
   };
 
-  const handleJoinTrip = () => {
+  const handleJoinTrip = async () => {
     if (!joinCode.trim()) return;
-    // TODO: podłącz logikę dołączania do podróży przez API
-    closeJoinModal();
+    try {
+      await joinTrip(joinCode.trim());
+      toast.success("Dołączono do podróży");
+      setJoinOpen(false);
+      setJoinCode("");
+      reloadTrips();
+    } catch (err: any) {
+      toast.error(err?.message || "Nie udało się dołączyć");
+    }
+  };
+
+  const openEditTrip = (trip: Trip) => {
+    setEditTrip(trip);
+    setEditForm({
+      name: trip.name,
+      destination: trip.destination,
+      startDate: trip.startDate?.slice(0, 10) || "",
+      endDate: trip.endDate?.slice(0, 10) || "",
+      description: trip.description || "",
+    });
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editTrip) return;
+    try {
+      await updateTrip(editTrip.id, {
+        name: editForm.name.trim(),
+        description: editForm.description?.trim() || undefined,
+        location: editForm.destination.trim(),
+        startDate: editForm.startDate,
+        endDate: editForm.endDate,
+      });
+      toast.success("Zaktualizowano podróż");
+      setEditOpen(false);
+      setEditTrip(null);
+      reloadTrips();
+    } catch (err: any) {
+      toast.error(err?.message || "Nie udało się zaktualizować podróży");
+    }
+  };
+
+  const handleGenerateCode = async (trip: Trip) => {
+    try {
+      await generateInviteCode(trip.id);
+      toast.success("Wygenerowano nowy kod");
+      reloadTrips();
+    } catch (err: any) {
+      toast.error(err?.message || "Nie udało się wygenerować kodu");
+    }
+  };
+
+  const handleArchive = async (trip: Trip) => {
+    try {
+      if (trip.status === "ARCHIVED") {
+        await unarchiveTrip(trip.id);
+        toast.success("Przywrócono podróż");
+      } else {
+        await archiveTrip(trip.id);
+        toast.success("Przeniesiono do archiwum");
+      }
+      reloadTrips();
+    } catch (err: any) {
+      toast.error(err?.message || "Nie udało się zmienić statusu");
+    }
+  };
+
+  const handleDelete = async (trip: Trip) => {
+    try {
+      await deleteTrip(trip.id);
+      toast.success("Usunięto z listy");
+      reloadTrips();
+      persistHidden([...hiddenTripIds, trip.id]);
+    } catch (err: any) {
+      toast.error(err?.message || "Nie udało się usunąć");
+    }
   };
 
   return (
@@ -370,7 +501,31 @@ export default function DashboardPageClient({
             </div>
           )}
 
-          {filteredTrips.length === 0 ? (
+          {tripsLoading ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-12 text-center min-h-[40vh]">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Ładuję Twoje podróże...
+              </p>
+            </div>
+          ) : tripsError ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-12 text-center min-h-[40vh]">
+              <SearchX className="h-7 w-7 text-muted-foreground" />
+              <div className="space-y-1">
+                <p className="text-lg font-semibold">Nie udało się pobrać podróży</p>
+                <p className="text-sm text-muted-foreground">
+                  {tripsError}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={reloadTrips}
+                className="mt-2"
+              >
+                Spróbuj ponownie
+              </Button>
+            </div>
+          ) : filteredTrips.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-12 text-center min-h-[60vh]">
               <SearchX className="h-7 w-7 text-muted-foreground" />
               <div className="space-y-1">
@@ -390,14 +545,16 @@ export default function DashboardPageClient({
                   trip={trip}
                   index={index}
                   onOpen={handleOpenTrip}
-                  imageUrlFromServer={tripImages[trip.id] ?? null}
+                  onEdit={openEditTrip}
+                  onGenerateCode={handleGenerateCode}
+                  onArchive={handleArchive}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>
           )}
         </div>
 
-        {/* MODAL: Nowa podróż */}
         <AnimatePresence>
           {createOpen && (
             <motion.div
@@ -530,10 +687,7 @@ export default function DashboardPageClient({
 
                     <Button
                       className="w-full h-12 rounded-2xl text-base font-semibold bg-primary text-primary-foreground hover:brightness-95 active:scale-[0.99] transition"
-                      onClick={() => {
-                        // tutaj podłączysz wywołanie API do stworzenia tripa
-                        setCreateOpen(false);
-                      }}
+                      onClick={handleCreateTrip}
                       disabled={
                         !createForm.name.trim() ||
                         !createForm.destination.trim()
@@ -548,7 +702,7 @@ export default function DashboardPageClient({
                       Podgląd karty
                     </p>
                     <div className="rounded-2xl border border-border/60 bg-card/80 p-3">
-                      <div className="rounded-[18px] border border-border/60 overflow-hidden bg-linear-to-brfrom-background via-muted/40 to-background shadow-sm">
+                      <div className="rounded-[18px] border border-border/60 overflow-hidden bg-gradient-to-br from-background via-muted/40 to-background shadow-sm">
                         <div
                           className="relative h-40"
                           style={{
@@ -559,7 +713,7 @@ export default function DashboardPageClient({
                             backgroundPosition: "center",
                           }}
                         >
-                          <div className="absolute inset-0 bg-linear-to-br from-background/70 via-background/10 to-background/70" />
+                          <div className="absolute inset-0 bg-gradient-to-br from-background/70 via-background/10 to-background/70" />
                           {createImageLoading && (
                             <div className="absolute inset-0 bg-background/60 flex items-center justify-center text-xs text-muted-foreground">
                               Ładowanie zdjęcia...
@@ -595,7 +749,6 @@ export default function DashboardPageClient({
           )}
         </AnimatePresence>
 
-        {/* MODAL: Dołącz do podróży */}
         <AnimatePresence>
           {joinOpen && (
             <motion.div
@@ -608,7 +761,7 @@ export default function DashboardPageClient({
             >
               <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                onClick={closeJoinModal}
+                onClick={() => setJoinOpen(false)}
               />
               <motion.div
                 initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -629,14 +782,14 @@ export default function DashboardPageClient({
                   </div>
                   <button
                     className="text-lg text-muted-foreground hover:text-foreground"
-                    onClick={closeJoinModal}
+                    onClick={() => setJoinOpen(false)}
                     aria-label="Zamknij"
                   >
                     ×
                   </button>
                 </div>
 
-                <div className="mt-5 space-y-5">
+                <div className="mt-5 space-y-6">
                   <label className="text-sm font-semibold text-foreground block">
                     Kod zaproszenia
                   </label>
@@ -645,34 +798,145 @@ export default function DashboardPageClient({
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                     placeholder="NP. TRIP-2025-ABC"
                     className="uppercase tracking-[0.08em] h-12 rounded-xl border border-border/70 bg-card/80 focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                    autoFocus
                   />
+                </div>
 
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button
-                      variant="ghost"
-                      className="flex-1 h-11 rounded-2xl text-xs font-semibold uppercase tracking-[0.2em]"
-                      onClick={closeJoinModal}
-                    >
-                      Anuluj
-                    </Button>
-                    <Button
-                      className="flex-1 h-11 rounded-2xl text-sm font-semibold bg-primary text-primary-foreground hover:brightness-95 active:scale-[0.99] transition"
-                      onClick={handleJoinTrip}
-                      disabled={!joinCode.trim()}
-                    >
-                      Dołącz
-                    </Button>
+                <Button
+                  className="mt-6 w-full h-12 rounded-2xl text-base font-semibold bg-primary text-primary-foreground hover:brightness-95 active:scale-[0.99] transition"
+                  onClick={handleJoinTrip}
+                  disabled={!joinCode.trim()}
+                >
+                  Dołącz
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {editOpen && editTrip && (
+            <motion.div
+              key="edit-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-0 z-50 flex items-center justify-center"
+            >
+              <div
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setEditOpen(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 14, scale: 0.98 }}
+                transition={{ duration: 0.22 }}
+                className="relative w-[min(680px,calc(100%-32px))] rounded-3xl border border-border/70 bg-background/95 backdrop-blur-xl p-6 shadow-lg"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1.5">
+                    <p className="text-xl font-semibold leading-tight">
+                      Edytuj podróż
+                    </p>
+                    <p className="text-sm text-muted-foreground leading-snug">
+                      Zaktualizuj podstawowe informacje o podróży.
+                    </p>
                   </div>
+                  <button
+                    className="text-lg text-muted-foreground hover:text-foreground"
+                    onClick={() => setEditOpen(false)}
+                    aria-label="Zamknij"
+                  >
+                    ×
+                  </button>
+                </div>
 
-                  <p className="text-xs text-muted-foreground">
-                    Kod znajdziesz w zaproszeniu od organizatora lub lidera
-                    grupy.
-                  </p>
+                <div className="mt-6 grid gap-4">
+                  <Input
+                    value={editForm.name}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder="Nazwa podróży"
+                    className="h-11 rounded-xl border border-border/70 bg-card/80"
+                  />
+                  <Input
+                    value={editForm.destination}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        destination: e.target.value,
+                      }))
+                    }
+                    placeholder="Destynacja"
+                    className="h-11 rounded-xl border border-border/70 bg-card/80"
+                  />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Input
+                      type="date"
+                      value={editForm.startDate}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      className="h-11 rounded-xl border border-border/70 bg-card/80"
+                    />
+                    <Input
+                      type="date"
+                      value={editForm.endDate}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
+                      className="h-11 rounded-xl border border-border/70 bg-card/80"
+                    />
+                  </div>
+                  <Input
+                    value={editForm.description}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Opis"
+                    className="h-11 rounded-xl border border-border/70 bg-card/80"
+                  />
+                </div>
+
+                <div className="mt-6 flex items-center justify-end gap-2">
+                  <Button variant="outline" onClick={() => setEditOpen(false)}>
+                    Anuluj
+                  </Button>
+                  <Button onClick={handleSaveEdit}>Zapisz zmiany</Button>
                 </div>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+          <button
+            className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:brightness-105 transition"
+            onClick={() => setCreateOpen(true)}
+            aria-label="Dodaj podróż"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+          <button
+            className="h-14 w-14 rounded-full bg-muted text-foreground shadow-lg flex items-center justify-center hover:bg-muted/80 transition"
+            onClick={() => setJoinOpen(true)}
+            aria-label="Dołącz do podróży"
+          >
+            <UserPlus className="h-6 w-6" />
+          </button>
+        </div>
       </main>
     </div>
   );

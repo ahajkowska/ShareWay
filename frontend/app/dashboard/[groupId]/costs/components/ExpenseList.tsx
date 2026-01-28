@@ -80,7 +80,7 @@ export default function ExpenseList({ expenses, loading, onDelete, onRefresh, ba
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-lg font-bold">{expense.amount.toFixed(2)} {t.pln}</p>
+                                <p className="text-lg font-bold">{expense.amount.toFixed(2)} {baseCurrency}</p>
                                 <p className="text-xs text-muted-foreground">
                                     {expense.splitBetween.length} {expense.splitBetween.length === 1 ? t.person : t.people}
                                 </p>

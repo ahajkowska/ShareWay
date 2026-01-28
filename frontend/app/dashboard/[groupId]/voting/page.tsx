@@ -11,196 +11,204 @@ import * as api from "@/lib/api";
 import VotingList from "./components/VotingList";
 import CreateVotingDialog from "./components/CreateVotingDialog";
 import VotingDetailsDialog from "./components/VotingDetailsDialog";
-import Navbar from "@/app/components/Navbar";
 import type { Voting, VotingFormData } from "./types";
 
 export default function GroupVotingPage() {
-    const { lang } = useI18n();
-    const t = getVotingTranslations(lang);
-    const params = useParams();
-    const router = useRouter();
-    const groupId = params.groupId as string;
-    
-    const [votings, setVotings] = useState<Voting[]>([]);
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [groupName, setGroupName] = useState("");
+  const { lang } = useI18n();
+  const t = getVotingTranslations(lang);
+  const params = useParams();
+  const router = useRouter();
+  const groupId = params.groupId as string;
 
-    const [selectedVoting, setSelectedVoting] = useState<Voting | null>(null);
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [votings, setVotings] = useState<Voting[]>([]);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [groupName, setGroupName] = useState("");
 
-    useEffect(() => {
-        if (groupId) {
-            fetchVotings();
-        }
-    }, [groupId]);
+  const [selectedVoting, setSelectedVoting] = useState<Voting | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-    const fetchVotings = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            
-            // Validate UUID format
-            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            if (!uuidRegex.test(groupId)) {
-                setError("Invalid trip ID format. Please select a valid trip.");
-                setLoading(false);
-                return;
-            }
-            
-            const data = await api.fetchVotings(groupId);
-            setVotings(Array.isArray(data) ? data : []);
-        } catch (err: any) {
-            console.error("Error fetching votings:", err);
-            setError(err.message || t.loadError || "Failed to load votings");
-            setVotings([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+  useEffect(() => {
+    if (groupId) {
+      fetchGroupInfo();
+      fetchVotings();
+    }
+  }, [groupId]);
 
-    const handleCreateVoting = async (data: VotingFormData) => {
-        try {
-            const payload = {
-                title: data.title,
-                description: data.description,
-                endsAt: data.endsAt?.toISOString(),
-                initialOptions: data.initialOptions,
-            };
+  const fetchGroupInfo = async () => {
+    try {
+      // Fetch trip details to get the name
+      const trip = await api.fetchAuth<{ name: string }>(
+        api.apiUrl(`/trips/${groupId}`),
+        {}
+      );
+      setGroupName(trip?.name || "Trip");
+    } catch (error) {
+      console.error("Error fetching group info:", error);
+      setGroupName("Trip");
+    }
+  };
 
-            await api.createVoting(groupId, payload);
-            await fetchVotings();
-            setIsCreateDialogOpen(false);
-        } catch (error) {
-            console.error("Error creating voting:", error);
-            alert(t.createError);
-        }
-    };
+  const fetchVotings = async () => {
+    try {
+      setLoading(true);
+      const data = (await api.fetchVotings(groupId)) as any[];
 
-    const handleVote = async (votingId: string, optionId: string) => {
-        try {
-            await api.castVote(votingId, [optionId]);
-            await fetchVotings();
-        } catch (error) {
-            console.error("Error voting:", error);
-            alert(t.voteError);
-        }
-    };
+      // Transform backend response to frontend Voting type
+      const transformedVotings: Voting[] = (data || []).map((vote: any) => ({
+        id: vote.id,
+        title: vote.title,
+        description: vote.description,
+        createdBy: vote.createdBy,
+        createdAt: new Date(vote.createdAt),
+        endsAt: vote.endsAt ? new Date(vote.endsAt) : new Date(),
+        status: vote.status?.toLowerCase() || "open",
+        options: (vote.options || []).map((opt: any) => ({
+          id: opt.id,
+          text: opt.text,
+          description: opt.description,
+          votes: opt.votes || 0,
+          voters: opt.voters || [],
+        })),
+        totalVoters: vote.totalVoters || 0,
+        userVote: vote.userVote,
+      }));
 
-    const handleAddOption = async (votingId: string, optionText: string, description?: string) => {
-        try {
-            await api.addVotingOption(votingId, optionText, description);
-            await fetchVotings();
-        } catch (error) {
-            console.error("Error adding option:", error);
-            alert(t.addOptionError);
-        }
-    };
+      setVotings(transformedVotings);
+    } catch (error) {
+      console.error("Error fetching votings:", error);
+      setVotings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleDeleteVoting = async (votingId: string) => {
-        try {
-            if (!confirm(t.deleteConfirm)) return;
+  const handleCreateVoting = async (data: VotingFormData) => {
+    try {
+      const payload = {
+        title: data.title,
+        description: data.description,
+        endsAt: data.endsAt?.toISOString(),
+        initialOptions: data.initialOptions,
+      };
 
-            await api.deleteVoting(votingId);
-            setVotings(votings.filter(v => v.id !== votingId));
-        } catch (error) {
-            console.error("Error deleting voting:", error);
-            alert(t.deleteError);
-        }
-    };
+      await api.createVoting(groupId, payload);
+      await fetchVotings();
+      setIsCreateDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating voting:", error);
+      alert(t.createError);
+    }
+  };
 
-    const handleViewDetails = (voting: Voting) => {
-        setSelectedVoting(voting);
-        setIsDetailsOpen(true);
-    };
+  const handleVote = async (votingId: string, optionId: string) => {
+    try {
+      await api.castVote(votingId, [optionId]);
+      await fetchVotings();
+    } catch (error) {
+      console.error("Error voting:", error);
+      alert(t.voteError);
+    }
+  };
 
-    return (
-        <>
-            <Navbar />
-            <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
-                <div className="container mx-auto px-4">
-                    {/* Back button */}
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push(`/dashboard/${groupId}`)}
-                        className="mb-6 gap-2"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        {t.backToGroup}
-                    </Button>
+  const handleAddOption = async (
+    votingId: string,
+    optionText: string,
+    description?: string
+  ) => {
+    try {
+      await api.addVotingOption(votingId, optionText, description);
+      await fetchVotings();
+    } catch (error) {
+      console.error("Error adding option:", error);
+      alert(t.addOptionError);
+    }
+  };
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="mb-12"
-                    >
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 flex items-center gap-3">
-                                    <VoteIcon className="w-10 h-10 text-primary" />
-                                    {t.voting}
-                                </h1>
-                                <p className="text-xl text-muted-foreground">
-                                    {t.subtitle}: <strong>{groupName}</strong>
-                                </p>
-                            </div>
-                            
-                            <Button
-                                size="lg"
-                                onClick={() => setIsCreateDialogOpen(true)}
-                                className="gap-2"
-                            >
-                                <Plus className="w-5 h-5" />
-                                {t.createPoll}
-                            </Button>
-                        </div>
-                    </motion.div>
+  const handleDeleteVoting = async (votingId: string) => {
+    try {
+      if (!confirm(t.deleteConfirm)) return;
 
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mb-8 p-6 bg-destructive/10 border border-destructive/20 rounded-lg"
-                        >
-                            <p className="text-destructive font-medium mb-4">{error}</p>
-                            <Button
-                                variant="outline"
-                                onClick={() => router.push('/dashboard')}
-                                className="gap-2"
-                            >
-                                <ArrowLeft className="w-4 h-4" />
-                                {t.backToGroup || "Back to Dashboard"}
-                            </Button>
-                        </motion.div>
-                    )}
+      await api.deleteVoting(votingId);
+      setVotings(votings.filter((v) => v.id !== votingId));
+    } catch (error) {
+      console.error("Error deleting voting:", error);
+      alert(t.deleteError);
+    }
+  };
 
-                    <VotingList 
-                        votings={votings} 
-                        loading={loading} 
-                        groupId={groupId}
-                        onVote={handleVote}
-                        onAddOption={handleAddOption}
-                        onDelete={handleDeleteVoting}
-                        onViewDetails={handleViewDetails}
-                    />
-                </div>
+  const handleViewDetails = (voting: Voting) => {
+    setSelectedVoting(voting);
+    setIsDetailsOpen(true);
+  };
 
-                <CreateVotingDialog
-                    open={isCreateDialogOpen}
-                    onOpenChange={setIsCreateDialogOpen}
-                    onSubmit={handleCreateVoting}
-                />
+  return (
+    <>
+      <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
+        <div className="container mx-auto px-4">
+          {/* Back button */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push(`/dashboard/${groupId}`)}
+            className="mb-6 gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {t.backToGroup}
+          </Button>
 
-                <VotingDetailsDialog
-                    voting={selectedVoting}
-                    open={isDetailsOpen}
-                    onClose={() => setIsDetailsOpen(false)}
-                    onVote={handleVote}
-                    onAddOption={handleAddOption}
-                />
-            </main>
-        </>
-    );
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 flex items-center gap-3">
+                  <VoteIcon className="w-10 h-10 text-primary" />
+                  {t.voting}
+                </h1>
+                <p className="text-xl text-muted-foreground">
+                  {t.subtitle}: <strong>{groupName}</strong>
+                </p>
+              </div>
+
+              <Button
+                size="lg"
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                {t.createPoll}
+              </Button>
+            </div>
+          </motion.div>
+
+          <VotingList
+            votings={votings}
+            loading={loading}
+            groupId={groupId}
+            onVote={handleVote}
+            onAddOption={handleAddOption}
+            onDelete={handleDeleteVoting}
+            onViewDetails={handleViewDetails}
+          />
+        </div>
+
+        <CreateVotingDialog
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          onSubmit={handleCreateVoting}
+        />
+
+        <VotingDetailsDialog
+          voting={selectedVoting}
+          open={isDetailsOpen}
+          onClose={() => setIsDetailsOpen(false)}
+          onVote={handleVote}
+          onAddOption={handleAddOption}
+        />
+      </main>
+    </>
+  );
 }

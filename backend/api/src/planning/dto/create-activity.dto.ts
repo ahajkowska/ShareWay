@@ -22,15 +22,15 @@ export class CreateActivityDto {
 
   @IsString()
   @IsOptional()
-  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-    message: 'startTime must be in HH:MM format',
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$|^\d{4}-\d{2}-\d{2}T.*$/, {
+    message: 'startTime must be in HH:MM or ISO 8601 format',
   })
   startTime?: string;
 
   @IsString()
   @IsOptional()
-  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-    message: 'endTime must be in HH:MM format',
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$|^\d{4}-\d{2}-\d{2}T.*$/, {
+    message: 'endTime must be in HH:MM or ISO 8601 format',
   })
   endTime?: string;
 

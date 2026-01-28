@@ -8,7 +8,8 @@ import React, {
   useState,
 } from "react";
 import type { AuthUser } from "@/lib/types/auth";
-import { fetchAuth, apiUrl, AuthError } from "@/lib/api";
+import { AuthError } from "@/lib/api";
+import { fetchCurrentUser } from "@/lib/auth/api";
 
 type SessionState = {
   user: AuthUser | null;
@@ -37,10 +38,7 @@ export function SessionProvider({
     setLoading(true);
     setError(undefined);
     try {
-      const profile = await fetchAuth<AuthUser | null>(apiUrl("/users/me"), {
-        method: "GET",
-        cache: "no-store",
-      });
+      const profile = await fetchCurrentUser();
       setUser(profile ?? null);
     } catch (err) {
       if (

@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -24,58 +26,38 @@ import {
   ChecklistItem,
   ChecklistItemState,
 } from './engagement/entities/index.js';
+import { HealthModule } from './health/health.module.js';
 import path from 'path';
 
 const env = process.env.NODE_ENV ?? 'development';
 
 const isTsRun = path.extname(__filename) === '.ts';
 
-// Load .env files with priority: .env.local > .env.{env} > .env
-// Note: dotenv loads variables from FIRST file that defines them (first match wins)
 const envFilePath = isTsRun
-  ? [
-      path.join(__dirname, '..', '.env.local'),
-      path.join(__dirname, '..', '..', `.env.${env}`),
-      path.join(__dirname, '..', '..', '.env'),
-    ]
-  : [
-      path.join(__dirname, '..', '.env.local'),
-      path.join(__dirname, '..', '..', '..', `.env.${env}`),
-      path.join(__dirname, '..', '..', '..', '.env'),
-    ];
-
-console.log('🔍 Environment loading debug:');
-console.log('  NODE_ENV:', env);
-console.log('  isTsRun:', isTsRun);
-console.log('  __filename:', __filename);
-console.log('  __dirname:', __dirname);
-console.log('  envFilePath:', envFilePath);
-envFilePath.forEach((p) => {
-  const fs = require('fs');
-  console.log(`  - ${p} ${fs.existsSync(p) ? '✓ exists' : '✗ not found'}`);
-});
+  ? [path.join(__dirname, '..', '..', `.env.${env}`)]
+  : [path.join(__dirname, '..', '..', '..', `.env.${env}`)];
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate, envFilePath }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        console.log('📊 Database config values:');
-        console.log('  DATABASE_HOST:', configService.getOrThrow<string>('DATABASE_HOST'));
-        console.log('  DATABASE_PORT:', configService.getOrThrow<number>('DATABASE_PORT'));
-        console.log('  REDIS_HOST:', configService.get<string>('REDIS_HOST'));
-        console.log('  REDIS_PORT:', configService.get<number>('REDIS_PORT'));
-        return {
-          type: 'postgres',
-          host: configService.getOrThrow<string>('DATABASE_HOST'),
-          port: configService.getOrThrow<number>('DATABASE_PORT'),
-          username: configService.getOrThrow<string>('DATABASE_USER'),
-          password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
-          database: configService.getOrThrow<string>('DATABASE_NAME'),
-          entities: [
-            User,
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.getOrThrow<string>('DATABASE_HOST'),
+        port: configService.getOrThrow<number>('DATABASE_PORT'),
+        username: configService.getOrThrow<string>('DATABASE_USER'),
+        password: configService.getOrThrow<string>('POSTGRES_PASSWORD'),
+        database: configService.getOrThrow<string>('DATABASE_NAME'),
+        entities: [
+          User,
           Trip,
           Participant,
           Day,
@@ -90,8 +72,7 @@ envFilePath.forEach((p) => {
         ],
         synchronize: env === 'development',
         logging: env === 'development',
-      };
-    },
+      }),
       inject: [ConfigService],
     }),
     MailerModuleLocal,
@@ -102,8 +83,15 @@ envFilePath.forEach((p) => {
     PlanningModule,
     FinanceModule,
     EngagementModule,
+    HealthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule { }

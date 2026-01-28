@@ -1,19 +1,109 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Vote, Wallet, Calendar, ListChecks, ArrowLeft } from "lucide-react";
+import {
+  Vote,
+  Wallet,
+  Calendar,
+  ListChecks,
+  ArrowLeft,
+  Users,
+  UserMinus,
+  ShieldCheck,
+  ShieldOff,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
-import Navbar from "@/app/components/Navbar";
 import { useI18n } from "@/app/context/LanguageContext";
+import { fetchTrip, fetchParticipants } from "@/lib/api";
+import { Avatar, AvatarFallback } from "@/app/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { useSession } from "@/app/context/SessionContext";
+import { removeParticipant, transferRole } from "@/lib/api";
 
 export default function GroupDashboard() {
     const params = useParams();
     const router = useRouter();
     const groupId = params.groupId as string;
     const { t } = useI18n();
+    const [tripName, setTripName] = useState<string>("");
+    const [tripLocation, setTripLocation] = useState<string>("");
+    const [loadingTrip, setLoadingTrip] = useState(true);
+    const [participants, setParticipants] = useState<
+      Array<{ id: string; name: string; role: "ORGANIZER" | "PARTICIPANT" }>
+    >([]);
+    const [actionLoading, setActionLoading] = useState<Record<string, boolean>>(
+      {}
+    );
+    const { user: currentUser } = useSession();
+
+    useEffect(() => {
+      const load = async () => {
+        setLoadingTrip(true);
+        try {
+          const trip = await fetchTrip(groupId);
+          setTripName(trip.name);
+          setTripLocation(trip.destination);
+          const data = await fetchParticipants(groupId);
+          const mapped = data.map((p) => ({
+            id: p.userId,
+            name: p.user?.nickname || p.user?.email || "Użytkownik",
+            role: p.role,
+          }));
+          setParticipants(mapped);
+        } catch {
+          setTripName("");
+          setTripLocation("");
+          setParticipants([]);
+        } finally {
+          setLoadingTrip(false);
+        }
+      };
+      if (groupId) {
+        void load();
+      }
+    }, [groupId]);
+
+    const currentUserId = currentUser?.id ?? null;
+    const currentUserRole =
+      participants.find((p) => p.id === currentUserId)?.role ?? null;
+    const isOrganizer = currentUserRole === "ORGANIZER";
+
+    const handleRemove = async (userId: string, name: string) => {
+      if (!confirm(`Usunąć ${name} z podróży?`)) return;
+      try {
+        setActionLoading((prev) => ({ ...prev, [userId]: true }));
+        await removeParticipant(groupId, userId);
+        setParticipants((prev) => prev.filter((p) => p.id !== userId));
+      } catch (err) {
+        console.error("Error removing participant:", err);
+        alert("Nie udało się usunąć uczestnika.");
+      } finally {
+        setActionLoading((prev) => ({ ...prev, [userId]: false }));
+      }
+    };
+
+    const handleToggleRole = async (
+      userId: string,
+      role: "ORGANIZER" | "PARTICIPANT"
+    ) => {
+      const newRole = role === "ORGANIZER" ? "PARTICIPANT" : "ORGANIZER";
+      try {
+        setActionLoading((prev) => ({ ...prev, [userId]: true }));
+        await transferRole(groupId, userId, newRole);
+        setParticipants((prev) =>
+          prev.map((p) => (p.id === userId ? { ...p, role: newRole } : p))
+        );
+      } catch (err) {
+        console.error("Error updating role:", err);
+        alert("Nie udało się zmienić roli.");
+      } finally {
+        setActionLoading((prev) => ({ ...prev, [userId]: false }));
+      }
+    };
 
     const modules = [
         {
@@ -48,7 +138,6 @@ export default function GroupDashboard() {
 
     return (
         <>
-            <Navbar />
             <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
                 <div className="container mx-auto px-4">
                     {/* Back button */}
@@ -66,13 +155,124 @@ export default function GroupDashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-12"
                     >
-                        <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">
-                            {t.dashboard.title}
-                        </h1>
-                        <p className="text-xl text-muted-foreground">
-                            {t.dashboard.subtitle}
-                        </p>
+                        {loadingTrip ? (
+                          <div className="space-y-3">
+                            <div className="h-10 w-72 bg-muted/60 rounded-xl animate-pulse" />
+                            <div className="h-6 w-48 bg-muted/50 rounded-lg animate-pulse" />
+                          </div>
+                        ) : (
+                          <>
+                            <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">
+                              {tripName}
+                            </h1>
+                            <p className="text-xl text-muted-foreground">
+                              {tripLocation}
+                            </p>
+                          </>
+                        )}
                     </motion.div>
+
+                    <Card className="mb-8">
+                      <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Uczestnicy
+                        </CardTitle>
+                        {!loadingTrip && (
+                          <span className="text-xs text-muted-foreground">
+                            {participants.length} osoba
+                          </span>
+                        )}
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-3">
+                          {loadingTrip
+                            ? Array.from({ length: 3 }).map((_, idx) => (
+                                <div
+                                  key={`skeleton-${idx}`}
+                                  className="h-10 w-44 rounded-full bg-muted/50 animate-pulse"
+                                />
+                              ))
+                            : participants.map((p, idx) => {
+                              const isSelf = currentUserId === p.id;
+                              const canManage = isOrganizer && !isSelf;
+                              const busy = actionLoading[p.id];
+                              return (
+                            <div
+                              key={p.id}
+                              className="flex items-center gap-2 rounded-full border border-border/60 px-3 py-2 bg-card/80"
+                            >
+                              <Avatar className="h-7 w-7">
+                                <AvatarFallback
+                                  className={cn(
+                                    "text-[10px] font-semibold text-white",
+                                    idx % 2 === 0
+                                      ? "bg-primary/70"
+                                      : "bg-travel-coral/70"
+                                  )}
+                                >
+                                  {p.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .slice(0, 2)
+                                    .toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="text-sm font-medium">{p.name}</div>
+                              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                                {p.role === "ORGANIZER" ? "Organizator" : "Uczestnik"}
+                              </span>
+
+                              {canManage && (
+                                <div className="flex items-center gap-1 ml-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={busy}
+                                    onClick={() => handleToggleRole(p.id, p.role)}
+                                    className="h-7 w-7 rounded-full"
+                                    aria-label={
+                                      p.role === "ORGANIZER"
+                                        ? "Zmień na uczestnika"
+                                        : "Zmień na organizatora"
+                                    }
+                                  >
+                                    {p.role === "ORGANIZER" ? (
+                                      <ShieldOff className="h-3.5 w-3.5" />
+                                    ) : (
+                                      <ShieldCheck className="h-3.5 w-3.5" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={busy}
+                                    onClick={() => handleRemove(p.id, p.name)}
+                                    className="h-7 w-7 rounded-full text-destructive hover:text-destructive"
+                                    aria-label="Usuń uczestnika"
+                                  >
+                                    <UserMinus className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              )}
+                              {isSelf && !isOrganizer && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  disabled={busy}
+                                  onClick={() => handleRemove(p.id, p.name)}
+                                  className="ml-2 text-xs"
+                                >
+                                  Opuść
+                                </Button>
+                              )}
+                            </div>
+                          );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {modules.map((module, index) => {

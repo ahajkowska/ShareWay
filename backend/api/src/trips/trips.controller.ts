@@ -11,9 +11,15 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { TripsService } from './trips.service.js';
-import { CreateTripDto, UpdateTripDto, JoinTripDto } from './dto/index.js';
+import {
+  CreateTripDto,
+  UpdateTripDto,
+  JoinTripDto,
+  TransferRoleDto,
+} from './dto/index.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { TripAccessGuard } from './guards/trip-access.guard.js';
 import { OrganizerOnly } from './decorators/organizer-only.decorator.js';
@@ -28,28 +34,29 @@ export interface RequestWithUser extends ExpressRequest {
 
 interface TripResponse {
   id: string;
-  groupId: string;
   name: string;
-  description: string;
-  destination: string;
+  description: string | null;
+  destination: string | null;
   startDate: string;
   endDate: string;
-  inviteCode: string | null;
-  accentPreset: string;
   baseCurrency: string;
+  inviteCode: string | null;
+  inviteCodeExpiry: string | null;
+  status: 'ACTIVE' | 'ARCHIVED';
+  roleForCurrentUser: 'ORGANIZER' | 'PARTICIPANT' | null; // FIXED: renamed from myRole to match frontend
+  createdAt: string;
+  updatedAt: string;
   members: Array<{
     id: string;
     name: string;
     avatarUrl: string | null;
   }>;
-  roleForCurrentUser: 'ORGANIZER' | 'PARTICIPANT';
-  status: 'ACTIVE' | 'ARCHIVED';
 }
 
 @Controller('trips')
 @UseGuards(JwtAuthGuard)
 export class TripsController {
-  constructor(private readonly tripsService: TripsService) {}
+  constructor(private readonly tripsService: TripsService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -59,7 +66,7 @@ export class TripsController {
   ) {
     const userId = req.user?.userId;
     if (!userId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
 
     const trip = await this.tripsService.create(userId, createTripDto);
@@ -84,7 +91,7 @@ export class TripsController {
   async join(@Req() req: RequestWithUser, @Body() joinTripDto: JoinTripDto) {
     const userId = req.user?.userId;
     if (!userId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
 
     const trip = await this.tripsService.joinByCode(userId, joinTripDto);
@@ -101,14 +108,9 @@ export class TripsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: RequestWithUser,
   ) {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return null;
-    }
-
     const trip = await this.tripsService.findById(id);
 
-    return this.formatTripResponse(trip, userId);
+    return this.formatTripResponse(trip, req.user?.userId);
   }
 
   @Patch(':id')
@@ -120,14 +122,9 @@ export class TripsController {
     @Body() updateTripDto: UpdateTripDto,
     @Req() req: RequestWithUser,
   ) {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return null;
-    }
-
     const trip = await this.tripsService.update(id, updateTripDto);
 
-    return this.formatTripResponse(trip, userId);
+    return this.formatTripResponse(trip, req.user?.userId);
   }
 
   @Delete(':id')
@@ -174,40 +171,88 @@ export class TripsController {
   ) {
     const requesterId = req.user?.userId;
     if (!requesterId) {
-      return null;
+      throw new UnauthorizedException('User not authenticated');
     }
 
     return this.tripsService.removeParticipant(tripId, userId, requesterId);
   }
 
-  private formatTripResponse(trip: Trip, currentUserId: string): TripResponse {
-    const currentParticipant = trip.participants?.find(
-      (p) => p.userId === currentUserId,
+  @Patch(':id/archive')
+  @UseGuards(TripAccessGuard)
+  @OrganizerOnly()
+  @HttpCode(HttpStatus.OK)
+  async archiveTrip(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const trip = await this.tripsService.archiveTrip(id);
+    return this.formatTripResponse(trip, req.user?.userId);
+  }
+
+  @Patch(':id/unarchive')
+  @UseGuards(TripAccessGuard)
+  @OrganizerOnly()
+  @HttpCode(HttpStatus.OK)
+  async unarchiveTrip(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const trip = await this.tripsService.unarchiveTrip(id);
+    return this.formatTripResponse(trip, req.user?.userId);
+  }
+
+  @Patch(':id/participants/:userId/role')
+  @UseGuards(TripAccessGuard)
+  @OrganizerOnly()
+  @HttpCode(HttpStatus.OK)
+  async transferRole(
+    @Param('id', ParseUUIDPipe) tripId: string,
+    @Param('userId', ParseUUIDPipe) targetUserId: string,
+    @Body() dto: TransferRoleDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const requesterId = req.user?.userId;
+    if (!requesterId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.tripsService.transferRole(
+      tripId,
+      targetUserId,
+      dto.newRole,
+      requesterId,
     );
-    const roleForCurrentUser =
-      currentParticipant?.role.toUpperCase() || 'PARTICIPANT';
+  }
+
+  private formatTripResponse(
+    trip: Trip,
+    requestingUserId?: string,
+  ): TripResponse {
+    const myParticipant = requestingUserId
+      ? trip.participants?.find((p) => p.userId === requestingUserId)
+      : undefined;
 
     return {
       id: trip.id,
-      groupId: trip.id,
       name: trip.name,
-      description: trip.description || '',
-      destination: trip.location || '',
-      startDate: trip.startDate.toISOString(),
-      endDate: trip.endDate.toISOString(),
-      inviteCode: trip.inviteCode,
-      accentPreset: trip.accentPreset || 'neutral',
+      description: trip.description,
+      destination: trip.location,
+      startDate: new Date(trip.startDate).toISOString(),
+      endDate: new Date(trip.endDate).toISOString(),
       baseCurrency: trip.baseCurrency,
+      inviteCode: trip.inviteCode,
+      inviteCodeExpiry: trip.inviteCodeExpiry?.toISOString() ?? null,
+      status: trip.status ?? 'ACTIVE',
+      roleForCurrentUser: myParticipant?.role
+        ? (myParticipant.role.toUpperCase() as 'ORGANIZER' | 'PARTICIPANT')
+        : null,
+      createdAt: trip.createdAt.toISOString(),
+      updatedAt: trip.updatedAt.toISOString(),
       members:
-        trip.participants?.map((p) => ({
-          id: p.user.id,
-          name: p.user.nickname,
+        trip.participants?.map((p: Participant) => ({
+          id: p.userId,
+          name: p.user?.nickname ?? 'Unknown',
           avatarUrl: null,
-        })) || [],
-      roleForCurrentUser: roleForCurrentUser as 'ORGANIZER' | 'PARTICIPANT',
-      status: trip.isDeleted
-        ? 'ARCHIVED'
-        : ((trip.status || 'ACTIVE') as 'ACTIVE' | 'ARCHIVED'),
+        })) ?? [],
     };
   }
 }

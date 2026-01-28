@@ -1,28 +1,46 @@
-import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Length, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsNumber,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUUID,
+  Length,
+  IsIn,
+} from 'class-validator';
 
 export class CreateExpenseDto {
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(1000)
-  description?: string;
-
   @IsNumber()
   @IsPositive()
   amount: number;
 
-  @IsString()
-  @Length(3, 3)
-  currency: string;
+  @IsOptional()
+  @IsUUID()
+  paidBy?: string;
 
   @IsOptional()
+  @IsString()
+  @Length(3, 3)
+  currency?: string; // Optional - will use trip's baseCurrency if not provided
+
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
   @IsDateString()
-  date?: string;
+  date: Date;
 
   @IsArray()
   @IsUUID('4', { each: true })
-  splitBetween: string[];
+  debtorIds: string[];
+
+  @IsOptional()
+  @IsIn(['PENDING', 'SETTLED'])
+  status?: 'PENDING' | 'SETTLED';
 }

@@ -9,12 +9,12 @@ import { Mail, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { toast } from "sonner";
-import { loginUser } from "@/lib/auth/api";
 
 import { useRememberedEmail } from "../hooks/useRememberedEmail";
 import { useExplainLoginError } from "../hooks/useExplainLoginError";
 import { FieldError } from "../hooks/useFieldError";
 import { ServerErrorBanner } from "../hooks/useServerErrorBanner";
+import { loginUser } from "../services/authService";
 
 export default function LoginForm() {
   const { t } = useI18n();
@@ -47,7 +47,7 @@ export default function LoginForm() {
       onSubmit={async (values, { setSubmitting }) => {
         setServerError(undefined);
         try {
-          const user = await loginUser({
+          await loginUser({
             email: values.email,
             password: values.password,
           });
@@ -55,7 +55,7 @@ export default function LoginForm() {
           update(values.remember, values.email);
 
           toast.success(t.auth.toast.loginSuccess, {
-            description: user.name || user.email,
+            description: `${values.email}`,
             duration: 2000,
           });
 
@@ -83,9 +83,8 @@ export default function LoginForm() {
                 type="email"
                 autoComplete="email"
                 aria-invalid={Boolean(touched.email && errors.email)}
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.email && errors.email ? "border-destructive" : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.email && errors.email ? "border-destructive" : ""
+                  }`}
                 placeholder="you@example.com"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("email", e.target.value);
@@ -108,11 +107,10 @@ export default function LoginForm() {
                 type={show ? "text" : "password"}
                 autoComplete="current-password"
                 aria-invalid={Boolean(touched.password && errors.password)}
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.password && errors.password
-                    ? "border-destructive"
-                    : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.password && errors.password
+                  ? "border-destructive"
+                  : ""
+                  }`}
                 placeholder="••••••••"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("password", e.target.value);
@@ -150,7 +148,7 @@ export default function LoginForm() {
               />
               {t.auth.common.rememberMe}
             </label>
-            <Link href="#" className="text-sm text-primary hover:underline">
+            <Link href="/forgot-password" className="text-sm text-primary hover:underline">
               {t.auth.common.forgotPassword}
             </Link>
           </div>

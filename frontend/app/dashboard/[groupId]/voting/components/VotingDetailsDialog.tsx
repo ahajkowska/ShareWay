@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, TrendingUp, Users, Calendar, Plus } from "lucide-react";
+import { X, TrendingUp, Users, Calendar, Plus, Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
@@ -19,6 +19,9 @@ interface VotingDetailsDialogProps {
   onClose: () => void;
   onVote: (votingId: string, optionId: string) => Promise<void>;
   onAddOption: (votingId: string, optionText: string, description?: string) => Promise<void>;
+  onUnvote: (votingId: string) => Promise<void>;
+  canEdit?: boolean;
+  onUpdate?: (votingId: string, data: { title: string; description?: string; endsAt?: Date | null }) => Promise<void>;
 }
 
 export default function VotingDetailsDialog({ 
@@ -26,7 +29,10 @@ export default function VotingDetailsDialog({
   open, 
   onClose,
   onVote,
-  onAddOption 
+  onAddOption,
+  onUnvote,
+  canEdit = false,
+  onUpdate
 }: VotingDetailsDialogProps) {
   const { lang } = useI18n();
   const t = getVotingTranslations(lang);
@@ -34,8 +40,21 @@ export default function VotingDetailsDialog({
   const [newOptionText, setNewOptionText] = useState("");
   const [newOptionDescription, setNewOptionDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editEndsAt, setEditEndsAt] = useState<string>("");
 
   if (!voting || !open) return null;
+
+  const initEdit = () => {
+    setEditTitle(voting.title);
+    setEditDescription(voting.description || "");
+    setEditEndsAt(
+      voting.endsAt ? new Date(voting.endsAt).toISOString().slice(0, 10) : ""
+    );
+    setEditing(true);
+  };
 
   const totalVotes = voting.options.reduce((sum, opt) => sum + opt.votes, 0);
   const uniqueVoters = new Set(voting.options.flatMap(opt => opt.voters));
@@ -55,6 +74,24 @@ export default function VotingDetailsDialog({
       setShowAddOption(false);
     } catch (error) {
       console.error("Error adding option:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onUpdate) return;
+    try {
+      setSubmitting(true);
+      await onUpdate(voting.id, {
+        title: editTitle.trim(),
+        description: editDescription.trim() || undefined,
+        endsAt: editEndsAt ? new Date(editEndsAt) : null,
+      });
+      setEditing(false);
+    } catch (error) {
+      console.error("Error updating voting:", error);
     } finally {
       setSubmitting(false);
     }
@@ -87,15 +124,76 @@ export default function VotingDetailsDialog({
                   <p className="text-sm text-muted-foreground mt-1">{voting.description}</p>
                 )}
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-muted rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {canEdit && !editing && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={initEdit}
+                    aria-label={t.edit}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                )}
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-muted rounded-lg transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="p-6 space-y-6">
+              {editing && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{t.editVoting}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleUpdate} className="space-y-4">
+                      <div>
+                        <Label>{t.pollTitle}</Label>
+                        <Input
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder={t.pollTitlePlaceholder}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label>{t.description}</Label>
+                        <Textarea
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder={t.descriptionPlaceholder}
+                        />
+                      </div>
+                      <div>
+                        <Label>{t.endDate}</Label>
+                        <Input
+                          type="date"
+                          value={editEndsAt}
+                          onChange={(e) => setEditEndsAt(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button type="submit" disabled={submitting}>
+                          {submitting ? t.saving : t.save}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setEditing(false)}
+                        >
+                          {t.cancel}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
               {/* Statystyki ogólne */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
@@ -167,6 +265,18 @@ export default function VotingDetailsDialog({
                     </p>
                   </CardContent>
                 </Card>
+              )}
+
+              {voting.userVote && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => onUnvote(voting.id)}
+                    disabled={submitting}
+                  >
+                    {t.unvote}
+                  </Button>
+                </div>
               )}
 
               {/* Ranking wszystkich opcji */}

@@ -4,6 +4,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { RedisRepository } from '../../redis/redis.repository.js';
+import { UsersService } from '../../users/users.service.js';
 
 export interface RefreshTokenPayload {
   sub: string;
@@ -19,6 +20,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   constructor(
     private readonly configService: ConfigService,
     private readonly redisRepository: RedisRepository,
+    private readonly usersService: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -46,6 +48,12 @@ export class RefreshTokenStrategy extends PassportStrategy(
       );
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    // Check if user is still active before allowing token refresh
+    const user = await this.usersService.findById(payload.sub);
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('User account is deactivated');
     }
 
     return {

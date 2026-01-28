@@ -1,12 +1,12 @@
 export interface ActivityDto {
     id: string;
-    dayId: string;
+    dayId?: string;
     title: string;
     description?: string;
     startTime?: string;
     endTime?: string;
     location?: string;
-    createdBy: string;
+    createdBy?: string;
     createdByName?: string;
 }
 
