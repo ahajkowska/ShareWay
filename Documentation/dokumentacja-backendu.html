@@ -207,6 +207,27 @@
         </tr>
         <tr>
           <td><strong>POST</strong></td>
+          <td><code>/auth/forgot-password</code></td>
+          <td>Public</td>
+          <td><code>ForgotPasswordDto</code></td>
+          <td>
+            Generates a reset token and sends a password reset email. Returns
+            <code>200 OK</code> even if the email does not exist (to avoid
+            disclosure).
+          </td>
+        </tr>
+        <tr>
+          <td><strong>POST</strong></td>
+          <td><code>/auth/reset-password</code></td>
+          <td>Public</td>
+          <td><code>ResetPasswordDto</code></td>
+          <td>
+            Resets user password using a valid reset token. Invalid or expired
+            tokens return <code>400 Bad Request</code>.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>POST</strong></td>
           <td><code>/auth/logout</code></td>
           <td>Protected</td>
           <td>-</td>
@@ -604,6 +625,17 @@
     <p><strong>Request: ChangePasswordDto</strong></p>
     <pre><code class="language-typescript">interface ChangePasswordDto {
   oldPassword: string;
+  newPassword: string;
+}</code></pre>
+
+    <p><strong>Request: ForgotPasswordDto</strong></p>
+    <pre><code class="language-typescript">interface ForgotPasswordDto {
+  email: string;
+}</code></pre>
+
+    <p><strong>Request: ResetPasswordDto</strong></p>
+    <pre><code class="language-typescript">interface ResetPasswordDto {
+  token: string;
   newPassword: string;
 }</code></pre>
 
