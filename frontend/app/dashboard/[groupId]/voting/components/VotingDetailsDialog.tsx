@@ -19,7 +19,7 @@ interface VotingDetailsDialogProps {
   onClose: () => void;
   onVote: (votingId: string, optionId: string) => Promise<void>;
   onAddOption: (votingId: string, optionText: string, description?: string) => Promise<void>;
-  onUnvote: (votingId: string) => Promise<void>;
+  onUnvote: (votingId: string, optionId: string) => Promise<void>;
   canEdit?: boolean;
   onUpdate?: (votingId: string, data: { title: string; description?: string; endsAt?: Date | null }) => Promise<void>;
 }
@@ -271,7 +271,7 @@ export default function VotingDetailsDialog({
                 <div className="flex justify-end">
                   <Button
                     variant="outline"
-                    onClick={() => onUnvote(voting.id)}
+                    onClick={() => onUnvote(voting.id, voting.userVote!)}
                     disabled={submitting}
                   >
                     {t.unvote}

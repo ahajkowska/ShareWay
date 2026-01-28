@@ -189,10 +189,10 @@ export interface VotingDto {
  * Create voting request payload
  */
 export interface CreateVotingPayload {
-  title: string;
+  question: string;
   description?: string;
-  endsAt?: string;
-  initialOptions: string[];
+  endDate?: string;
+  options: string[];
 }
 
 /**
@@ -271,6 +271,13 @@ export async function addVotingOption(
     body: JSON.stringify({ text, description }),
   });
 }
+
+export const removeVote = async (votingId: string, optionId: string): Promise<void> => {
+  // Zakładając, że Twój backend przyjmuje DELETE na taki endpoint:
+  await fetchAuth(apiUrl(`/votings/${votingId}/options/${optionId}/vote`), {
+    method: "DELETE",
+  });
+};
 
 // ============================================
 // CHECKLIST API

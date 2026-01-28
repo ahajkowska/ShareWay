@@ -86,10 +86,10 @@ export default function GroupVotingPage() {
   const handleCreateVoting = async (data: VotingFormData) => {
     try {
       const payload = {
-        title: data.title,
+        question: data.title,
         description: data.description,
-        endsAt: data.endsAt?.toISOString(),
-        initialOptions: data.initialOptions,
+        endDate: data.endsAt?.toISOString(),
+        options: data.initialOptions,
       };
 
       await api.createVoting(groupId, payload);
@@ -142,6 +142,26 @@ export default function GroupVotingPage() {
     setIsDetailsOpen(true);
   };
 
+  const handleUnvote = async (votingId: string, optionId: string) => {
+    try {
+      // Wywołujemy funkcję z api.ts, którą wcześniej stworzyliśmy
+      await api.removeVote(votingId, optionId);
+      
+      // Odświeżamy listę głosowań, żeby UI pokazał aktualny stan
+      await fetchVotings();
+      
+      // Jeśli mamy otwarte okno szczegółów, musimy też zaktualizować selectedVoting
+      // (ponieważ fetchVotings zmienia stan 'votings', ale nie 'selectedVoting')
+      if (selectedVoting && selectedVoting.id === votingId) {
+        const updated = votings.find(v => v.id === votingId);
+        if (updated) setSelectedVoting(updated);
+      }
+    } catch (error) {
+      console.error("Error removing vote:", error);
+      alert("Nie udało się usunąć głosu.");
+    }
+  };
+  
   return (
     <>
       <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
@@ -207,6 +227,7 @@ export default function GroupVotingPage() {
           onClose={() => setIsDetailsOpen(false)}
           onVote={handleVote}
           onAddOption={handleAddOption}
+          onUnvote={handleUnvote}
         />
       </main>
     </>
