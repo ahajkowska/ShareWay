@@ -103,10 +103,10 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                                 )}
 
                                 {/* Created By */}
-                                {activity.createdBy && (
+                                {activity.createdByName && (
                                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                                         <User className="w-3.5 h-3.5" />
-                                        <span>{t.addedBy}: {activity.createdBy}</span>
+                                        <span>{t.addedBy}: {activity.createdByName}</span>
                                     </div>
                                 )}
 

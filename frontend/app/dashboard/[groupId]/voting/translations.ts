@@ -1,6 +1,7 @@
 export const votingTranslations = {
   pl: {
     voting: "Głosowania",
+    loadError: "Błąd podczas ładowania głosowań",
     createPoll: "Utwórz głosowanie",
     pollTitle: "Tytuł głosowania",
     description: "Opis",
@@ -68,6 +69,7 @@ export const votingTranslations = {
   },
   en: {
     voting: "Voting",
+    loadError: "Failed to load votings",
     createPoll: "Create Poll",
     pollTitle: "Poll Title",
     description: "Description",

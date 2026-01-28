@@ -52,7 +52,6 @@ export default function EditActivityDialog({ open, onOpenChange, activity, onUpd
             await api.updateActivity(activity.id, payload);
             onUpdated?.();
             onOpenChange(false);
-            window.location.reload();
         } catch (err: any) {
             console.error(err);
             alert(err.message || t.updateError);

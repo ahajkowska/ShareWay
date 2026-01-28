@@ -114,7 +114,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <label className="block text-sm font-medium mb-2">
-                                    {t.startTime} ({t.dateAndTime})
+                                    {t.startTime} ({t.optional})
                                 </label>
                                 <input 
                                     type="time" 
