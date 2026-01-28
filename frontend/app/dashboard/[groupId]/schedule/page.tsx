@@ -24,9 +24,11 @@ import {
   Trash2,
 } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
+import { useSession } from "@/app/context/SessionContext";
 import { getScheduleTranslations } from "./translations";
 import * as api from "@/lib/api";
 import type { DayDto } from "./types";
+import { toast } from "sonner";
 import ActivityTimeline from "./components/ActivityTimeline";
 import CreateDayDialog from "./components/CreateDayDialog";
 import CreateActivityDialog from "./components/CreateActivityDialog";
@@ -50,6 +52,10 @@ export default function SchedulePage() {
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
   const [expandedDayId, setExpandedDayId] = useState<string | null>(null);
   const [deletingDayId, setDeletingDayId] = useState<string | null>(null);
+  const [participants, setParticipants] = useState<
+    Array<{ id: string; name: string; role: "ORGANIZER" | "PARTICIPANT" }>
+  >([]);
+  const { user: currentUser } = useSession();
 
   const load = async () => {
     try {
@@ -58,6 +64,15 @@ export default function SchedulePage() {
 
       const data = (await api.fetchPlan(tripId)) as DayDto[];
       setDays(data || []);
+      
+      // Load participants to check role
+      const participantsData = await api.fetchParticipants(tripId);
+      const mapped = participantsData.map((p) => ({
+        id: p.userId,
+        name: p.user?.nickname || p.user?.email || "User",
+        role: p.role,
+      }));
+      setParticipants(mapped);
     } catch (err: any) {
       console.error("Error loading schedule:", err);
       setError(err.message || t.loadError);
@@ -78,9 +93,10 @@ export default function SchedulePage() {
       await api.createDay(tripId, { date });
       await load();
       setCreateDayOpen(false);
+      toast.success(t.dayCreated || "Dzień dodany");
     } catch (err: any) {
       console.error("Error creating day:", err);
-      alert(err.message || t.createDayError);
+      toast.error(err.message || t.createDayError);
     }
   };
 
@@ -100,9 +116,10 @@ export default function SchedulePage() {
       setDeletingDayId(dayId);
       await api.deleteDay(dayId);
       await load();
+      toast.success(t.dayDeleted || "Dzień usunięty");
     } catch (err: any) {
       console.error("Error deleting day:", err);
-      alert(err.message || t.deleteDayError);
+      toast.error(err.message || t.deleteDayError);
     } finally {
       setDeletingDayId(null);
     }
@@ -111,6 +128,11 @@ export default function SchedulePage() {
   const toggleDay = (dayId: string) => {
     setExpandedDayId(expandedDayId === dayId ? null : dayId);
   };
+
+  const currentUserId = currentUser?.id ?? null;
+  const currentUserRole =
+    participants.find((p) => p.id === currentUserId)?.role ?? null;
+  const isOrganizer = currentUserRole === "ORGANIZER";
 
   return (
     <>
@@ -275,18 +297,20 @@ export default function SchedulePage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={(e) => handleDeleteDay(day.id, e)}
-                            disabled={deletingDayId === day.id}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
-                            title={t.deleteDay}
-                          >
-                            {deletingDayId === day.id ? (
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600" />
-                            ) : (
-                              <Trash2 className="w-5 h-5" />
-                            )}
-                          </button>
+                          {isOrganizer && (
+                            <button
+                              onClick={(e) => handleDeleteDay(day.id, e)}
+                              disabled={deletingDayId === day.id}
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                              title={t.deleteDay}
+                            >
+                              {deletingDayId === day.id ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600" />
+                              ) : (
+                                <Trash2 className="w-5 h-5" />
+                              )}
+                            </button>
+                          )}
                           <ChevronDown
                             className={cn(
                               "w-5 h-5 text-muted-foreground transition-transform duration-200",
