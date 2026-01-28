@@ -8,6 +8,7 @@ import * as api from "@/lib/api";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "../translations";
 import type { ExpenseDto } from "../types";
+import { toast } from "sonner";
 
 interface Props {
     open: boolean;
@@ -80,15 +81,15 @@ export default function EditExpenseDialog({
         if (!expense) return;
 
         if (!title.trim()) {
-            alert(t.titleRequired);
+            toast.error(t.titleRequired);
             return;
         }
         if (!amount || parseFloat(amount) <= 0) {
-            alert(t.invalidAmount);
+            toast.error(t.invalidAmount);
             return;
         }
         if (splitBetween.length === 0) {
-            alert(t.chooseSplit);
+            toast.error(t.chooseSplit);
             return;
         }
 
@@ -104,11 +105,12 @@ export default function EditExpenseDialog({
             
             await api.updateExpense(expense.id, payload);
 
+            toast.success(t.updateExpenseSuccess || "Wydatek zaktualizowany");
             onUpdated?.();
             onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || t.updateExpenseError);
+            toast.error(err.message || t.updateExpenseError);
         } finally {
             setSubmitting(false);
         }

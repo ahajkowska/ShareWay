@@ -14,6 +14,7 @@ import { Plus, Wallet, TrendingUp, ArrowLeft } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "./translations";
 import * as api from "@/lib/api";
+import { toast } from "sonner";
 import ExpenseList from "./components/ExpenseList";
 import CreateExpenseDialog from "./components/CreateExpenseDialog";
 import EditExpenseDialog from "./components/EditExpenseDialog";
@@ -56,7 +57,7 @@ export default function CostsPage() {
       setExpenses(data || []);
     } catch (err: any) {
       console.error("Error loading expenses:", err);
-      alert(err.message || t.loadError);
+      toast.error(err.message || t.loadError);
     } finally {
       setLoading(false);
     }
@@ -73,17 +74,92 @@ export default function CostsPage() {
 
   const loadMyBalance = async () => {
     try {
+      // Fetch balance - backend will calculate with all expenses including settlements
       const data = await api.fetchMyBalance(tripId);
-      // Transform to expected type if needed
-      setMyBalance({
-        myUserId: data.myUserId,
-        myUserName: data.myUserName,
-        balances: data.balances.map((b) => ({
+      
+      // Use expenses from state (should be fresh if called after loadExpenses)
+      // If not available, fetch them
+      const allExpenses = expenses.length > 0 ? expenses : await api.fetchExpenses(tripId);
+      
+      // Filter out settlement expenses from breakdown display
+      // Settlements are already calculated in the balance by backend
+      // We just don't want to show them in the detailed expense breakdown list
+      const regularExpenses = allExpenses.filter(exp => 
+        exp.status !== 'SETTLED' && 
+        !exp.title.startsWith('Rozliczenie z')
+      );
+      
+      // Calculate detailed expense breakdown for each person
+      const balancesWithExpenses = data.balances.map((b) => {
+        const expenseBreakdown: any[] = [];
+        
+        regularExpenses.forEach((expense) => {
+          const numberOfPeople = expense.splitBetween.length;
+          const sharePerPerson = expense.amount / numberOfPeople;
+          
+          // Check if both I and the other person are involved in this expense
+          const iAmInSplit = expense.splitBetween.includes(data.myUserName);
+          const theyAreInSplit = expense.splitBetween.includes(b.userName);
+          const iAmPayer = expense.paidBy === data.myUserId;
+          const theyArePayer = expense.paidBy === b.userId;
+          
+          // Only process if both are involved (either in split or as payer)
+          const iAmInvolved = iAmInSplit || iAmPayer;
+          const theyAreInvolved = theyAreInSplit || theyArePayer;
+          
+          if (iAmInvolved && theyAreInvolved) {
+            // My share of this expense
+            const myShare = iAmInSplit ? sharePerPerson : 0;
+            // Their share of this expense
+            const theirShare = theyAreInSplit ? sharePerPerson : 0;
+            
+            // How much each person paid
+            const iPaid = iAmPayer ? expense.amount : 0;
+            const theyPaid = theyArePayer ? expense.amount : 0;
+            
+            // Calculate balance for THIS expense between me and this person
+            // If I paid for their share, they owe me (positive)
+            // If they paid for my share, I owe them (negative)
+            let balanceForThisExpense = 0;
+            
+            if (iAmPayer && theyAreInSplit) {
+              // I paid, they should pay their share to me
+              balanceForThisExpense += theirShare;
+            }
+            if (theyArePayer && iAmInSplit) {
+              // They paid, I should pay my share to them
+              balanceForThisExpense -= myShare;
+            }
+            
+            // Round to 2 decimal places to avoid floating point errors
+            balanceForThisExpense = Math.round(balanceForThisExpense * 100) / 100;
+            
+            // Only include if there's a non-zero balance between us for this expense
+            if (Math.abs(balanceForThisExpense) > 0.01) {
+              expenseBreakdown.push({
+                expenseId: expense.id,
+                expenseTitle: expense.title,
+                totalAmount: Math.round(expense.amount * 100) / 100,
+                myShare: Math.round(myShare * 100) / 100,
+                iPaid: Math.round(iPaid * 100) / 100,
+                balance: balanceForThisExpense,
+              });
+            }
+          }
+        });
+        
+        return {
           userId: b.userId,
           userName: b.userName,
           balance: b.balance,
-          expenses: [], // Backend doesn't provide detailed breakdown yet
-        })),
+          expenses: expenseBreakdown,
+        };
+      });
+      
+      setMyBalance({
+        myUserId: data.myUserId,
+        myUserName: data.myUserName,
+        balances: balancesWithExpenses.filter(b => Math.abs(b.balance) > 0.01),
         totalIOweThem: data.totalIOweThem,
         totalTheyOweMe: data.totalTheyOweMe,
       });
@@ -102,17 +178,23 @@ export default function CostsPage() {
   }, [tripId]);
 
   const handleDeleteExpense = async (expenseId: string) => {
-    if (!confirm(t.deleteConfirm)) return;
-
-    try {
-      await api.deleteExpense(expenseId);
-      await loadExpenses();
-      await loadBalance();
-      await loadMyBalance();
-    } catch (err: any) {
-      console.error("Error deleting expense:", err);
-      alert(err.message || t.deleteError);
-    }
+    toast.info(t.deleteConfirm, {
+      action: {
+        label: "Usuń",
+        onClick: async () => {
+          try {
+            await api.deleteExpense(expenseId);
+            await loadExpenses();
+            await loadBalance();
+            await loadMyBalance();
+            toast.success("Wydatek usunięty");
+          } catch (err: any) {
+            console.error("Error deleting expense:", err);
+            toast.error(err.message || t.deleteError);
+          }
+        },
+      },
+    });
   };
 
   const handleEditExpense = (expense: ExpenseDto) => {
@@ -129,6 +211,9 @@ export default function CostsPage() {
   };
 
   const handleRefreshMyBalance = async () => {
+    // Refresh all data sequentially to ensure consistency
+    await loadExpenses();
+    await loadBalance();
     await loadMyBalance();
   };
 

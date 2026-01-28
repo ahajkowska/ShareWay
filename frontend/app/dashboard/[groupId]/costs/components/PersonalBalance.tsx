@@ -65,8 +65,20 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId,
     const netBalance = myBalance.totalTheyOweMe - myBalance.totalIOweThem;
     const isSettled = netBalance === 0;
 
-    const handleSettleExpense = (expense: ExpenseBreakdown, personName: string, personUserId: string, tripId: string) => {
-        setSelectedExpense({ ...expense, personName, personUserId, tripId });
+    const handleSettle = (balance: number, personName: string, personUserId: string) => {
+        // Create a mock expense object with total balance
+        const mockExpense: ExpenseBreakdown & { personName: string; personUserId: string; tripId: string } = {
+            expenseId: 'settlement',
+            expenseTitle: `Saldo z ${personName}`,
+            totalAmount: Math.abs(balance),
+            myShare: 0,
+            iPaid: 0,
+            balance: balance,
+            personName,
+            personUserId,
+            tripId,
+        };
+        setSelectedExpense(mockExpense);
         setSettleDialogOpen(true);
     };
 
@@ -118,7 +130,7 @@ export default function PersonalBalance({ myBalance, loading, onRefresh, tripId,
                                         person={person}
                                         tripId={tripId}
                                         baseCurrency={baseCurrency}
-                                        onSettleExpense={(exp, name) => handleSettleExpense(exp, name, person.userId, tripId)}
+                                        onSettle={handleSettle}
                                     />
                                 ))}
                             </div>

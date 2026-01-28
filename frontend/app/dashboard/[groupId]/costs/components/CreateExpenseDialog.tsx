@@ -9,6 +9,7 @@ import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "../translations";
 import type { CreateExpenseDto } from "../types";
 import { useSession } from "@/app/context/SessionContext";
+import { toast } from "sonner";
 
 interface Props {
     open: boolean;
@@ -66,19 +67,19 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
         e?.preventDefault();
         
         if (!title.trim()) {
-            alert(t.titleRequired);
+            toast.error(t.titleRequired);
             return;
         }
         if (!amount || parseFloat(amount) <= 0) {
-            alert(t.invalidAmount);
+            toast.error(t.invalidAmount);
             return;
         }
         if (!paidBy) {
-            alert(t.choosePayer);
+            toast.error(t.choosePayer);
             return;
         }
         if (splitBetween.length === 0) {
-            alert(t.chooseSplit);
+            toast.error(t.chooseSplit);
             return;
         }
 
@@ -104,11 +105,12 @@ export default function CreateExpenseDialog({ open, onOpenChange, tripId, baseCu
             setPaidBy("");
             setSplitBetween([]);
             
+            toast.success(t.createExpenseSuccess || "Wydatek dodany");
             onCreated?.();
             onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || t.createExpenseError);
+            toast.error(err.message || t.createExpenseError);
         } finally {
             setSubmitting(false);
         }
