@@ -39,6 +39,7 @@ export async function getCurrentUserServer(): Promise<AuthUser | null> {
     id: data.id,
     name: data.nickname ?? data.name ?? "",
     email: data.email,
+    role: data.role,
     isActive: data.isActive,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
