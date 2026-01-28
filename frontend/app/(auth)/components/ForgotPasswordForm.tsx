@@ -31,6 +31,10 @@ export default function ForgotPasswordForm() {
           });
           if (!res.ok) {
             const data = await res.json().catch(() => ({}));
+            // Prefer friendly validation feedback instead of raw backend errors
+            if (res.status === 400 || res.status === 404) {
+              throw new Error("Nieprawidłowy e-mail.");
+            }
             throw new Error(data?.message || "Nie udało się wysłać maila.");
           }
           toast.success("Wysłano link do resetu hasła");
