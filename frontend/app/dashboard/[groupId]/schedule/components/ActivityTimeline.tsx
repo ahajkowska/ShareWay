@@ -68,10 +68,10 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
                             {activity.startTime && (
                                 <div className="absolute left-12 top-0 flex items-center gap-1.5 text-xs font-mono font-medium text-primary">
                                     <Clock className="w-3.5 h-3.5" />
-                                    {format(new Date(activity.startTime), "HH:mm")}
+                                    {activity.startTime}
                                     {activity.endTime && (
                                         <span className="text-muted-foreground">
-                                            - {format(new Date(activity.endTime), "HH:mm")}
+                                            - {activity.endTime}
                                         </span>
                                     )}
                                 </div>

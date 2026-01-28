@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 import LanguageToggle from "@/app/components/LanguageToggle";
 import { Avatar, AvatarFallback } from "@/app/components/ui/avatar";
@@ -12,12 +12,11 @@ import Logo from "@/app/components/Logo";
 import { useI18n } from "@/app/context/LanguageContext";
 import { logoutUser } from "@/lib/auth/logout";
 import { toast } from "sonner";
-import type { AuthUser } from "@/lib/types/auth";
 
 export default function DashboardNavbar({
-  user,
+  user = { name: "Demo User", email: "demo@shareway.app" },
 }: {
-  user?: AuthUser;
+  user?: { name: string; email: string };
 }) {
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,18 +24,10 @@ export default function DashboardNavbar({
   const { lang, t } = useI18n();
   const router = useRouter();
 
-  const resolvedUser =
-    user ?? {
-      id: "guest",
-      name: "Demo User",
-      email: "demo@shareway.app",
-    };
-
   const logoutLabel = t.nav.logout;
-  const settingsLabel = t.nav.settings;
   const profileLabel = t.nav.profile;
   const initials =
-    resolvedUser.name
+    user.name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
@@ -69,7 +60,7 @@ export default function DashboardNavbar({
       await logoutUser();
 
       toast.success(t.auth.toast.logoutSuccess, {
-        description: resolvedUser.email,
+        description: user.email,
         duration: 2000,
       });
 
@@ -128,10 +119,10 @@ export default function DashboardNavbar({
                 >
                   <div className="p-4 border-b border-border/70 bg-linear-to-r from-primary/8 via-transparent to-secondary/10">
                     <p className="text-sm font-semibold text-foreground">
-                      {resolvedUser.name}
+                      {user.name}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {resolvedUser.email}
+                      {user.email}
                     </p>
                   </div>
 
@@ -143,14 +134,6 @@ export default function DashboardNavbar({
                     >
                       <User className="h-4 w-4 text-muted-foreground" />{" "}
                       <span className="text-foreground">{profileLabel}</span>
-                    </Link>
-                    <Link
-                      href="/dashboard/settings"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted/70 transition-colors"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <Settings className="h-4 w-4 text-muted-foreground" />{" "}
-                      <span className="text-foreground">{settingsLabel}</span>
                     </Link>
                     <button
                       onClick={handleLogout}
@@ -193,13 +176,6 @@ export default function DashboardNavbar({
                 onClick={() => setOpen(false)}
               >
                 {profileLabel}
-              </Link>
-              <Link
-                href="/dashboard/settings"
-                className="px-6 py-4 text-lg hover:bg-muted/60 transition"
-                onClick={() => setOpen(false)}
-              >
-                {settingsLabel}
               </Link>
               <button
                 onClick={handleLogout}

@@ -9,12 +9,12 @@ import { Mail, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { toast } from "sonner";
-import { registerUser } from "@/lib/auth/api";
 
 import { PasswordChecklist } from "../hooks/usePasswordChecklist";
 import { FieldError } from "../hooks/useFieldError";
 import { ServerErrorBanner } from "../hooks/useServerErrorBanner";
 import { useExplainRegisterError } from "../hooks/useExplainRegisterError";
+import { registerUser } from "../services/authService";
 
 export default function RegisterForm() {
   const { t } = useI18n();
@@ -57,9 +57,8 @@ export default function RegisterForm() {
   const schema = useMemo(
     () =>
       Yup.object({
-        nickname: Yup.string()
+        name: Yup.string()
           .min(2, t.auth.validation.name.min(2))
-          .max(50, t.auth.validation.name.max?.(50) ?? "Max 50 characters")
           .required(t.auth.validation.name.required),
         email: Yup.string()
           .email(t.auth.validation.email.invalid)
@@ -82,7 +81,7 @@ export default function RegisterForm() {
   return (
     <Formik
       initialValues={{
-        nickname: "",
+        name: "",
         email: "",
         password: "",
         confirm: "",
@@ -94,18 +93,18 @@ export default function RegisterForm() {
           setServerError(undefined);
 
           await registerUser({
-            nickname: values.nickname,
             email: values.email,
             password: values.password,
+            name: values.name,
           });
 
           toast.success(t.auth.toast.registerSuccess, {
-            description: values.nickname || values.email,
+            description: values.name,
             duration: 2200,
           });
 
           resetForm();
-          router.replace("/login");
+          router.replace("/dashboard"); // Successful registration logs user in automatically in authService
         } catch (err: any) {
           setServerError(explainRegisterError(err, isPL));
         } finally {
@@ -118,27 +117,26 @@ export default function RegisterForm() {
           <ServerErrorBanner message={serverError} />
 
           <div className="space-y-1">
-            <label htmlFor="reg-nickname" className="text-sm font-medium">
+            <label htmlFor="reg-name" className="text-sm font-medium">
               {t.auth.common.nameLabel}
             </label>
             <div className="relative">
               <Field
-                id="reg-nickname"
-                name="nickname"
+                id="reg-name"
+                name="name"
                 type="text"
                 autoComplete="name"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.nickname && errors.nickname ? "border-destructive" : ""
-                }`}
-                placeholder={isPL ? "twój_nick" : "your_nickname"}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.name && errors.name ? "border-destructive" : ""
+                  }`}
+                placeholder={isPL ? "Alex Podróżnik" : "Alex Traveler"}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setFieldValue("nickname", e.target.value);
+                  setFieldValue("name", e.target.value);
                   setServerError(undefined);
                 }}
               />
               <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <FieldError name="nickname" id="reg-nickname-error" />
+            <FieldError name="name" id="reg-name-error" />
           </div>
 
           <div className="space-y-1">
@@ -151,9 +149,8 @@ export default function RegisterForm() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.email && errors.email ? "border-destructive" : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.email && errors.email ? "border-destructive" : ""
+                  }`}
                 placeholder="you@example.com"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("email", e.target.value);
@@ -175,11 +172,10 @@ export default function RegisterForm() {
                 name="password"
                 type={showPass ? "text" : "password"}
                 autoComplete="new-password"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.password && errors.password
-                    ? "border-destructive"
-                    : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.password && errors.password
+                  ? "border-destructive"
+                  : ""
+                  }`}
                 placeholder="••••••••"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("password", e.target.value);
@@ -224,9 +220,8 @@ export default function RegisterForm() {
                 name="confirm"
                 type={showConfirm ? "text" : "password"}
                 autoComplete="new-password"
-                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${
-                  touched.confirm && errors.confirm ? "border-destructive" : ""
-                }`}
+                className={`w-full h-11 rounded-xl border bg-background/70 px-4 pr-10 outline-none focus:ring-2 focus:ring-ring ${touched.confirm && errors.confirm ? "border-destructive" : ""
+                  }`}
                 placeholder="••••••••"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue("confirm", e.target.value);

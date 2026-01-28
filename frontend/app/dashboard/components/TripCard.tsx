@@ -1,9 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { MapPin, Calendar, Copy, ChevronRight, Users } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Copy,
+  ChevronRight,
+  Users,
+  Pencil,
+  Archive,
+  Trash2,
+  KeyRound,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
@@ -15,7 +25,10 @@ interface TripCardProps {
   trip: Trip;
   index: number;
   onOpen: (trip: Trip) => void;
-  imageUrlFromServer?: string | null; // 👈 NOWE
+  onEdit?: (trip: Trip) => void;
+  onGenerateCode?: (trip: Trip) => void;
+  onArchive?: (trip: Trip) => void;
+  onDelete?: (trip: Trip) => void;
 }
 
 const accentStyles: Record<
@@ -95,6 +108,39 @@ function getAccentPreset(trip: Trip): TripAccentPreset {
   return "neutral";
 }
 
+const imageUrlCache = new Map<string, string>();
+const LOCAL_CACHE_KEY = "dashboard-destination-image-cache-v2-no-fallback";
+let cacheHydratedFromStorage = false;
+
+function hydrateCacheFromStorage() {
+  if (cacheHydratedFromStorage) return;
+  cacheHydratedFromStorage = true;
+  if (typeof window === "undefined") return;
+
+  try {
+    // Drop legacy cache that could contain fallback images.
+    window.localStorage.removeItem("dashboard-destination-image-cache-v1");
+    const raw = window.localStorage.getItem(LOCAL_CACHE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Record<string, string>;
+    Object.entries(parsed).forEach(([key, value]) => {
+      if (typeof key === "string" && typeof value === "string") {
+        imageUrlCache.set(key, value);
+      }
+    });
+  } catch {}
+}
+
+function persistCacheToStorage() {
+  if (typeof window === "undefined") return;
+  const entries = Array.from(imageUrlCache.entries());
+  const limited = entries.slice(Math.max(0, entries.length - 50));
+  const asObject = Object.fromEntries(limited);
+  try {
+    window.localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(asObject));
+  } catch {}
+}
+
 const fallbackMembers: TripMember[] = [
   { id: "f1", name: "Alicja Nowak" },
   { id: "f2", name: "Bartek Kowalski" },
@@ -106,6 +152,7 @@ const fallbackMembers: TripMember[] = [
 
 function withFallbackMembers(trip: Trip): TripMember[] {
   if (trip.members.length > 0) return trip.members;
+  // Deterministyczny fallback
   const seed = Number(trip.id) || trip.id.length;
   return fallbackMembers
     .map((m, i) => ({ ...m, id: `${m.id}-${seed + i}` }))
@@ -116,16 +163,22 @@ export default function TripCard({
   trip,
   index,
   onOpen,
-  imageUrlFromServer,
+  onEdit,
+  onGenerateCode,
+  onArchive,
+  onDelete,
 }: TripCardProps) {
   const isOrganizer = trip.roleForCurrentUser === "ORGANIZER";
   const isArchived = trip.status === "ARCHIVED";
   const preset = getAccentPreset(trip);
   const style = accentStyles[preset];
-
-  const [imageUrl, setImageUrl] = useState<string | null>(
-    imageUrlFromServer ?? null
+  const cacheKey = useMemo(
+    () => `${preset}:${trip.destination.toLowerCase()}`,
+    [preset, trip.destination]
   );
+  const [imageUrl, setImageUrl] = useState<string | null>(() => {
+    return imageUrlCache.get(cacheKey) ?? null;
+  });
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -150,10 +203,13 @@ export default function TripCard({
   useEffect(() => {
     const controller = new AbortController();
     let mounted = true;
-
-    if (imageUrlFromServer) {
-      setImageUrl(imageUrlFromServer);
-      return () => controller.abort();
+    hydrateCacheFromStorage();
+    const cached = imageUrlCache.get(cacheKey);
+    if (cached) {
+      setImageUrl(cached);
+      return () => {
+        controller.abort();
+      };
     }
 
     setImageUrl(null);
@@ -164,10 +220,6 @@ export default function TripCard({
           q: trip.destination,
           preset,
         });
-        const context = `${trip.name} ${trip.description ?? ""}`.trim();
-        if (context) {
-          params.set("context", context);
-        }
         const res = await fetch(`/api/destination-image?${params.toString()}`, {
           signal: controller.signal,
         });
@@ -176,6 +228,8 @@ export default function TripCard({
         const data = (await res.json()) as { url?: string };
         if (mounted && data?.url) {
           setImageUrl(data.url);
+          imageUrlCache.set(cacheKey, data.url);
+          persistCacheToStorage();
         }
       } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return;
@@ -188,13 +242,7 @@ export default function TripCard({
       mounted = false;
       controller.abort();
     };
-  }, [
-    preset,
-    trip.destination,
-    imageUrlFromServer,
-    trip.name,
-    trip.description,
-  ]);
+  }, [cacheKey, preset, trip.destination]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("pl-PL", {
@@ -399,7 +447,7 @@ export default function TripCard({
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-3 mt-auto border-top border-border/50">
+            <div className="pt-3 mt-auto border-top border-border/50">
               <div className="flex items-center">
                 <div className="flex -space-x-2">
                   {displayedMembers.map((m, i) => (
@@ -429,17 +477,79 @@ export default function TripCard({
                 )}
               </div>
 
-              <div className="flex items-center gap-1">
-                {trip.inviteCode && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleCopyCode}
-                    className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                )}
+              <div className="flex items-center justify-between gap-2 mt-3">
+                <div className="flex items-center gap-1">
+                  {!isArchived && trip.inviteCode && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopyCode}
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      aria-label="Skopiuj kod"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {!isArchived &&
+                    isOrganizer &&
+                    !trip.inviteCode &&
+                    onGenerateCode && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onGenerateCode(trip);
+                        }}
+                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        aria-label="Wygeneruj kod"
+                      >
+                        <KeyRound className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  {!isArchived && isOrganizer && onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(trip);
+                      }}
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      aria-label="Edytuj"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {isOrganizer && onArchive && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onArchive(trip);
+                      }}
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      aria-label={isArchived ? "Przywróć" : "Archiwizuj"}
+                    >
+                      <Archive className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {isArchived && isOrganizer && onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(trip);
+                      }}
+                      className="h-8 w-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                      aria-label="Usuń"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
 
                 <Button
                   variant="ghost"

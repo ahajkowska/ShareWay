@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
-import { getCurrentUserServer } from "./server";
-import type { AuthUser } from "@/lib/types/auth";
+import { getCurrentUserServer } from "@/lib/auth/server";
 
-export async function requireUser(redirectFrom: string = "/dashboard"): Promise<AuthUser> {
+export async function requireUser(redirectTo: string = "/dashboard") {
   const user = await getCurrentUserServer();
-
   if (!user) {
-    redirect(`/login?from=${encodeURIComponent(redirectFrom)}`);
+    const target = encodeURIComponent(redirectTo);
+    redirect(`/login?from=${target}`);
   }
-
-  return user!;
+  return user;
 }

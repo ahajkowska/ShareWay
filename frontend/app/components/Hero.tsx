@@ -30,7 +30,7 @@ export default function Hero() {
         <AnimatePresence mode="wait">
           <motion.div
             key={slides[index]}
-            initial={{ opacity: 0, scale: 1.04 }}
+            initial={{ opacity: 1, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 1.0, ease: "easeInOut" }}
@@ -54,9 +54,8 @@ export default function Hero() {
             key={i}
             onClick={() => setIndex(i)}
             aria-label={`Slajd ${i + 1}`}
-            className={`h-2.5 rounded-full transition-all ${
-              i === index ? "w-10 bg-white" : "w-2.5 bg-white/60"
-            }`}
+            className={`h-2.5 rounded-full transition-all ${i === index ? "w-10 bg-white" : "w-2.5 bg-white/60"
+              }`}
           />
         ))}
       </div>
@@ -65,7 +64,7 @@ export default function Hero() {
         <AnimatePresence mode="wait">
           <motion.div
             key={`hero-copy-${lang}`}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 1, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -20 }}
             transition={{

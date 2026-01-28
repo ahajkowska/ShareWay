@@ -4,6 +4,8 @@ export interface ExpenseDto {
   title: string;
   description?: string;
   amount: number;
+  currency?: string;
+  status?: "PENDING" | "SETTLED";
   paidBy: string;
   paidByName: string;
   splitBetween: string[]; // Array nazwisk osób
@@ -26,9 +28,11 @@ export interface CreateExpenseDto {
   title: string;
   description?: string;
   amount: number;
-  paidBy: string; // User ID
-  splitBetween: string[]; // Array User IDs
-  date?: string;
+  paidBy?: string; // User ID
+  debtorIds: string[]; // Array User IDs
+  date: string;
+  currency?: string;
+  status?: "PENDING" | "SETTLED";
 }
 
 export interface ExpenseBreakdown {

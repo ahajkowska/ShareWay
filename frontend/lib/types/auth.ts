@@ -2,9 +2,6 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  isActive?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 export type AuthCredentials = {
@@ -13,7 +10,7 @@ export type AuthCredentials = {
 };
 
 export type RegisterData = {
-  nickname: string;
+  name: string;
   email: string;
   password: string;
 };

@@ -7,7 +7,6 @@ export interface Translations {
     signup: string;
     logout: string;
     profile: string;
-    settings: string;
   };
   hero: {
     kicker: string;
@@ -99,7 +98,7 @@ export interface Translations {
       logoutSuccess: string;
     };
     validation: {
-      name: { required: string; min: (n: number) => string; max?: (n: number) => string };
+      name: { required: string; min: (n: number) => string };
       email: { required: string; invalid: string };
       password: {
         required: string;
@@ -216,7 +215,6 @@ export const dict: Record<Lang, Translations> = {
       signup: "Załóż konto",
       logout: "Wyloguj",
       profile: "Profil",
-      settings: "Ustawienia",
     },
 
     hero: {
@@ -348,7 +346,7 @@ export const dict: Record<Lang, Translations> = {
         emailLabel: "E-mail",
         passwordLabel: "Hasło",
         confirmPasswordLabel: "Potwierdź hasło",
-        nameLabel: "Nick",
+        nameLabel: "Imię",
         rememberMe: "Zapamiętaj mnie",
         forgotPassword: "Zapomniałeś hasła?",
         showPassword: "Pokaż hasło",
@@ -365,9 +363,8 @@ export const dict: Record<Lang, Translations> = {
       },
       validation: {
         name: {
-          required: "Nick jest wymagany",
-          min: (n: number) => `Nick musi mieć co najmniej ${n} znaki`,
-          max: (n: number) => `Nick może mieć maksymalnie ${n} znaków`,
+          required: "Imię jest wymagane",
+          min: (n: number) => `Imię musi mieć co najmniej ${n} znaki`,
         },
         email: {
           required: "E-mail jest wymagany",
@@ -507,7 +504,6 @@ export const dict: Record<Lang, Translations> = {
       signup: "Sign up",
       logout: "Log out",
       profile: "Profile",
-      settings: "Settings",
     },
 
     hero: {
@@ -639,7 +635,7 @@ export const dict: Record<Lang, Translations> = {
         emailLabel: "Email",
         passwordLabel: "Password",
         confirmPasswordLabel: "Confirm password",
-        nameLabel: "Nickname",
+        nameLabel: "Name",
         rememberMe: "Remember me",
         forgotPassword: "Forgot password?",
         showPassword: "Show password",
@@ -656,9 +652,8 @@ export const dict: Record<Lang, Translations> = {
       },
       validation: {
         name: {
-          required: "Nickname is required",
-          min: (n: number) => `Nickname must be at least ${n} characters long`,
-          max: (n: number) => `Nickname must be at most ${n} characters long`,
+          required: "Name is required",
+          min: (n: number) => `Name must be at least ${n} characters long`,
         },
         email: {
           required: "Email is required",

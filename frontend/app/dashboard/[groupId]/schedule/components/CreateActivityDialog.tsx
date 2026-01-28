@@ -117,7 +117,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                                     {t.startTime} ({t.dateAndTime})
                                 </label>
                                 <input 
-                                    type="datetime-local" 
+                                    type="time" 
                                     value={startTime} 
                                     onChange={(e) => setStartTime(e.target.value)} 
                                     className="w-full px-4 py-3 rounded-xl border border-input" 
@@ -128,7 +128,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
                                     {t.endTime} ({t.optional})
                                 </label>
                                 <input 
-                                    type="datetime-local" 
+                                    type="time" 
                                     value={endTime} 
                                     onChange={(e) => setEndTime(e.target.value)} 
                                     className="w-full px-4 py-3 rounded-xl border border-input" 

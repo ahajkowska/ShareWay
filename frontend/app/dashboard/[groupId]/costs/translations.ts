@@ -9,6 +9,7 @@ export const costsTranslations = {
     deleteConfirm: "Na pewno chcesz usunąć ten wydatek?",
     deleteError: "Nie udało się usunąć wydatku",
     loadError: "Nie udało się załadować wydatków",
+    unknownUser: "Nieznany użytkownik",
     
     // SettleBalanceDialog
     markAsSettled: "Oznacz jako rozliczone",
@@ -69,6 +70,7 @@ export const costsTranslations = {
     selectAll: "Zaznacz wszystkich",
     deselect: "Odznacz",
     splitPerPerson: (amt: string, currency: string) => `Po ${amt} ${currency} na osobę`,
+    loadingParticipants: "Ładowanie uczestników...",
     titleRequired: "Wpisz tytuł wydatku",
     invalidAmount: "Wpisz poprawną kwotę",
     choosePayer: "Wybierz kto zapłacił",
@@ -87,6 +89,7 @@ export const costsTranslations = {
     deleteConfirm: "Are you sure you want to delete this expense?",
     deleteError: "Failed to delete expense",
     loadError: "Failed to load expenses",
+    unknownUser: "Unknown user",
     
     // SettleBalanceDialog
     markAsSettled: "Mark as Settled",
@@ -147,6 +150,7 @@ export const costsTranslations = {
     selectAll: "Select all",
     deselect: "Deselect",
     splitPerPerson: (amt: string, currency: string) => `${amt} ${currency} per person`,
+    loadingParticipants: "Loading participants...",
     titleRequired: "Enter expense title",
     invalidAmount: "Enter a valid amount",
     choosePayer: "Choose who paid",
