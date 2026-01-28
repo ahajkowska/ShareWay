@@ -2,22 +2,25 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
-import { Trash2, RefreshCw } from "lucide-react";
+import { Trash2, RefreshCw, Pencil } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getCostsTranslations } from "../translations";
 import type { ExpenseDto } from "../types";
+import { useSession } from "@/app/context/SessionContext";
 
 interface Props {
     expenses: ExpenseDto[];
     loading: boolean;
     onDelete: (expenseId: string) => Promise<void>;
+    onEdit: (expense: ExpenseDto) => void;
     onRefresh: () => Promise<void>;
     baseCurrency: string;
 }
 
-export default function ExpenseList({ expenses, loading, onDelete, onRefresh, baseCurrency }: Props) {
+export default function ExpenseList({ expenses, loading, onDelete, onEdit, onRefresh, baseCurrency }: Props) {
     const { lang } = useI18n();
     const t = getCostsTranslations(lang);
+    const { user } = useSession();
 
     if (loading) {
         return (
@@ -85,14 +88,26 @@ export default function ExpenseList({ expenses, loading, onDelete, onRefresh, ba
                                     {expense.splitBetween.length} {expense.splitBetween.length === 1 ? t.person : t.people}
                                 </p>
                             </div>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => onDelete(expense.id)}
-                                className="text-destructive hover:text-destructive"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <div className="flex gap-1">
+                                {user?.id === expense.paidBy && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => onEdit(expense)}
+                                        className="text-primary hover:text-primary"
+                                    >
+                                        <Pencil className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => onDelete(expense.id)}
+                                    className="text-destructive hover:text-destructive"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
                 </div>

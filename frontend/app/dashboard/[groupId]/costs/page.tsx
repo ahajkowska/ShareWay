@@ -16,6 +16,7 @@ import { getCostsTranslations } from "./translations";
 import * as api from "@/lib/api";
 import ExpenseList from "./components/ExpenseList";
 import CreateExpenseDialog from "./components/CreateExpenseDialog";
+import EditExpenseDialog from "./components/EditExpenseDialog";
 import PersonalBalance from "./components/PersonalBalance";
 import type { ExpenseDto, BalanceGraphDto, MyBalanceSummaryDto } from "./types";
 
@@ -30,8 +31,10 @@ export default function CostsPage() {
   const [balance, setBalance] = useState<BalanceGraphDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [createExpenseOpen, setCreateExpenseOpen] = useState(false);
+  const [editExpenseOpen, setEditExpenseOpen] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState<ExpenseDto | null>(null);
   const [myBalance, setMyBalance] = useState<MyBalanceSummaryDto | null>(null);
-  const [baseCurrency, setBaseCurrency] = useState<string>("PLN"); // Default, will be loaded from trip
+  const [baseCurrency, setBaseCurrency] = useState<string>("PLN");
 
   const loadTripInfo = async () => {
     try {
@@ -110,6 +113,11 @@ export default function CostsPage() {
       console.error("Error deleting expense:", err);
       alert(err.message || t.deleteError);
     }
+  };
+
+  const handleEditExpense = (expense: ExpenseDto) => {
+    setExpenseToEdit(expense);
+    setEditExpenseOpen(true);
   };
 
   const handleRefreshExpenses = async () => {
@@ -193,6 +201,7 @@ export default function CostsPage() {
                 expenses={expenses}
                 loading={loading}
                 onDelete={handleDeleteExpense}
+                onEdit={handleEditExpense}
                 onRefresh={handleRefreshExpenses}
                 baseCurrency={baseCurrency}
               />
@@ -221,6 +230,21 @@ export default function CostsPage() {
         onCreated={() => {
           loadExpenses();
           loadBalance();
+          loadMyBalance();
+        }}
+      />
+
+      {/* Edit Expense Dialog */}
+      <EditExpenseDialog
+        open={editExpenseOpen}
+        onOpenChange={setEditExpenseOpen}
+        expense={expenseToEdit}
+        tripId={tripId}
+        baseCurrency={baseCurrency}
+        onUpdated={() => {
+          loadExpenses();
+          loadBalance();
+          loadMyBalance();
         }}
       />
     </>
