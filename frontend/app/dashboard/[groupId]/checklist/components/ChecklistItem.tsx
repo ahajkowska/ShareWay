@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getChecklistTranslations } from "../translations";
@@ -32,13 +33,23 @@ export default function ChecklistItem({ item, onToggle, onDelete }: Props) {
     };
 
     const handleDelete = async () => {
-        if (!confirm(t.deleteConfirm)) return;
-        try {
-            setSaving(true);
-            await onDelete?.(item.id);
-        } finally {
-            setSaving(false);
-        }
+        toast.info(t.deleteConfirm, {
+            action: {
+                label: "Usuń",
+                onClick: async () => {
+                    try {
+                        setSaving(true);
+                        await onDelete?.(item.id);
+                        toast.success("Element usunięty");
+                    } catch (err: any) {
+                        console.error("Error deleting item:", err);
+                        toast.error("Nie udało się usunąć elementu");
+                    } finally {
+                        setSaving(false);
+                    }
+                },
+            },
+        });
     };
 
     return (

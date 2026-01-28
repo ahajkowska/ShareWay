@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import { Clock, MapPin, Edit, Trash2, User } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "../translations";
@@ -28,18 +29,24 @@ export default function ActivityTimeline({ activities, onRefresh }: Props) {
     );
 
     const handleDelete = async (activityId: string) => {
-        if (!confirm(t.deleteActivityConfirm)) return;
-        
-        try {
-            setDeleting(activityId);
-            await api.deleteActivity(activityId);
-            onRefresh();
-        } catch (err: any) {
-            console.error("Error deleting activity:", err);
-            alert(err.message || t.deleteActivityError);
-        } finally {
-            setDeleting(null);
-        }
+        toast.info(t.deleteActivityConfirm, {
+            action: {
+                label: "Usuń",
+                onClick: async () => {
+                    try {
+                        setDeleting(activityId);
+                        await api.deleteActivity(activityId);
+                        toast.success("Aktywność usunięta");
+                        onRefresh();
+                    } catch (err: any) {
+                        console.error("Error deleting activity:", err);
+                        toast.error(err.message || t.deleteActivityError);
+                    } finally {
+                        setDeleting(null);
+                    }
+                },
+            },
+        });
     };
 
     if (sortedActivities.length === 0) {
