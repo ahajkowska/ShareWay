@@ -5,6 +5,7 @@ import {
   MaxLength,
   MinLength,
   IsIn,
+  IsNotEmpty,
 } from 'class-validator';
 import { SUPPORTED_CURRENCIES } from '../constants/currencies.js';
 
@@ -24,37 +25,16 @@ export class CreateTripDto {
   @MaxLength(255, { message: 'Location must be at most 255 characters' })
   location?: string;
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(255, { message: 'Destination must be at most 255 characters' })
-  destination?: string;
-
   @IsDateString({}, { message: 'Start date must be a valid date' })
   startDate: string;
 
   @IsDateString({}, { message: 'End date must be a valid date' })
   endDate: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty({ message: 'Base currency is required' })
   @IsIn(SUPPORTED_CURRENCIES, {
     message: `Currency must be one of: ${SUPPORTED_CURRENCIES.join(', ')}`,
   })
-  baseCurrency?: string;
-
-  @IsOptional()
-  @IsString()
-  @IsIn([
-    'mountains',
-    'beach',
-    'city',
-    'neutral',
-    'desert',
-    'tropical',
-    'winter',
-    'lake',
-    'countryside',
-    'adventure',
-  ])
-  accentPreset?: string;
+  baseCurrency: string;
 }

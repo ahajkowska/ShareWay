@@ -30,7 +30,7 @@ export class PlanningService {
     private readonly tripRepository: Repository<Trip>,
     @InjectRepository(Participant)
     private readonly participantRepository: Repository<Participant>,
-  ) {}
+  ) { }
 
   async getPlan(tripId: string): Promise<Day[]> {
     return this.dayRepository.find({
@@ -119,14 +119,19 @@ export class PlanningService {
   ): Promise<Activity> {
     await this.findDayById(dayId);
 
-    if (createActivityDto.startTime && createActivityDto.endTime) {
-      if (createActivityDto.startTime > createActivityDto.endTime) {
+    const startTime = this.extractTime(createActivityDto.startTime);
+    const endTime = this.extractTime(createActivityDto.endTime);
+
+    if (startTime && endTime) {
+      if (startTime > endTime) {
         throw new BadRequestException('Start time must be before end time');
       }
     }
 
     const activity = this.activityRepository.create({
       ...createActivityDto,
+      startTime,
+      endTime,
       dayId,
       creatorId: userId,
     });
@@ -175,13 +180,20 @@ export class PlanningService {
       );
     }
 
-    if (updateActivityDto.startTime && updateActivityDto.endTime) {
-      if (updateActivityDto.startTime > updateActivityDto.endTime) {
+    const startTime = this.extractTime(updateActivityDto.startTime) ?? activity.startTime;
+    const endTime = this.extractTime(updateActivityDto.endTime) ?? activity.endTime;
+
+    if (startTime && endTime) {
+      if (startTime > endTime) {
         throw new BadRequestException('Start time must be before end time');
       }
     }
 
-    Object.assign(activity, updateActivityDto);
+    Object.assign(activity, {
+      ...updateActivityDto,
+      startTime,
+      endTime,
+    });
 
     await this.activityRepository.save(activity);
 
@@ -243,5 +255,15 @@ export class PlanningService {
     }
 
     return activity.day.tripId;
+  }
+
+  // Item #74: Extract HH:MM from ISO string if needed
+  private extractTime(value: string | undefined): string | undefined {
+    if (!value) return undefined;
+    if (/^\d{2}:\d{2}$/.test(value)) return value;
+    if (value.includes('T')) {
+      return value.split('T')[1].substring(0, 5);
+    }
+    return value;
   }
 }

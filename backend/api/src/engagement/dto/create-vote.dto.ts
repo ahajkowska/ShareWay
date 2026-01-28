@@ -1,22 +1,27 @@
-import { IsArray, IsDateString, IsNotEmpty, IsOptional, IsString, ArrayMinSize, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsDateString,
+  ArrayMinSize,
+} from 'class-validator';
 
 export class CreateVoteDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(500)
-  title: string;
+  question: string;
 
-  @IsOptional()
   @IsString()
-  @MaxLength(2000)
+  @IsOptional()
   description?: string;
 
-  @IsOptional()
   @IsDateString()
-  endsAt?: string;
+  @IsOptional()
+  endDate?: string;
 
   @IsArray()
   @IsString({ each: true })
   @ArrayMinSize(2)
-  initialOptions: string[];
+  options: string[];
 }

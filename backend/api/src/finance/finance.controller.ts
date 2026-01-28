@@ -2,9 +2,11 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   Req,
   HttpCode,
@@ -12,34 +14,16 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { FinanceService } from './finance.service.js';
-import { CreateExpenseDto } from './dto/index.js';
+import { CreateExpenseDto, UpdateExpenseDto } from './dto/index.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { TripAccessGuard } from '../trips/guards/trip-access.guard.js';
 import type { RequestWithUser } from '../trips/trips.controller.js';
-import type { Expense } from './entities/expense.entity.js';
+import { PaginationDto } from '../admin/dto/pagination.dto.js';
 
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
-
-  private formatExpenseResponse(expense: Expense) {
-    return {
-      id: expense.id,
-      tripId: expense.tripId,
-      title: expense.title,
-      description: expense.description || '',
-      amount: expense.amount / 100,
-      paidBy: expense.payerId,
-      paidByName: expense.payer?.nickname || 'Unknown',
-      splitBetween:
-        expense.debtors
-          ?.map((d) => d.debtor?.nickname)
-          .filter(Boolean) || [],
-      date: expense.date.toISOString(),
-      createdAt: expense.createdAt.toISOString(),
-    };
-  }
 
   @Post('trips/:id/expenses')
   @UseGuards(TripAccessGuard)
@@ -50,19 +34,17 @@ export class FinanceController {
     @Body() createExpenseDto: CreateExpenseDto,
   ) {
     const userId = req.user!.userId;
-    const expense = await this.financeService.create(
-      tripId,
-      userId,
-      createExpenseDto,
-    );
-    return this.formatExpenseResponse(expense);
+    return this.financeService.create(tripId, userId, createExpenseDto);
   }
 
   @Get('trips/:id/expenses')
   @UseGuards(TripAccessGuard)
-  async findAll(@Param('id', ParseUUIDPipe) tripId: string) {
-    const expenses = await this.financeService.findAllByTrip(tripId);
-    return expenses.map((expense) => this.formatExpenseResponse(expense));
+  async findAll(
+    @Param('id', ParseUUIDPipe) tripId: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    const { page, limit } = paginationDto;
+    return this.financeService.findAllByTripPaginated(tripId, page, limit);
   }
 
   @Get('trips/:id/balance')
@@ -71,16 +53,24 @@ export class FinanceController {
     return this.financeService.calculateBalance(tripId);
   }
 
-  @Get('trips/:id/balance-summary')
+  @Get('trips/:id/my-balance')
   @UseGuards(TripAccessGuard)
-  async getBalanceSummary(
+  async getMyBalance(
     @Param('id', ParseUUIDPipe) tripId: string,
     @Req() req: RequestWithUser,
   ) {
-    return this.financeService.calculateBalanceSummary(
-      tripId,
-      req.user!.userId,
-    );
+    const userId = req.user!.userId;
+    return this.financeService.calculateMyBalance(tripId, userId);
+  }
+
+  @Patch('expenses/:id')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateExpenseDto: UpdateExpenseDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user!.userId;
+    return this.financeService.update(id, userId, updateExpenseDto);
   }
 
   @Delete('expenses/:id')

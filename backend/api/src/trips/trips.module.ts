@@ -10,10 +10,6 @@ import { TripAccessGuard } from './guards/trip-access.guard.js';
   imports: [TypeOrmModule.forFeature([Trip, Participant, User])],
   controllers: [TripsController],
   providers: [TripsService, TripAccessGuard],
-  exports: [
-    TripsService,
-    TripAccessGuard,
-    TypeOrmModule.forFeature([Participant]),
-  ],
+  exports: [TripsService, TripAccessGuard, TypeOrmModule],
 })
 export class TripsModule {}

@@ -1,29 +1,32 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    OneToMany,
-    JoinColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Vote } from './vote.entity.js';
 import { VoteCast } from './vote-cast.entity.js';
 
 @Entity('vote_options')
 export class VoteOption {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({ name: 'vote_id' })
-    voteId: string;
+  @Column({ name: 'vote_id' })
+  voteId: string;
 
-    @ManyToOne(() => Vote, (vote) => vote.options, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'vote_id' })
-    vote: Vote;
+  @ManyToOne(() => Vote, (vote) => vote.options, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'vote_id' })
+  vote: Vote;
 
-    @Column()
-    text: string;
+  @Column()
+  text: string;
 
-    @OneToMany(() => VoteCast, (cast) => cast.option)
-    casts: VoteCast[];
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
+
+  @OneToMany(() => VoteCast, (cast) => cast.option)
+  casts: VoteCast[];
 }

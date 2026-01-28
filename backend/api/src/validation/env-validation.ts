@@ -40,6 +40,10 @@ export class EnvironmentalVariables {
 
   @IsString()
   @IsOptional()
+  ALLOWED_ORIGINS?: string;
+
+  @IsString()
+  @IsOptional()
   MAIL_HOST?: string;
 
   @IsNumber()

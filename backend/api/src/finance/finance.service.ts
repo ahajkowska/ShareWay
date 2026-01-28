@@ -5,11 +5,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-import { Expense, ExpenseDebtor } from './entities/index.js';
-import { CreateExpenseDto } from './dto/index.js';
+import { Repository, DataSource, In } from 'typeorm';
+import { Expense, ExpenseDebtor, ExpenseStatus } from './entities/index.js';
+import { CreateExpenseDto, UpdateExpenseDto } from './dto/index.js';
 import { TripsService } from '../trips/trips.service.js';
 import { ParticipantRole } from '../trips/entities/participant.entity.js';
+import { User } from '../users/entities/user.entity.js';
 
 @Injectable()
 export class FinanceService {
@@ -20,36 +21,61 @@ export class FinanceService {
     private readonly expenseRepository: Repository<Expense>,
     @InjectRepository(ExpenseDebtor)
     private readonly expenseDebtorRepository: Repository<ExpenseDebtor>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly tripsService: TripsService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async create(
     tripId: string,
     payerId: string,
     createExpenseDto: CreateExpenseDto,
   ): Promise<Expense> {
-    const { splitBetween, amount, date, ...rest } = createExpenseDto;
+    const { debtorIds, currency, paidBy, ...expenseData } = createExpenseDto;
 
-    const amountInCents = Math.round(amount * 100);
+    // Item #71: Handle explicit payerId (paidBy) from frontend
+    // If paidBy is provided, use it. Otherwise use the requesting user (payerId)
+    const activePayerId = paidBy || payerId;
+
+    // Verify payer is participant if different from requester
+    if (paidBy && paidBy !== payerId) {
+      const isParticipant = await this.tripsService.isParticipant(tripId, paidBy);
+      if (!isParticipant) {
+        throw new ForbiddenException('Payer must be a participant of the trip');
+      }
+    }
+
+    // Item #72: Convert amount from Float (Frontend) to Cents (Backend)
+    const amountInCents = Math.round(expenseData.amount * 100);
+
+    // Item #4: Auto-use trip's baseCurrency if currency not provided
+    let expenseCurrency = currency;
+    if (!expenseCurrency) {
+      const trip = await this.tripsService.findById(tripId);
+      expenseCurrency = trip.baseCurrency;
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      // Create expense with resolved currency
       const expense = queryRunner.manager.create(Expense, {
-        ...rest,
-        amount: amountInCents,
+        ...expenseData,
+        amount: amountInCents, // Store in cents
         tripId,
-        payerId,
-        date: date ? new Date(date) : new Date(),
+        payerId: activePayerId,
+        currency: expenseCurrency,
+        status: expenseData.status as ExpenseStatus | undefined,
       });
 
       const savedExpense = await queryRunner.manager.save(expense);
 
-      if (splitBetween.length > 0) {
-        const debtors = splitBetween.map((debtorId) =>
+      // Create debtors
+      if (debtorIds.length > 0) {
+        const debtors = debtorIds.map((debtorId) =>
           queryRunner.manager.create(ExpenseDebtor, {
             expenseId: savedExpense.id,
             debtorId,
@@ -60,6 +86,7 @@ export class FinanceService {
 
       await queryRunner.commitTransaction();
 
+      // Return complete expense (fetched normal way after commit)
       return this.findOne(savedExpense.id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -73,12 +100,57 @@ export class FinanceService {
     }
   }
 
-  async findAllByTrip(tripId: string): Promise<Expense[]> {
-    return this.expenseRepository.find({
+  async findAllByTrip(tripId: string) {
+    const expenses = await this.expenseRepository.find({
       where: { tripId },
       relations: ['payer', 'debtors', 'debtors.debtor'],
       order: { date: 'DESC' },
     });
+
+    return expenses.map((expense) => this.formatExpenseResponse(expense));
+  }
+
+  async findAllByTripPaginated(
+    tripId: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
+    const skip = (page - 1) * limit;
+    const [expenses, total] = await this.expenseRepository.findAndCount({
+      where: { tripId },
+      relations: ['payer', 'debtors', 'debtors.debtor'],
+      order: { date: 'DESC' },
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: expenses.map((expense) => this.formatExpenseResponse(expense)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  private formatExpenseResponse(expense: Expense) {
+    return {
+      id: expense.id,
+      tripId: expense.tripId,
+      title: expense.title,
+      description: expense.description ?? null,
+      amount: expense.amount / 100, // Return as Float (Item #72)
+      currency: expense.currency,
+      status: expense.status ?? 'PENDING',
+      paidBy: expense.payerId,
+      paidByName: expense.payer?.nickname ?? 'Unknown',
+      splitBetween:
+        expense.debtors?.map((d) => d.debtor?.nickname ?? d.debtorId) ?? [],
+      date: expense.date?.toISOString() ?? null,
+      createdAt: expense.createdAt.toISOString(),
+    };
   }
 
   async findOne(id: string): Promise<Expense> {
@@ -107,7 +179,9 @@ export class FinanceService {
       );
     }
 
+    // Only payer or trip organizer can delete
     if (expense.payerId !== userId) {
+      // Check if user is organizer of the trip
       const trip = await this.tripsService.findById(expense.tripId);
       const isOrganizer = trip.participants.some(
         (p) => p.userId === userId && p.role === ParticipantRole.ORGANIZER,
@@ -123,11 +197,85 @@ export class FinanceService {
     await this.expenseRepository.remove(expense);
   }
 
+  async update(
+    id: string,
+    userId: string,
+    updateExpenseDto: UpdateExpenseDto,
+  ): Promise<Expense> {
+    const expense = await this.findOne(id);
+
+    const isParticipant = await this.tripsService.isParticipant(
+      expense.tripId,
+      userId,
+    );
+    if (!isParticipant) {
+      throw new ForbiddenException(
+        'You must be a current participant of the trip to manage expenses',
+      );
+    }
+
+    // Only payer or trip organizer can update
+    if (expense.payerId !== userId) {
+      const trip = await this.tripsService.findById(expense.tripId);
+      const isOrganizer = trip.participants.some(
+        (p) => p.userId === userId && p.role === ParticipantRole.ORGANIZER,
+      );
+
+      if (!isOrganizer) {
+        throw new ForbiddenException(
+          'You can only update your own expenses or if you are the organizer',
+        );
+      }
+    }
+
+    const { debtorIds, ...updateData } = updateExpenseDto;
+
+    // Update basic expense fields
+    if (updateData.title !== undefined) expense.title = updateData.title;
+    if (updateData.description !== undefined)
+      expense.description = updateData.description;
+    if (updateData.amount !== undefined) {
+      expense.amount = Math.round(updateData.amount * 100);
+    }
+    if (updateData.date !== undefined) expense.date = new Date(updateData.date);
+    if (updateData.status !== undefined)
+      expense.status = updateData.status as ExpenseStatus;
+
+    await this.expenseRepository.save(expense);
+
+    // Update debtors if provided
+    if (debtorIds !== undefined) {
+      // Remove existing debtors
+      await this.expenseDebtorRepository.delete({ expenseId: id });
+
+      // Add new debtors
+      if (debtorIds.length > 0) {
+        const newDebtors = debtorIds.map((debtorId) =>
+          this.expenseDebtorRepository.create({
+            expenseId: id,
+            debtorId,
+          }),
+        );
+        await this.expenseDebtorRepository.save(newDebtors);
+      }
+    }
+
+    this.logger.log(`Expense ${id} updated by user ${userId}`);
+
+    return this.findOne(id);
+  }
+
   async calculateBalance(tripId: string) {
-    const expenses = await this.findAllByTrip(tripId);
+    // Fetch raw expenses for calculation
+    const expenses = await this.expenseRepository.find({
+      where: { tripId },
+      relations: ['payer', 'debtors', 'debtors.debtor'],
+      order: { date: 'DESC' },
+    });
 
     const balances: Record<string, number> = {};
 
+    // Helper to add to balance
     const addToBalance = (userId: string, amount: number) => {
       balances[userId] = (balances[userId] || 0) + amount;
     };
@@ -135,20 +283,28 @@ export class FinanceService {
     for (const expense of expenses) {
       if (!expense.debtors || expense.debtors.length === 0) continue;
 
-      const totalAmount = expense.amount;
+      const totalAmount = expense.amount; // In cents
       const payerId = expense.payerId;
       const debtors = expense.debtors;
       const numberOfSplitters = debtors.length;
 
+      // Logic: Payer paid 'totalAmount'.
+      // This 'totalAmount' is consumed by 'numberOfSplitters'.
+      // Each splitter "consumes" a portion.
+
+      // 1. Credit the payer the full amount they paid.
       addToBalance(payerId, totalAmount);
 
+      // 2. Debit each splitter their share.
       const splitAmount = Math.floor(totalAmount / numberOfSplitters);
       const remainder = totalAmount % numberOfSplitters;
 
+      // Distribute base amount
       for (let i = 0; i < numberOfSplitters; i++) {
         const debtor = debtors[i];
         let amountToDebit = splitAmount;
 
+        // Distribute remainder cents to the first few debtors
         if (i < remainder) {
           amountToDebit += 1;
         }
@@ -156,30 +312,36 @@ export class FinanceService {
         addToBalance(debtor.debtorId, -amountToDebit);
       }
     }
+
+    // Now convert balances to "Who owes Whom"
+    // Balances > 0 : User is owed money (Creditor)
+    // Balances < 0 : User owes money (Debtor)
+
     const creditors: { userId: string; amount: number }[] = [];
-    const debtors: { userId: string; amount: number }[] = [];
+    const debtorsList: { userId: string; amount: number }[] = [];
 
     for (const [userId, amount] of Object.entries(balances)) {
       if (amount > 0) creditors.push({ userId, amount });
-      if (amount < 0) debtors.push({ userId, amount: -amount });
+      if (amount < 0) debtorsList.push({ userId, amount: -amount }); // Store positive magnitude
     }
 
+    // Sort by amount descending to minimize transaction count
     creditors.sort((a, b) => b.amount - a.amount);
-    debtors.sort((a, b) => b.amount - a.amount);
+    debtorsList.sort((a, b) => b.amount - a.amount);
 
-    const settlements: { from: string; to: string; amount: number }[] = [];
+    const transactions: { from: string; to: string; amount: number }[] = [];
 
-    let i = 0;
-    let j = 0;
+    let i = 0; // creditor index
+    let j = 0; // debtor index
 
-    while (i < creditors.length && j < debtors.length) {
+    while (i < creditors.length && j < debtorsList.length) {
       const creditor = creditors[i];
-      const debtor = debtors[j];
+      const debtor = debtorsList[j];
 
       const amount = Math.min(creditor.amount, debtor.amount);
 
       if (amount > 0) {
-        settlements.push({
+        transactions.push({
           from: debtor.userId,
           to: creditor.userId,
           amount,
@@ -193,115 +355,128 @@ export class FinanceService {
       if (debtor.amount === 0) j++;
     }
 
-    const trip = await this.tripsService.findById(tripId);
-    const userMap = new Map(
-      trip.participants.map((p) => [p.userId, p.user.nickname]),
-    );
+    // Get user nicknames for settlements
+    const userIds = new Set<string>();
+    transactions.forEach((t) => {
+      userIds.add(t.from);
+      userIds.add(t.to);
+    });
 
-    const settlementsWithNames = settlements.map((s) => ({
-      from: userMap.get(s.from) || 'Unknown',
-      to: userMap.get(s.to) || 'Unknown',
-      amount: s.amount / 100,
-    }));
+    // Fetch user names
+    const users = await this.userRepository.findBy({
+      id: In([...userIds]),
+    });
+    const userMap = new Map(users.map((u) => [u.id, u.nickname]));
 
-    const totalExpenses =
-      expenses.reduce((sum, e) => sum + e.amount, 0) / 100;
+    // Calculate total expenses
+    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
 
     return {
-      settlements: settlementsWithNames,
-      totalExpenses,
+      settlements: transactions.map((t) => ({
+        from: userMap.get(t.from) ?? t.from,
+        to: userMap.get(t.to) ?? t.to,
+        amount: t.amount / 100, // Convert to Float
+      })),
+      totalExpenses: totalExpenses / 100, // Convert to Float
     };
   }
 
-  async calculateBalanceSummary(tripId: string, userId: string) {
-    const expenses = await this.findAllByTrip(tripId);
-    const trip = await this.tripsService.findById(tripId);
+  /**
+   * Calculate personal balance summary for a user
+   * Returns: "Jesteś winien: X" and "Tobie winni: Y"
+   */
+  async calculateMyBalance(tripId: string, userId: string) {
+    const expenses = await this.expenseRepository.find({
+      where: { tripId },
+      relations: ['payer', 'debtors', 'debtors.debtor'],
+    });
 
-    const balancesByUser = new Map<
-      string,
-      {
-        userId: string;
-        userName: string;
-        balance: number;
-        expenses: Array<any>;
-      }
-    >();
+    // Track what the user owes to others and what others owe to the user
+    const owesToOthers: Record<string, number> = {}; // userId -> amount user owes them
+    const othersOweMe: Record<string, number> = {}; // userId -> amount they owe user
 
     for (const expense of expenses) {
+      if (!expense.debtors || expense.debtors.length === 0) continue;
+
       const totalAmount = expense.amount;
+      const payerId = expense.payerId;
       const debtors = expense.debtors;
-      const splitCount = debtors.length;
-      const myShare = debtors.some((d) => d.debtorId === userId)
-        ? Math.floor(totalAmount / splitCount)
-        : 0;
-      const iPaid = expense.payerId === userId ? totalAmount : 0;
+      const numberOfSplitters = debtors.length;
+      const splitAmount = Math.floor(totalAmount / numberOfSplitters);
+      const remainder = totalAmount % numberOfSplitters;
 
-      if (expense.payerId !== userId && myShare > 0) {
-        const payerId = expense.payerId;
-        if (!balancesByUser.has(payerId)) {
-          balancesByUser.set(payerId, {
-            userId: payerId,
-            userName: expense.payer.nickname,
-            balance: 0,
-            expenses: [],
-          });
+      // Calculate each debtor's share
+      for (let i = 0; i < numberOfSplitters; i++) {
+        const debtor = debtors[i];
+        let shareAmount = splitAmount;
+        if (i < remainder) {
+          shareAmount += 1;
         }
-        const entry = balancesByUser.get(payerId)!;
-        entry.balance -= myShare;
-        entry.expenses.push({
-          expenseId: expense.id,
-          expenseTitle: expense.title,
-          totalAmount: totalAmount / 100,
-          myShare: myShare / 100,
-          iPaid: 0,
-          balance: -(myShare / 100),
-        });
-      } else if (expense.payerId === userId) {
-        for (const debtor of debtors) {
-          if (debtor.debtorId === userId) continue;
 
-          if (!balancesByUser.has(debtor.debtorId)) {
-            balancesByUser.set(debtor.debtorId, {
-              userId: debtor.debtorId,
-              userName: debtor.debtor.nickname,
-              balance: 0,
-              expenses: [],
-            });
-          }
-          const entry = balancesByUser.get(debtor.debtorId)!;
-          const theirShare = Math.floor(totalAmount / splitCount);
-          entry.balance += theirShare;
-          entry.expenses.push({
-            expenseId: expense.id,
-            expenseTitle: expense.title,
-            totalAmount: totalAmount / 100,
-            myShare: myShare / 100,
-            iPaid: totalAmount / 100,
-            balance: theirShare / 100,
-          });
+        if (debtor.debtorId === userId && payerId !== userId) {
+          // I'm a debtor and didn't pay -> I owe the payer
+          owesToOthers[payerId] = (owesToOthers[payerId] || 0) + shareAmount;
+        } else if (payerId === userId && debtor.debtorId !== userId) {
+          // I'm the payer and this debtor is not me -> they owe me
+          othersOweMe[debtor.debtorId] =
+            (othersOweMe[debtor.debtorId] || 0) + shareAmount;
         }
       }
     }
 
-    const balances = Array.from(balancesByUser.values()).map((b) => ({
-      ...b,
-      balance: b.balance / 100,
-    }));
+    // Net the balances - if I owe someone 100 but they owe me 30, net is I owe 70
+    const netBalances: Record<string, number> = {};
+    const allUserIds = new Set([
+      ...Object.keys(owesToOthers),
+      ...Object.keys(othersOweMe),
+    ]);
 
-    const me = trip.participants.find((p) => p.userId === userId);
+    for (const otherUserId of allUserIds) {
+      const iOweThem = owesToOthers[otherUserId] || 0;
+      const theyOweMe = othersOweMe[otherUserId] || 0;
+      const netBalance = theyOweMe - iOweThem;
+      if (netBalance !== 0) {
+        netBalances[otherUserId] = netBalance;
+      }
+    }
+
+    // Fetch user names
+    const userIdsArray = [...allUserIds];
+    const users =
+      userIdsArray.length > 0
+        ? await this.userRepository.findBy({ id: In(userIdsArray) })
+        : [];
+    const userMap = new Map(users.map((u) => [u.id, u.nickname]));
+
+    // Get requesting user info
+    const me = await this.userRepository.findOneBy({ id: userId });
+
+    // Calculate totals
+    let totalIOweThem = 0;
+    let totalTheyOweMe = 0;
+
+    const balances = Object.entries(netBalances).map(
+      ([otherUserId, balance]) => {
+        if (balance < 0) {
+          totalIOweThem += Math.abs(balance);
+        } else {
+          totalTheyOweMe += balance;
+        }
+
+        return {
+          userId: otherUserId,
+          userName: userMap.get(otherUserId) ?? otherUserId,
+          balance: balance / 100, // Convert to Float
+        };
+      },
+    );
 
     return {
       myUserId: userId,
-      myUserName: me?.user.nickname || 'Me',
+      myUserName: me?.nickname ?? userId,
       balances,
-      totalIOweThem: balances.reduce(
-        (sum, b) => sum + (b.balance < 0 ? -b.balance : 0),
-        0,
-      ),
-      totalTheyOweMe: balances.reduce(
-        (sum, b) => sum + (b.balance > 0 ? b.balance : 0),
-        0,
-      ),
+      totalIOweThem: totalIOweThem / 100, // Convert to Float
+      totalTheyOweMe: totalTheyOweMe / 100, // Convert to Float
     };
   }
 }
