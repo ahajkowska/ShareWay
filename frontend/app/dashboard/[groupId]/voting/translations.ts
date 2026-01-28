@@ -70,6 +70,7 @@ export const votingTranslations = {
     saving: "Zapisywanie...",
     editVoting: "Edytuj głosowanie",
     unvote: "Cofnij głos",
+    unvoteError: "Błąd podczas cofania głosu",
     edit: "Edytuj",
   },
   en: {
@@ -143,6 +144,7 @@ export const votingTranslations = {
     saving: "Saving...",
     editVoting: "Edit Poll",
     unvote: "Remove vote",
+    unvoteError: "Error removing vote",
     edit: "Edit",
   },
 };

@@ -105,6 +105,17 @@ export default function GroupVotingPage() {
     try {
       await api.castVote(votingId, [optionId]);
       await fetchVotings();
+      
+      // Odśwież selectedVoting jeśli dialog szczegółów jest otwarty
+      if (selectedVoting && selectedVoting.id === votingId) {
+        setTimeout(() => {
+          setVotings(prev => {
+            const updated = prev.find(v => v.id === votingId);
+            if (updated) setSelectedVoting(updated);
+            return prev;
+          });
+        }, 100);
+      }
     } catch (error) {
       console.error("Error voting:", error);
       alert(t.voteError);
@@ -142,26 +153,28 @@ export default function GroupVotingPage() {
     setIsDetailsOpen(true);
   };
 
-  const handleUnvote = async (votingId: string, optionId: string) => {
+  const handleUnvote = async (votingId: string) => {
     try {
-      // Wywołujemy funkcję z api.ts, którą wcześniej stworzyliśmy
-      await api.removeVote(votingId, optionId);
-      
-      // Odświeżamy listę głosowań, żeby UI pokazał aktualny stan
+      await api.removeVote(votingId);
       await fetchVotings();
       
-      // Jeśli mamy otwarte okno szczegółów, musimy też zaktualizować selectedVoting
-      // (ponieważ fetchVotings zmienia stan 'votings', ale nie 'selectedVoting')
+      // Odśwież selectedVoting po pobraniu nowych danych
       if (selectedVoting && selectedVoting.id === votingId) {
-        const updated = votings.find(v => v.id === votingId);
-        if (updated) setSelectedVoting(updated);
+        // Musimy poczekać na następny render cycle
+        setTimeout(() => {
+          setVotings(prev => {
+            const updated = prev.find(v => v.id === votingId);
+            if (updated) setSelectedVoting(updated);
+            return prev;
+          });
+        }, 100);
       }
     } catch (error) {
       console.error("Error removing vote:", error);
-      alert("Nie udało się usunąć głosu.");
+      alert(t.unvoteError || "Nie udało się cofnąć głosu.");
     }
   };
-  
+
   return (
     <>
       <main className="min-h-screen pt-24 pb-16 bg-gradient-soft">
