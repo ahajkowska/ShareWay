@@ -21,6 +21,7 @@ import {
   Cloud,
   Sunrise,
   ArrowLeft,
+  Trash2,
 } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "./translations";
@@ -48,6 +49,7 @@ export default function SchedulePage() {
   const [createActivityOpen, setCreateActivityOpen] = useState(false);
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
   const [expandedDayId, setExpandedDayId] = useState<string | null>(null);
+  const [deletingDayId, setDeletingDayId] = useState<string | null>(null);
 
   const load = async () => {
     try {
@@ -85,6 +87,25 @@ export default function SchedulePage() {
   const handleOpenActivityDialog = (dayId: string) => {
     setSelectedDayId(dayId);
     setCreateActivityOpen(true);
+  };
+
+  const handleDeleteDay = async (dayId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!confirm(t.deleteDayConfirm)) {
+      return;
+    }
+
+    try {
+      setDeletingDayId(dayId);
+      await api.deleteDay(dayId);
+      await load();
+    } catch (err: any) {
+      console.error("Error deleting day:", err);
+      alert(err.message || t.deleteDayError);
+    } finally {
+      setDeletingDayId(null);
+    }
   };
 
   const toggleDay = (dayId: string) => {
@@ -253,12 +274,26 @@ export default function SchedulePage() {
                           </div>
                         </div>
 
-                        <ChevronDown
-                          className={cn(
-                            "w-5 h-5 text-muted-foreground transition-transform duration-200",
-                            isExpanded && "rotate-180"
-                          )}
-                        />
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => handleDeleteDay(day.id, e)}
+                            disabled={deletingDayId === day.id}
+                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                            title={t.deleteDay}
+                          >
+                            {deletingDayId === day.id ? (
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600" />
+                            ) : (
+                              <Trash2 className="w-5 h-5" />
+                            )}
+                          </button>
+                          <ChevronDown
+                            className={cn(
+                              "w-5 h-5 text-muted-foreground transition-transform duration-200",
+                              isExpanded && "rotate-180"
+                            )}
+                          />
+                        </div>
                       </button>
 
                       {/* Expanded Content - Timeline */}
