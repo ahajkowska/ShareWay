@@ -17,6 +17,7 @@ import {
 } from './interfaces/auth.interfaces.js';
 import { TOKEN_EXPIRY } from './constants/auth.constants.js';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -138,6 +139,34 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user || !user.isActive) {
+      // Do not reveal whether the email exists
+      return { message: 'If the account exists, a reset email has been sent' };
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await this.usersService.setPasswordResetToken(user.id, resetToken, expires);
+
+    const appUrl =
+      this.configService.get<string>('APP_URL') || 'http://localhost:3000';
+    const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
+
+    await this.mailerService.sendPasswordResetEmail({
+      email: user.email,
+      nickname: user.nickname,
+      resetToken,
+      resetUrl,
+    });
+
+    this.logger.log(`Password reset requested for user: ${user.id}`);
+
+    return { message: 'If the account exists, a reset email has been sent' };
   }
 
   async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
