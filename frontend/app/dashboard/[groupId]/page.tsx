@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback } from "@/app/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/app/context/SessionContext";
 import { removeParticipant, transferRole } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function GroupDashboard() {
     const params = useParams();
@@ -54,10 +55,10 @@ export default function GroupDashboard() {
             role: p.role,
           }));
           setParticipants(mapped);
-        } catch {
-          setTripName("");
-          setTripLocation("");
-          setParticipants([]);
+        } catch (err: any) {
+          console.error("Error loading trip:", err);
+          toast.error("Nie znaleziono podróży");
+          router.push("/dashboard");
         } finally {
           setLoadingTrip(false);
         }
@@ -65,25 +66,50 @@ export default function GroupDashboard() {
       if (groupId) {
         void load();
       }
-    }, [groupId]);
+    }, [groupId, router]);
 
     const currentUserId = currentUser?.id ?? null;
     const currentUserRole =
       participants.find((p) => p.id === currentUserId)?.role ?? null;
     const isOrganizer = currentUserRole === "ORGANIZER";
+    const organizerCount = participants.filter((p) => p.role === "ORGANIZER").length;
 
     const handleRemove = async (userId: string, name: string) => {
-      if (!confirm(`Usunąć ${name} z podróży?`)) return;
-      try {
-        setActionLoading((prev) => ({ ...prev, [userId]: true }));
-        await removeParticipant(groupId, userId);
-        setParticipants((prev) => prev.filter((p) => p.id !== userId));
-      } catch (err) {
-        console.error("Error removing participant:", err);
-        alert("Nie udało się usunąć uczestnika.");
-      } finally {
-        setActionLoading((prev) => ({ ...prev, [userId]: false }));
+      const isSelf = userId === currentUserId;
+      
+      // Check if user is the last organizer trying to leave
+      if (isSelf && currentUserRole === "ORGANIZER" && organizerCount === 1) {
+        toast.error("Nie możesz opuścić podróży jako ostatni organizator. Wyznacz najpierw nowego organizatora.");
+        return;
       }
+      
+      const message = isSelf 
+        ? "Czy na pewno chcesz opuścić tę podróż?"
+        : `Czy na pewno chcesz usunąć użytkownika ${name} z tej podróży?`;
+      
+      toast.info(message, {
+        action: {
+          label: isSelf ? "Opuść" : "Usuń",
+          onClick: async () => {
+            try {
+              setActionLoading((prev) => ({ ...prev, [userId]: true }));
+              await removeParticipant(groupId, userId);
+              setParticipants((prev) => prev.filter((p) => p.id !== userId));
+              toast.success(`${name} został usunięty z podróży`);
+              
+              // If user removed themselves, redirect to dashboard
+              if (isSelf) {
+                router.push("/dashboard");
+              }
+            } catch (err) {
+              console.error("Error removing participant:", err);
+              toast.error("Nie udało się usunąć uczestnika.");
+            } finally {
+              setActionLoading((prev) => ({ ...prev, [userId]: false }));
+            }
+          },
+        },
+      });
     };
 
     const handleToggleRole = async (
@@ -97,9 +123,10 @@ export default function GroupDashboard() {
         setParticipants((prev) =>
           prev.map((p) => (p.id === userId ? { ...p, role: newRole } : p))
         );
+        toast.success(`Rola została zmieniona`);
       } catch (err) {
         console.error("Error updating role:", err);
-        alert("Nie udało się zmienić roli.");
+        toast.error("Nie udało się zmienić roli.");
       } finally {
         setActionLoading((prev) => ({ ...prev, [userId]: false }));
       }
@@ -256,7 +283,7 @@ export default function GroupDashboard() {
                                   </Button>
                                 </div>
                               )}
-                              {isSelf && !isOrganizer && (
+                              {isSelf && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
