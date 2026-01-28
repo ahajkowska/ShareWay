@@ -20,4 +20,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-changes.md
+# Next.js
+.next/
+**/.next/
+
+# TypeScript
+*.tsbuildinfo
