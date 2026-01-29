@@ -55,6 +55,8 @@ export default function SchedulePage() {
   const [participants, setParticipants] = useState<
     Array<{ id: string; name: string; role: "ORGANIZER" | "PARTICIPANT" }>
   >([]);
+  const [tripStartDate, setTripStartDate] = useState<string | null>(null);
+  const [tripEndDate, setTripEndDate] = useState<string | null>(null);
   const { user: currentUser } = useSession();
 
   const load = async () => {
@@ -64,6 +66,11 @@ export default function SchedulePage() {
 
       const data = (await api.fetchPlan(tripId)) as DayDto[];
       setDays(data || []);
+      
+      // Load trip info to get date range
+      const trip = await api.fetchTrip(tripId);
+      setTripStartDate(trip.startDate);
+      setTripEndDate(trip.endDate);
       
       // Load participants to check role
       const participantsData = await api.fetchParticipants(tripId);
@@ -360,6 +367,8 @@ export default function SchedulePage() {
         open={createDayOpen}
         onOpenChange={setCreateDayOpen}
         onSubmit={handleCreateDay}
+        tripStartDate={tripStartDate}
+        tripEndDate={tripEndDate}
       />
 
       {selectedDayId && (

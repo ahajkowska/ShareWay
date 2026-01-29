@@ -17,6 +17,7 @@ import {
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import * as api from "@/lib/api";
+import { toast } from "sonner";
 
 export default function UsersManagement() {
   const { lang } = useI18n();
@@ -109,7 +110,7 @@ export default function UsersManagement() {
       setTotalPages(Math.ceil(response.total / response.limit));
     } catch (error) {
       console.error("Error fetching users:", error);
-      alert(t.error);
+      toast.error(t.error);
     } finally {
       console.log('Setting loading to false');
       setLoading(false);
@@ -117,50 +118,65 @@ export default function UsersManagement() {
   };
 
   const handleBanUser = async (userId: string) => {
-    if (!confirm(t.confirmBan)) return;
-
-    try {
-      setActionLoading(userId);
-      await api.adminBanUser(userId);
-      alert(t.banSuccess);
-      await fetchUsers();
-    } catch (error) {
-      console.error("Error banning user:", error);
-      alert(t.error);
-    } finally {
-      setActionLoading(null);
-    }
+    toast.info(t.confirmBan, {
+      action: {
+        label: t.ban,
+        onClick: async () => {
+          try {
+            setActionLoading(userId);
+            await api.adminBanUser(userId);
+            toast.success(t.banSuccess);
+            await fetchUsers();
+          } catch (error) {
+            console.error("Error banning user:", error);
+            toast.error(t.error);
+          } finally {
+            setActionLoading(null);
+          }
+        },
+      },
+    });
   };
 
   const handleUnbanUser = async (userId: string) => {
-    if (!confirm(t.confirmUnban)) return;
-
-    try {
-      setActionLoading(userId);
-      await api.adminUnbanUser(userId);
-      alert(t.unbanSuccess);
-      await fetchUsers();
-    } catch (error) {
-      console.error("Error unbanning user:", error);
-      alert(t.error);
-    } finally {
-      setActionLoading(null);
-    }
+    toast.info(t.confirmUnban, {
+      action: {
+        label: t.unban,
+        onClick: async () => {
+          try {
+            setActionLoading(userId);
+            await api.adminUnbanUser(userId);
+            toast.success(t.unbanSuccess);
+            await fetchUsers();
+          } catch (error) {
+            console.error("Error unbanning user:", error);
+            toast.error(t.error);
+          } finally {
+            setActionLoading(null);
+          }
+        },
+      },
+    });
   };
 
   const handleResetPassword = async (userId: string) => {
-    if (!confirm(t.confirmReset)) return;
-
-    try {
-      setActionLoading(userId);
-      await api.adminResetUserPassword(userId);
-      alert(t.resetSuccess);
-    } catch (error) {
-      console.error("Error resetting password:", error);
-      alert(t.error);
-    } finally {
-      setActionLoading(null);
-    }
+    toast.info(t.confirmReset, {
+      action: {
+        label: t.resetPassword,
+        onClick: async () => {
+          try {
+            setActionLoading(userId);
+            await api.adminResetUserPassword(userId);
+            toast.success(t.resetSuccess);
+          } catch (error) {
+            console.error("Error resetting password:", error);
+            toast.error(t.error);
+          } finally {
+            setActionLoading(null);
+          }
+        },
+      },
+    });
   };
 
   const filteredUsers = (users || []).filter(

@@ -14,6 +14,8 @@ interface VotingListProps {
   onAddOption: (votingId: string, optionText: string, description?: string) => Promise<void>;
   onDelete: (votingId: string) => Promise<void>;
   onViewDetails: (voting: Voting) => void;
+  currentUserId: string | null;
+  isOrganizer: boolean;
 }
 
 export default function VotingList({ 
@@ -23,7 +25,9 @@ export default function VotingList({
   onVote,
   onAddOption,
   onDelete,
-  onViewDetails
+  onViewDetails,
+  currentUserId,
+  isOrganizer
 }: VotingListProps) {
   const { lang } = useI18n();
   const t = getVotingTranslations(lang);
@@ -83,6 +87,8 @@ export default function VotingList({
                 onVote={onVote}
                 onDelete={onDelete}
                 onViewDetails={onViewDetails}
+                currentUserId={currentUserId}
+                isOrganizer={isOrganizer}
               />
             ))}
           </div>
@@ -105,6 +111,8 @@ export default function VotingList({
                 onVote={onVote}
                 onDelete={onDelete}
                 onViewDetails={onViewDetails}
+                currentUserId={currentUserId}
+                isOrganizer={isOrganizer}
               />
             ))}
           </div>

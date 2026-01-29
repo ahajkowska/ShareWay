@@ -14,6 +14,7 @@ import { Plus, ArrowLeft } from "lucide-react";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getChecklistTranslations } from "./translations";
 import * as api from "@/lib/api";
+import { toast } from "sonner";
 import ChecklistList from "./components/ChecklistList";
 import AddItemForm from "./components/AddItemForm";
 import type { ChecklistItemDto } from "./types";
@@ -66,7 +67,7 @@ export default function ChecklistPage() {
       setIsAddOpen(false);
     } catch (err: any) {
       console.error("Error adding item:", err);
-      alert(err.message || t.addError);
+      toast.error(err.message || t.addError);
     }
   };
 
@@ -86,7 +87,7 @@ export default function ChecklistPage() {
           i.id === itemId ? { ...i, isChecked: !newChecked } : i
         )
       );
-      alert(err.message || t.toggleError);
+      toast.error(err.message || t.toggleError);
     }
   };
 
@@ -99,7 +100,7 @@ export default function ChecklistPage() {
       setItems((prev) => prev.filter((i) => i.id !== itemId));
     } catch (err: any) {
       console.error("Error deleting item:", err);
-      alert(err.message || t.deleteError);
+      toast.error(err.message || t.deleteError);
     }
   };
 

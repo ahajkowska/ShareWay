@@ -13,6 +13,7 @@ import VotingList from "./components/VotingList";
 import CreateVotingDialog from "./components/CreateVotingDialog";
 import VotingDetailsDialog from "./components/VotingDetailsDialog";
 import type { Voting, VotingFormData } from "./types";
+import { useSession } from "@/app/context/SessionContext";
 
 export default function GroupVotingPage() {
   const { lang } = useI18n();
@@ -20,11 +21,15 @@ export default function GroupVotingPage() {
   const params = useParams();
   const router = useRouter();
   const groupId = params.groupId as string;
+  const { user: currentUser } = useSession();
 
   const [votings, setVotings] = useState<Voting[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [groupName, setGroupName] = useState("");
+  const [participants, setParticipants] = useState<
+    Array<{ id: string; name: string; role: "ORGANIZER" | "PARTICIPANT" }>
+  >([]);
 
   const [selectedVoting, setSelectedVoting] = useState<Voting | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -33,6 +38,7 @@ export default function GroupVotingPage() {
     if (groupId) {
       fetchGroupInfo();
       fetchVotings();
+      fetchParticipants();
     }
   }, [groupId]);
 
@@ -47,6 +53,20 @@ export default function GroupVotingPage() {
     } catch (error) {
       console.error("Error fetching group info:", error);
       setGroupName("Trip");
+    }
+  };
+
+  const fetchParticipants = async () => {
+    try {
+      const data = await api.fetchParticipants(groupId);
+      const mapped = data.map((p: any) => ({
+        id: p.userId,
+        name: p.user?.nickname || p.user?.email || "Użytkownik",
+        role: p.role,
+      }));
+      setParticipants(mapped);
+    } catch (error) {
+      console.error("Error fetching participants:", error);
     }
   };
 
@@ -234,6 +254,8 @@ export default function GroupVotingPage() {
             onAddOption={handleAddOption}
             onDelete={handleDeleteVoting}
             onViewDetails={handleViewDetails}
+            currentUserId={currentUser?.id ?? null}
+            isOrganizer={participants.find((p) => p.id === currentUser?.id)?.role === "ORGANIZER"}
           />
         </div>
 
