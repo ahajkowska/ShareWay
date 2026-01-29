@@ -259,15 +259,17 @@ export default function SchedulePage() {
                       )}
                     >
                       {/* Day Header - Clickable */}
-                      <button
-                        onClick={() => toggleDay(day.id)}
+                      <div
                         className={cn(
                           "w-full p-5 flex items-center justify-between hover:bg-muted/50 transition-colors",
                           isCurrentDay &&
                             "bg-gradient-to-r from-primary/5 to-travel-coral/5"
                         )}
                       >
-                        <div className="flex items-center gap-4">
+                        <div
+                          onClick={() => toggleDay(day.id)}
+                          className="flex items-center gap-4 flex-1 cursor-pointer"
+                        >
                           <div
                             className={cn(
                               "w-12 h-12 rounded-xl flex items-center justify-center",
@@ -319,13 +321,14 @@ export default function SchedulePage() {
                             </button>
                           )}
                           <ChevronDown
+                            onClick={() => toggleDay(day.id)}
                             className={cn(
-                              "w-5 h-5 text-muted-foreground transition-transform duration-200",
+                              "w-5 h-5 text-muted-foreground transition-transform duration-200 cursor-pointer",
                               isExpanded && "rotate-180"
                             )}
                           />
                         </div>
-                      </button>
+                      </div>
 
                       {/* Expanded Content - Timeline */}
                       {isExpanded && (
