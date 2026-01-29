@@ -8,6 +8,7 @@ import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "../translations";
 import type { ActivityDto, UpdateActivityDto } from "../types";
 import * as api from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
     open: boolean;
@@ -37,7 +38,7 @@ export default function EditActivityDialog({ open, onOpenChange, activity, onUpd
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!title.trim()) {
-            alert(t.titleRequired);
+            toast.error(t.titleRequired);
             return;
         }
         try {

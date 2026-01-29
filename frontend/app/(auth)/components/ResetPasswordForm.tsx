@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { toast } from "sonner";
 import { resetPassword } from "@/lib/api";
+import { useI18n } from "@/app/context/LanguageContext";
 
 import { PasswordChecklist } from "../hooks/usePasswordChecklist";
 import { FieldError } from "../hooks/useFieldError";
@@ -19,46 +20,47 @@ interface ResetPasswordFormProps {
 
 export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     const router = useRouter();
+    const { lang } = useI18n();
     const [showPass, setShowPass] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [serverError, setServerError] = useState<string>();
 
-    // Hardcoding text for simplicity as specific i18n keys might be missing
-    // In a real app, I would add keys to the LanguageContext type
+    const isPL = lang === 'pl';
+
     const t = {
         labels: {
-            password: "New Password",
-            confirm: "Confirm Password",
-            submit: "Reset Password"
+            password: isPL ? "Nowe hasło" : "New Password",
+            confirm: isPL ? "Potwierdź hasło" : "Confirm Password",
+            submit: isPL ? "Zresetuj hasło" : "Reset Password"
         },
         validation: {
-            min: "Minimum 8 characters",
-            required: "Required",
-            mismatch: "Passwords must match"
+            min: isPL ? "Minimum 8 znaków" : "Minimum 8 characters",
+            required: isPL ? "Wymagane" : "Required",
+            mismatch: isPL ? "Hasła muszą być identyczne" : "Passwords must match"
         },
-        success: "Password reset successfully. You can now login.",
-        error: "Failed to reset password. Token might be invalid or expired."
+        success: isPL ? "Hasło zostało zresetowane. Możesz się teraz zalogować." : "Password reset successfully. You can now login.",
+        error: isPL ? "Nie udało się zresetować hasła. Token mógł wygasł lub być nieprawidłowy." : "Failed to reset password. Token might be invalid or expired."
     };
 
     const labels = useMemo(
         () => ({
-            min: "8+ chars",
-            lower: "lowercase",
-            upper: "uppercase",
-            number: "number",
-            special: "special char",
+            min: isPL ? "Min. 8 znaków" : "8+ chars",
+            lower: isPL ? "mała litera" : "lowercase",
+            upper: isPL ? "duża litera" : "uppercase",
+            number: isPL ? "cyfra" : "number",
+            special: isPL ? "znak specjalny" : "special char",
         }),
-        []
+        [isPL]
     );
 
     const strengthLabels = useMemo(
         () => ({
-            weak: "Weak",
-            medium: "Medium",
-            strong: "Strong",
-            veryStrong: "Very strong",
+            weak: isPL ? "Słabe" : "Weak",
+            medium: isPL ? "Średnie" : "Medium",
+            strong: isPL ? "Silne" : "Strong",
+            veryStrong: isPL ? "Bardzo silne" : "Very strong",
         }),
-        []
+        [isPL]
     );
 
     const schema = useMemo(

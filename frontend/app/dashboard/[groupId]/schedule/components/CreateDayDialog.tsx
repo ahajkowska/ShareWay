@@ -6,14 +6,17 @@ import { X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "../translations";
+import { toast } from "sonner";
 
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (date: string) => Promise<void>;
+    tripStartDate: string | null;
+    tripEndDate: string | null;
 }
 
-export default function CreateDayDialog({ open, onOpenChange, onSubmit }: Props) {
+export default function CreateDayDialog({ open, onOpenChange, onSubmit, tripStartDate, tripEndDate }: Props) {
     const { lang } = useI18n();
     const t = getScheduleTranslations(lang);
     const [date, setDate] = useState<string>("");
@@ -22,7 +25,7 @@ export default function CreateDayDialog({ open, onOpenChange, onSubmit }: Props)
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!date) {
-            alert(t.selectDate);
+            toast.error(t.selectDate);
             return;
         }
         try {
@@ -31,7 +34,7 @@ export default function CreateDayDialog({ open, onOpenChange, onSubmit }: Props)
             setDate("");
         } catch (err: any) {
             console.error(err);
-            alert(err.message || t.createDayError);
+            toast.error(err.message || t.createDayError);
         } finally {
             setSubmitting(false);
         }
@@ -69,10 +72,17 @@ export default function CreateDayDialog({ open, onOpenChange, onSubmit }: Props)
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
                         <div>
                             <label className="block text-sm font-medium mb-2">{t.date}</label>
+                            {tripStartDate && tripEndDate && (
+                                <p className="text-sm text-muted-foreground mb-2">
+                                    {t.selectDateBetween} <strong>{new Date(tripStartDate).toLocaleDateString()}</strong> {t.and} <strong>{new Date(tripEndDate).toLocaleDateString()}</strong>
+                                </p>
+                            )}
                             <input
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
+                                min={tripStartDate || undefined}
+                                max={tripEndDate || undefined}
                                 className="w-full px-4 py-3 rounded-xl border border-input"
                             />
                         </div>

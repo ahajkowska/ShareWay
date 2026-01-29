@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getChecklistTranslations } from "../translations";
+import { toast } from "sonner";
 
 interface Props {
   onSubmit: (text: string) => Promise<void>;
@@ -19,7 +20,7 @@ export default function AddItemForm({ onSubmit, onCancel }: Props) {
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!text.trim()) {
-            alert(t.itemPlaceholder);
+            toast.error(t.itemPlaceholder);
             return;
         }
         try {

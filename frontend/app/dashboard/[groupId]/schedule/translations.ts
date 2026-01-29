@@ -46,6 +46,9 @@ export const scheduleTranslations = {
     deleteDayConfirm: "Na pewno chcesz usunąć ten dzień? Wszystkie aktywności zostaną usunięte.",
     deleteDayError: "Błąd podczas usuwania dnia",
     backToGroup: "Powrót do wyboru modułów",
+    selectDateBetween: "Wybierz datę pomiędzy",
+    and: "a",
+    dayMustBeInRange: "Data musi być w zakresie",
   },
   en: {
     schedule: "Trip Schedule",
@@ -94,6 +97,9 @@ export const scheduleTranslations = {
     deleteDayConfirm: "Are you sure you want to delete this day? All activities will be removed.",
     deleteDayError: "Error deleting day",
     backToGroup: "Back to module selection",
+    selectDateBetween: "Select date between",
+    and: "and",
+    dayMustBeInRange: "Date must be in range",
   },
 };
 

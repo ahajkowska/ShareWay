@@ -7,6 +7,7 @@ import { Button } from "@/app/components/ui/button";
 import { useI18n } from "@/app/context/LanguageContext";
 import { getScheduleTranslations } from "../translations";
 import * as api from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
     open: boolean;
@@ -28,7 +29,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!title.trim()) {
-            alert(t.titleRequired);
+            toast.error(t.titleRequired);
             return;
         }
         try {
@@ -53,7 +54,7 @@ export default function CreateActivityDialog({ open, onOpenChange, dayId, onCrea
             onOpenChange(false);
         } catch (err: any) {
             console.error(err);
-            alert(err.message || t.createActivityError);
+            toast.error(err.message || t.createActivityError);
         } finally {
             setSubmitting(false);
         }

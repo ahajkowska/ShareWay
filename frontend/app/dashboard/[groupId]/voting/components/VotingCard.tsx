@@ -16,6 +16,8 @@ interface VotingCardProps {
   onVote: (votingId: string, optionId: string) => Promise<void>;
   onDelete: (votingId: string) => Promise<void>;
   onViewDetails: (voting: Voting) => void;
+  currentUserId: string | null;
+  isOrganizer: boolean;
 }
 
 export default function VotingCard({
@@ -25,6 +27,8 @@ export default function VotingCard({
   onVote,
   onDelete,
   onViewDetails,
+  currentUserId,
+  isOrganizer,
 }: VotingCardProps) {
   const { lang } = useI18n();
   const t = getVotingTranslations(lang);
@@ -32,6 +36,9 @@ export default function VotingCard({
   const uniqueVoters = new Set(voting.options.flatMap(opt => opt.voters));
   const sortedOptions = [...voting.options].sort((a, b) => b.votes - a.votes);
   const topOption = sortedOptions[0];
+  
+  // Użytkownik może usunąć głosowanie tylko jeśli jest organizatorem lub twórcą
+  const canDelete = isOrganizer || voting.createdBy === currentUserId;
 
   return (
     <motion.div
@@ -50,14 +57,16 @@ export default function VotingCard({
                 </p>
               )}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(voting.id)}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(voting.id)}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </CardHeader>
 
