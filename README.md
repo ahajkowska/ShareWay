@@ -84,6 +84,10 @@ git clone [https://github.com/ahajkowska/ShareWay.git](https://github.com/ahajko
    docker compose logs db
    ```
 
+6. **Korzystaj z aplikacji**
+
+Możesz korzystać lokalnie z aplikacji na `http://localhost:4000/`
+
 ### Zatrzymanie projektu:
 
 1. **Zatrzymaj projekt:**
