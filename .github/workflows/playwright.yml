@@ -29,9 +29,6 @@ jobs:
     - name: Instalacja zależności
       run: npm install
 
-    - name: Budowanie aplikacji
-      run: npm run build
-
     - name: Instalacja przeglądarek Playwrighta
       run: npx playwright install --with-deps chromium
 
