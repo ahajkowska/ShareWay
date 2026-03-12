@@ -51,19 +51,19 @@ test.describe('Ochrona ścieżek (routing)', () => {
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/dashboard(?:\?.*)?$/);
 
-    // Otwórz menu użytkownika (desktop navbar)
+    // Otworzenie menu użytkownika
     await page.locator('button[aria-label="User menu"]').click();
 
-    // Kliknij przycisk wylogowania
+    // przycisk wylogowania
     await page.getByRole('button', { name: /wyloguj/i }).click();
 
-    // Po wylogowaniu aplikacja przekierowuje na stronę główną
+    // strona główna
     await expect(page).toHaveURL(/^http:\/\/localhost:3000\/?$/);
 
-    // Usuń E2E cookie – symuluje usunięcie access_token przez serwer po logout
+    // symulacja usunięcia access_token przez serwer po logout
     await page.context().clearCookies();
 
-    // Sprawdź, że chroniona ścieżka jest znowu niedostępna
+    // Sprawdzenie, że chroniona ścieżka jest znowu niedostępna
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/login(?:\?.*)?$/);
   });
