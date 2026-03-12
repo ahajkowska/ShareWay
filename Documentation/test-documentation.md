@@ -715,6 +715,22 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 **Oczekiwany rezultat:** Użytkownik pozostaje na stronie `/dashboard` i uzyskuje dostęp do jej zawartości.
 
+---
+
+**[ST-ROUTE-03] Wylogowanie użytkownika** *(Test Automatyczny – routing.spec.ts)*
+
+**Cel:** Weryfikacja, czy po kliknięciu przycisku wylogowania sesja jest kończona i użytkownik traci dostęp do chronionych ścieżek.
+
+**Warunki początkowe:** Użytkownik zalogowany, endpoint `/auth/logout` zwraca status 200 (mock).
+
+**Kroki:**
+1. Otwórz stronę `/dashboard`.
+2. Kliknij avatar użytkownika w navbarze, aby otworzyć menu.
+3. Kliknij przycisk „Wyloguj się".
+4. Po przekierowaniu wróć bezpośrednio pod adres `/dashboard`.
+
+**Oczekiwany rezultat:** Po kroku 3 użytkownik zostaje przekierowany na stronę główną (`/`). Po kroku 4 aplikacja ponownie przekierowuje na `/login`, potwierdzając zakończenie sesji.
+
 
 <div class="page-break"></div>
 
@@ -737,6 +753,7 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 | ST-REG-06 | Pomyślna rejestracja – nawigacja | `register.spec.ts` | Chromium | ZALICZONY |
 | ST-ROUTE-01 | Wejście niezalogowanego użytkownika na `/dashboard` | `routing.spec.ts` | Chromium | ZALICZONY |
 | ST-ROUTE-02 | Dostęp zalogowanego użytkownika do `/dashboard` | `routing.spec.ts` | Chromium | ZALICZONY |
+| ST-ROUTE-03 | Wylogowanie użytkownika | `routing.spec.ts` | Chromium | ZALICZONY |
 
 ### 3.2. Testy manualne (Funkcjonalne)
 
