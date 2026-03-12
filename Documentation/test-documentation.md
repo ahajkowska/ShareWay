@@ -243,10 +243,13 @@ blockquote {
   - [2.7. Głosowanie (Voting)](#27-głosowanie-voting)
   - [2.8. Profil użytkownika](#28-profil-użytkownika)
   - [2.9. Panel Administratora (Admin)](#29-panel-administratora-admin)
+  - [2.10. Ochrona ścieżek (Routing)](#210-ochrona-ścieżek-routing)
 - [3. Raport z testów](#3-raport-z-testów)
   - [3.1. Testy automatyczne (E2E – Playwright)](#31-testy-automatyczne-e2e--playwright)
   - [3.2. Testy manualne (Funkcjonalne)](#32-testy-manualne-funkcjonalne)
   - [3.3. Scenariusze do uzupełnienia](#33-scenariusze-do-uzupełnienia)
+  - [3.4 Zrzut z playwright](#34-zrzut-z-playwright)
+  - [3.5 Zrzut z testów jednostkowych](#35-zrzut-z-testów-jednostkowych)
 <!-- /TOC -->
 
 <div class="page-break"></div>
@@ -259,13 +262,18 @@ W projekcie ShareWay przyjęto hybrydowy model testowania, łączący testy auto
 
 **Testy Automatyczne (End-to-End / E2E):**
 - Narzędzie: Playwright
-- Zakres: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" (Happy Paths) na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. Obejmują proces logowania, rejestracji oraz walidację formularzy wejściowych.
+- Zakres: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" (Happy Paths) na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. Obejmują proces logowania, rejestracji, walidację formularzy wejściowych oraz ochronę ścieżek (routing).
 - Uruchamianie: Automatycznie w procesie CI (Continuous Integration) przy użyciu GitHub Actions po każdym dodaniu nowego kodu do głównej gałęzi repozytorium.
-- Pliki testów: `frontend/tests/login.spec.ts`, `frontend/tests/register.spec.ts`
+- Pliki testów: `frontend/tests/login.spec.ts`, `frontend/tests/register.spec.ts`, `frontend/tests/routing.spec.ts`
 
 **Testy Manualne (Eksploracyjne i Funkcjonalne):**
 - Zakres: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram. Sprawdzana jest również responsywność na urządzeniach mobilnych.
 - Środowisko: Testy przeprowadzane na środowisku lokalnym / deweloperskim.
+
+**Uzasadnienie wyboru strategii hybrydowej:**
+Zdecydowaliśmy się na podejście hybrydowe ze względu na specyfikę projektu ShareWay. Zastosowanie testów automatycznych End-to-End (E2E) przy użyciu frameworka Playwright dla modułu uwierzytelniania (Auth/Register) wynika z faktu, że są to najbardziej krytyczne ścieżki w systemie (tzw. Critical User Journeys). Ewentualne błędy w tym miejscu całkowicie blokują użytkownikom dostęp do aplikacji. Playwright został wybrany ze względu na doskonałą integrację z Next.js, szybkość działania oraz generowanie czytelnych raportów wizualnych (HTML).
+
+Z kolei moduły takie jak Finanse (podział kosztów), Harmonogram czy Głosowania charakteryzują się bardzo dużą dynamiką interfejsu i skomplikowanymi interakcjami po stronie użytkownika. Z uwagi na ograniczenia czasowe projektu, ich automatyzacja na poziomie E2E przyniosłaby mniejszy zwrot z inwestycji (ROI) niż gruntowne przetestowanie manualne. Testy manualne pozwalają na szybką weryfikację logiki biznesowej i użyteczności (UX) bezpośrednio z perspektywy końcowego użytkownika.
 
 <div class="page-break"></div>
 
@@ -678,6 +686,36 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 >
 > **[ST-ADMIN-03] Blokowanie/usuwanie konta użytkownika** – *do uzupełnienia*
 
+### 2.10. Ochrona ścieżek (Routing)
+
+---
+
+**[ST-ROUTE-01] Próba wejścia niezalogowanego użytkownika na chronioną ścieżkę** *(Test Automatyczny – routing.spec.ts)*
+
+**Cel:** Weryfikacja, czy niezalogowany użytkownik nie może wejść na chroniony widok aplikacji.
+
+**Warunki początkowe:** Aplikacja uruchomiona, użytkownik niezalogowany.
+
+**Kroki:**
+1. Wejdź bezpośrednio pod adres `/dashboard`.
+
+**Oczekiwany rezultat:** Użytkownik zostaje automatycznie przekierowany na stronę `/login`.
+
+---
+
+**[ST-ROUTE-02] Dostęp zalogowanego użytkownika do chronionej ścieżki** *(Test Automatyczny – routing.spec.ts)*
+
+**Cel:** Weryfikacja, czy zalogowany użytkownik może poprawnie wejść na chronioną stronę.
+
+**Warunki początkowe:** Użytkownik zalogowany, endpointy autoryzacyjne zwracają odpowiedzi sukcesu.
+
+**Kroki:**
+1. Zaloguj się poprawnymi danymi.
+2. Wejdź pod adres `/dashboard`.
+
+**Oczekiwany rezultat:** Użytkownik pozostaje na stronie `/dashboard` i uzyskuje dostęp do jej zawartości.
+
+
 <div class="page-break"></div>
 
 ## 3. Raport z testów
@@ -697,6 +735,8 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 | ST-REG-04 | Walidacja formatu e-mail | `register.spec.ts` | Chromium | ZALICZONY |
 | ST-REG-05 | Błąd serwera – e-mail już zajęty | `register.spec.ts` | Chromium | ZALICZONY |
 | ST-REG-06 | Pomyślna rejestracja – nawigacja | `register.spec.ts` | Chromium | ZALICZONY |
+| ST-ROUTE-01 | Wejście niezalogowanego użytkownika na `/dashboard` | `routing.spec.ts` | Chromium | ZALICZONY |
+| ST-ROUTE-02 | Dostęp zalogowanego użytkownika do `/dashboard` | `routing.spec.ts` | Chromium | ZALICZONY |
 
 ### 3.2. Testy manualne (Funkcjonalne)
 
@@ -747,3 +787,7 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 | ST-ADMIN-01 | Logowanie administratora | Admin | Nie przeprowadzono |
 | ST-ADMIN-02 | Przeglądanie listy użytkowników | Admin | Nie przeprowadzono |
 | ST-ADMIN-03 | Blokowanie konta użytkownika | Admin | Nie przeprowadzono |
+
+### 3.4 Zrzut z playwright
+
+### 3.5 Zrzut z testów jednostkowych
