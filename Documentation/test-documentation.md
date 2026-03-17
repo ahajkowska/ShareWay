@@ -258,14 +258,17 @@ W projekcie ShareWay przyjęto hybrydowy model testowania, łączący testy jedn
 
 **Testy Automatyczne (End-to-End / E2E):**
 - Narzędzie: Playwright
-- Zakres: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" (Happy Paths) na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. Obejmują proces logowania, rejestracji, walidację formularzy wejściowych oraz ochronę ścieżek (routing).
+- Zakres: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. Obejmują proces logowania, rejestracji, walidację formularzy wejściowych oraz ochronę ścieżek (routing).
+- Dlaczego użyto?: Sprawdzają najważniejsze ścieżki użytkownika od początku do końca. Czyli to, co jest najbardziej kluczowe do działania aplikacji i "zepsucie" tych funkcjonalności skutkowałoby największymi problemami w aplikacji.
 - Uruchamianie: Automatycznie w procesie CI (Continuous Integration) przy użyciu GitHub Actions po każdym dodaniu nowego kodu do głównej gałęzi repozytorium.
 
-**Testy Manualne (Eksploracyjne i Funkcjonalne):**
-- Zakres: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram. Sprawdzana jest również responsywność na urządzeniach mobilnych.
-- Środowisko: Testy przeprowadzane na środowisku lokalnym / deweloperskim.
+**Testy Manualne:**
+- Zakres: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram.
+- Dlaczego użyto?: Automatyzacja byłaby kosztowna, logika jest bardzo skomplikowana i łatwiej wytestować ją manualnie niż zakodować w E2E. Można też sprawdzić wygodność realnego użycia funkcjonalności.
 
 **Testy Jednostkowe**
+- Zakres: Najmniejsze elementy logiki w izolacji (funkcje, serwisy, walidacje)
+- Dlaczego użyto?: Są najszybsze i najtańsze w utrzymaniu. Są bardzo dobre do łapania błędów zanim problem "wyjdzie" do UI. Daja peewność, że rdzeń działa poprawnie niezależnie od frontendu.
 
 **Uzasadnienie wyboru strategii hybrydowej:**
 Zdecydowaliśmy się na podejście hybrydowe ze względu na specyfikę projektu ShareWay. Zastosowanie testów automatycznych End-to-End (E2E) przy użyciu frameworka Playwright dla modułu uwierzytelniania (Auth/Register) wynika z faktu, że są to najbardziej krytyczne ścieżki w systemie. Ewentualne błędy w tym miejscu całkowicie blokują użytkownikom dostęp do aplikacji. Playwright został wybrany ze względu na doskonałą integrację z Next.js, szybkość działania oraz generowanie czytelnych raportów wizualnych (HTML).
@@ -359,23 +362,17 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-AUTH-06] Resetowanie hasła przez link z e-maila** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja, czy użytkownik może ustawić nowe hasło przy użyciu poprawnego linku resetującego.
 
-**Warunki początkowe:**
-
-**Kroki:**
-
-**Oczekiwany rezultat:**
-
-> **[ST-AUTH-07] Wygaśnięcie sesji / wylogowanie po czasie nieaktywności** *(Test Manualny)*
-
-**Cel:**
-
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik otrzymał aktywny link resetu hasła na e-mail.
 
 **Kroki:**
+1. Otwórz link resetujący z wiadomości e-mail.
+2. Wprowadź nowe hasło i jego potwierdzenie.
+3. Kliknij przycisk "Zapisz nowe hasło".
+4. Przejdź na stronę `/login` i zaloguj się nowym hasłem.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Hasło zostaje zmienione, użytkownik widzi komunikat sukcesu i może zalogować się nowym hasłem. Logowanie starym hasłem jest odrzucone.
 
 ### 2.2. Rejestracja (Register)
 
@@ -465,29 +462,22 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-REG-07] Walidacja siły hasła (wymagania dot. znaków specjalnych/cyfr)** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja egzekwowania minimalnych wymagań bezpieczeństwa hasła.
 
-**Warunki początkowe:**
-
-**Kroki:**
-
-**Oczekiwany rezultat:**
-
-> **[ST-REG-08] Rejestracja bez zaznaczenia checkboxa zgody** *(Test Manualny)*
-
-**Cel:**
-
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik znajduje się na stronie `/register`.
 
 **Kroki:**
+1. Wpisz hasło bez cyfr i znaków specjalnych.
+2. Kliknij poza pole hasła lub spróbuj wysłać formularz.
+3. Wpisz hasło spełniające reguły i ponów próbę.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Dla słabego hasła wyświetla się komunikat walidacyjny, a formularz nie jest wysyłany. Po wpisaniu poprawnego hasła walidacja przechodzi.
 
 ### 2.3. Zarządzanie podróżą (Trips)
 
 > **[ST-TRIPS-01] Tworzenie nowej podróży** *(Test Automatyczny)*
 
-**Cel:** Weryfikacja kreatora nowej podróży.
+**Cel:** Weryfikacja tworzenia nowej podróży.
 
 **Warunki początkowe:** Użytkownik jest zalogowany i znajduje się na widoku `/dashboard`.
 
@@ -530,49 +520,61 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-TRIPS-04] Edycja szczegółów podróży (nazwa, daty) przez organizatora** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja, czy organizator może aktualizować podstawowe dane podróży.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik z rolą organizatora ma utworzoną podróż.
 
 **Kroki:**
+1. Otwórz szczegóły podróży.
+2. Kliknij "Edytuj".
+3. Zmień nazwę i/lub daty podróży.
+4. Zapisz zmiany.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Nowe dane są zapisane i widoczne na liście podróży oraz w widoku szczegółów.
 
 ---
 
 > **[ST-TRIPS-05] Usunięcie podróży przez organizatora** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja możliwości trwałego usunięcia podróży przez organizatora.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik jest organizatorem podróży i ma dostęp do opcji usuwania podróży.
 
 **Kroki:**
+1. Otwórz ustawienia podróży.
+2. Zarchiwizuj aktywną podróż.
+3. Kliknij opcję "Usuń podróż".
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Podróż znika z listy, a wejście pod jej bezpośredni adres zwraca komunikat, że nieznaleziono takiej podróży.
 
 ---
 
 > **[ST-TRIPS-06] Opuszczenie podróży przez uczestnika** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja, czy zwykły uczestnik może opuścić podróż bez usuwania jej dla innych.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik jest uczestnikiem (nie organizatorem) aktywnej podróży.
 
 **Kroki:**
+1. Wejdź w szczegóły podróży.
+2. Kliknij "Opuść podróż".
+3. Potwierdź decyzję.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Podróż przestaje być widoczna na dashboardzie tego użytkownika, pozostaje jednak dostępna dla pozostałych członków.
 
 ---
 
 > **[ST-TRIPS-07] Próba dostępu do podróży przez nieuprawnionego użytkownika** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja kontroli dostępu do zasobów podróży.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik X nie należy do podróży Y i posiada jej bezpośredni link.
 
 **Kroki:**
+1. Zaloguj się jako użytkownik X.
+2. Otwórz URL podróży Y.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** System blokuje dostęp, nie ujawnia danych podróży.
 
 ---
 
@@ -602,7 +604,7 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 **Warunki początkowe:** Zalogowany użytkownik, podróż z co najmniej jednym dodanym wydatkiem.
 
 **Kroki:**
-1. Wejdź w zakładkę "Koszty" w wybranej podróży.
+1. Wejdź w zakładkę "Koszty" w wybranej podróży i sprawdź listę wydatków.
 
 **Oczekiwany rezultat:** Lista zawiera wszystkie dodane wydatki z tytułem, kwotą i płatnikiem. Suma bilansu jest poprawna.
 
@@ -610,49 +612,29 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-FIN-03] Usunięcie wydatku i przeliczenie bilansu** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja, czy usunięcie kosztu aktualizuje salda wszystkich uczestników.
 
-**Warunki początkowe:**
+**Warunki początkowe:** W podróży istnieje co najmniej jeden wydatek wpływający na bilans.
 
 **Kroki:**
+1. Wejdź do zakładki "Koszty".
+2. Usuń wybrany wydatek z listy.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Wydatek znika z historii, a wartości sald i podsumowań zostają przeliczone bez błędów.
 
 ---
 
-> **[ST-FIN-04] Podział kosztów z nierównymi udziałami (kwoty indywidualne)** *(Test Manualny)*
+> **[ST-FIN-04] Walidacja – próba dodania wydatku z kwotą 0 lub ujemną** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja walidacji pola kwoty wydatku.
 
-**Warunki początkowe:**
-
-**Kroki:**
-
-**Oczekiwany rezultat:**
-
----
-
-> **[ST-FIN-05] Walidacja – próba dodania wydatku z kwotą 0 lub ujemną** *(Test Manualny)*
-
-**Cel:**
-
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik otworzył formularz dodawania wydatku.
 
 **Kroki:**
+1. Wprowadź kwotę `0` i spróbuj zapisać.
+2. Wprowadź kwotę ujemną (np. `-10`) i spróbuj zapisać.
 
-**Oczekiwany rezultat:**
-
----
-
-> **[ST-FIN-06] Podgląd bilansu całkowitego podróży** *(Test Manualny)*
-
-**Cel:**
-
-**Warunki początkowe:**
-
-**Kroki:**
-
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Formularz odrzuca obie wartości i wyświetla komunikat o wymaganej kwocie dodatniej.
 
 ---
 
@@ -690,37 +672,45 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-PLAN-03] Edycja aktywności** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja możliwości modyfikacji danych już dodanej aktywności.
 
-**Warunki początkowe:**
+**Warunki początkowe:** W harmonogramie istnieje aktywność przypisana do dnia.
 
 **Kroki:**
+1. Otwórz aktywność i wybierz opcję "Edytuj".
+2. Zmień nazwę i/lub godzinę.
+3. Zapisz zmiany.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Aktywność wyświetla zaktualizowane dane i zachowuje poprawne położenie na osi czasu dnia.
 
 ---
 
 > **[ST-PLAN-04] Usunięcie dnia wraz z aktywnościami** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja usuwania całego dnia i powiązanych aktywności.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Harmonogram zawiera dzień z co najmniej jedną aktywnością. Użytkownik jest organizatorem podróży.
 
 **Kroki:**
+1. Wybierz dzień do usunięcia.
+2. Kliknij "Usuń" i potwierdź operację.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Dzień oraz wszystkie przypisane aktywności znikają z harmonogramu.
 
 ---
 
 > **[ST-PLAN-05] Próba dodania dnia spoza zakresu dat podróży** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja walidacji dat harmonogramu względem dat podróży.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Podróż ma zdefiniowany zakres dat (od-do).
 
 **Kroki:**
+1. Otwórz modal "Dodaj dzień".
+2. Spróbuj wybrać datę wcześniejszą niż start podróży lub późniejszą niż koniec.
+3. Zatwierdź.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** System nie pozwala zapisać dnia spoza zakresu i wyświetla komunikat walidacyjny.
 
 ---
 
@@ -756,25 +746,29 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-CHECK-03] Usunięcie elementu z listy kontrolnej** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja możliwości usuwania pozycji z checklisty.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Na liście kontrolnej znajduje się co najmniej jeden element.
 
 **Kroki:**
+1. Kliknij ikonę usuwania przy wybranym elemencie.
+2. Potwierdź usunięcie.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Element zostaje usunięty z widoku u wszystkich uczestników podróży.
 
 ---
 
 > **[ST-CHECK-04] Widoczność zmian statusu dla innych uczestników podróży** *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja statusów pozycji checklisty między członkami tej samej podróży.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Dwóch użytkowników (A i B) należy do tej samej podróży i ma otwartą listę kontrolną.
 
 **Kroki:**
+1. Użytkownik A oznacza element jako spakowany.
+2. Użytkownik B sprawdza widok listy.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Użytkownik B widzi niezmienione statusy elementu, niezależne od zmian wykonanych przez użytkownika A.
 
 ---
 
@@ -812,37 +806,29 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-VOTE-03] Wycofanie oddanego głosu** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja możliwości zmiany decyzji przez uczestnika głosowania.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik oddał już głos w otwartym głosowaniu.
 
 **Kroki:**
+1. Otwórz głosowanie, w którym użytkownik wcześniej zagłosował.
+2. Wycofaj swój głos klikając przycisk "Cofnij głos".
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Oddany głos zostaje usunięty, a wyniki aktualizują się zgodnie z nowym stanem.
 
 ---
 
-> **[ST-VOTE-04] Zamknięcie głosowania przez organizatora** – *(Test Manualny)*
+> **[ST-VOTE-04] Próba głosowania po zamknięciu ankiety** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja blokady oddawania głosu po zakończeniu ankiety.
 
-**Warunki początkowe:**
-
-**Kroki:**
-
-**Oczekiwany rezultat:**
-
----
-
-> **[ST-VOTE-05] Próba głosowania po zamknięciu ankiety** – *(Test Manualny)*
-
-**Cel:**
-
-**Warunki początkowe:**
+**Warunki początkowe:** Głosowanie ma status "zamknięte".
 
 **Kroki:**
+1. Otwórz zamknięte głosowanie jako zwykły uczestnik.
+2. Spróbuj zaznaczyć opcję i zatwierdzić głos.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Akcja oddania głosu jest niedostępna, a wyniki pozostają bez zmian.
 
 ---
 
@@ -850,35 +836,45 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-PROF-01] Wyświetlanie danych profilu** – *(Test Automatyczny)*
 
-**Cel:**
+**Cel:** Weryfikacja poprawnego renderowania i pobierania danych użytkownika na stronie profilu.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik zalogowany, endpoint profilu zwraca poprawne dane.
 
 **Kroki:**
+1. Wejdź na stronę profilu użytkownika.
+2. Zweryfikuj widoczność pól (np. e-mail, nick/imię).
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Dane w interfejsie są zgodne z danymi użytkownika z backendu.
 
 ---
 
-> **[ST-PROF-03] Edycja nicku/imienia użytkownika** – *(Test Manualny)*
+> **[ST-PROF-02] Edycja nicku/imienia użytkownika** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja możliwości aktualizacji danych podstawowych profilu.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik jest zalogowany i znajduje się na stronie profilu.
 
 **Kroki:**
+1. Kliknij "Profil".
+2. Zmień wyświetlaną nazwę.
+3. Zapisz zmiany i odśwież stronę.
 
-**Oczekiwany rezultat:**
+**Oczekiwany rezultat:** Nowa wartość jest widoczna po zapisie i utrzymuje się po odświeżeniu.
 
 ---
 
-> **[ST-PROF-04] Zmiana hasła z poziomu profilu** – *(Test Manualny)*
+> **[ST-PROF-03] Zmiana hasła z poziomu profilu** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja procesu zmiany hasła dla zalogowanego użytkownika.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Użytkownik zna aktualne hasło i jest zalogowany.
 
 **Kroki:**
+1. Kliknij "Profil" i przejdź do sekcji zmiany hasła.
+2. Wprowadź aktualne hasło oraz nowe hasło z potwierdzeniem.
+3. Zatwierdź formularz klikając przycisk "Zmień hasło".
+
+**Oczekiwany rezultat:** System potwierdza zmianę hasła. Logowanie nowym hasłem działa, a starym nie.
 
 ---
 
@@ -886,31 +882,46 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 > **[ST-ADMIN-01] Logowanie na konto administratora** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja poprawnego dostępu do panelu administracyjnego dla konta z rolą admin.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Istnieje aktywne konto administratora.
 
 **Kroki:**
+1. Wejdź na stronę logowania.
+2. Zaloguj się danymi administratora.
+3. Przejdź do sekcji `/admin`.
+
+**Oczekiwany rezultat:** Użytkownik z odpowiednią rolą dostęp do panelu admina.
 
 ---
 
 > **[ST-ADMIN-02] Przeglądanie listy użytkowników** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja dostępności i poprawności listy użytkowników w panelu admina.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Administrator jest zalogowany i znajduje się w panelu `/admin`.
 
 **Kroki:**
+1. Otwórz zakładkę użytkowników.
+2. Zweryfikuj listę (np. e-mail, rola, status konta).
+
+**Oczekiwany rezultat:** Lista ładuje się poprawnie i zawiera aktualne rekordy użytkowników.
 
 ---
 
-> **[ST-ADMIN-03] Blokowanie/usuwanie konta użytkownika** – *(Test Manualny)*
+> **[ST-ADMIN-03] Blokowanie konta użytkownika** – *(Test Manualny)*
 
-**Cel:**
+**Cel:** Weryfikacja operacji blokowania na koncie użytkownika.
 
-**Warunki początkowe:**
+**Warunki początkowe:** Administrator jest zalogowany; istnieje konto użytkownika przeznaczone do blokady.
 
 **Kroki:**
+1. Odszukaj użytkownika na liście.
+2. Wybierz akcję "Zablokuj".
+3. Potwierdź operację.
+4. Spróbuj zalogować się na zmodyfikowane konto.
+
+**Oczekiwany rezultat:** Status konta zmienia się zgodnie z akcją admina. Konto zablokowane nie może zalogować się do systemu.
 
 ---
 
@@ -992,40 +1003,35 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 |---|---|---|---|---|
 | ST-AUTH-04 | Prawidłowe logowanie użytkownika | Auth | ZALICZONY  | — |
 | ST-AUTH-05 | Odzyskiwanie hasła – wysłanie linku | Auth | ZALICZONY  | — |
-| ST-AUTH-06 | Resetowanie hasła przez link z e-maila | Auth | Nie przeprowadzono |
-| ST-AUTH-07 | Wygaśnięcie sesji / wylogowanie | Auth | Nie przeprowadzono |
-| ST-REG-07 | Walidacja siły hasła | Register | Nie przeprowadzono |
-| ST-REG-08 | Rejestracja bez checkboxa zgody | Register | Nie przeprowadzono |
+| ST-AUTH-06 | Resetowanie hasła przez link z e-maila | Auth | ZALICZONY |
+| ST-REG-07 | Walidacja siły hasła | Register | ZALICZONY |
 | ST-TRIPS-03 | Dołączanie przez kod zaproszenia | Trips | ZALICZONY  | — |
-| ST-TRIPS-04 | Edycja szczegółów podróży | Trips | Nie przeprowadzono |
-| ST-TRIPS-05 | Usunięcie podróży | Trips | Nie przeprowadzono |
-| ST-TRIPS-06 | Opuszczenie podróży przez uczestnika | Trips | Nie przeprowadzono |
-| ST-TRIPS-07 | Dostęp nieuprawnionego użytkownika | Trips | Nie przeprowadzono |
+| ST-TRIPS-04 | Edycja szczegółów podróży | Trips | ZALICZONY |
+| ST-TRIPS-05 | Usunięcie podróży | Trips | ZALICZONY |
+| ST-TRIPS-06 | Opuszczenie podróży przez uczestnika | Trips | ZALICZONY |
+| ST-TRIPS-07 | Dostęp nieuprawnionego użytkownika | Trips | ZALICZONY |
 | ST-FIN-01 | Dodanie wydatku i podział kosztów | Finance | ZALICZONY  | — |
 | ST-FIN-02 | Wyświetlanie listy wydatków | Finance | ZALICZONY  | — |
-| ST-FIN-03 | Usunięcie wydatku | Finance | Nie przeprowadzono |
-| ST-FIN-04 | Podział z nierównymi udziałami | Finance | Nie przeprowadzono |
-| ST-FIN-05 | Walidacja kwoty 0 lub ujemnej | Finance | Nie przeprowadzono |
-| ST-FIN-06 | Podgląd bilansu całkowitego | Finance | Nie przeprowadzono |
+| ST-FIN-03 | Usunięcie wydatku | Finance | NIEZALICZONY | Całościowe saldo i główny spis wydatku zostaje zaktualizowany poprawnie, ale spis rozliczeń z innymi osobami we własnym saldzie zostaje zaktualizowany dopiero po odświeżeniu strony. |
+| ST-FIN-04 | Walidacja kwoty 0 lub ujemnej | Finance | NIEZALICZONY | W przypadku kwoty ujemnej - wszystko działa poprawnie, przy kwocie 0 dostajemy natomiast komunikat "Wpisz poprawną kwotę", zamiast informacji o kwocie nieujemnej |
 | ST-PLAN-01 | Dodanie dnia do harmonogramu | Planning | NIEZALICZONY  | Dodanie dnia działa tylko za pomocą przycisku "Dodaj dzień"; w przypadku kliknięcia entera - modal z dodaniem dnia się zamyka, ale dzień się nie dodaje. |
 | ST-PLAN-02 | Dodanie aktywności do dnia | Planning | NIEZALICZONY  | Dodanie aktywności działa tylko za pomocą przycisku "Dodaj aktywność"; w przypadku kliknięcia entera - modal z dodaniem aktywności się zamyka, ale aktywność nie zostaje dodana. |
-| ST-PLAN-03 | Edycja aktywności | Planning | Nie przeprowadzono |
-| ST-PLAN-04 | Usunięcie dnia z aktywnościami | Planning | Nie przeprowadzono |
-| ST-PLAN-05 | Dzień spoza zakresu dat podróży | Planning | Nie przeprowadzono |
+| ST-PLAN-03 | Edycja aktywności | Planning | ZALICZONY |
+| ST-PLAN-04 | Usunięcie dnia z aktywnościami | Planning | ZALICZONY |
+| ST-PLAN-05 | Dzień spoza zakresu dat podróży | Planning | ZALICZONY |
 | ST-CHECK-01 | Dodanie elementu listy kontrolnej | Checklist | ZALICZONY  | — |
 | ST-CHECK-02 | Odznaczenie elementu listy kontrolnej | Checklist | ZALICZONY | — |
-| ST-CHECK-03 | Usunięcie elementu listy kontrolnej | Checklist | Nie przeprowadzono |
-| ST-CHECK-04 | Widoczność statusu dla uczestników | Checklist | Nie przeprowadzono |
+| ST-CHECK-03 | Usunięcie elementu listy kontrolnej | Checklist | ZALICZONY |
+| ST-CHECK-04 | Widoczność statusu dla uczestników | Checklist | ZALICZONY |
 | ST-VOTE-01 | Tworzenie nowego głosowania | Voting | ZALICZONY  | — |
 | ST-VOTE-02 | Oddanie głosu | Voting | ZALICZONY  | — |
-| ST-VOTE-03 | Wycofanie oddanego głosu | Voting | Nie przeprowadzono |
-| ST-VOTE-04 | Zamknięcie głosowania | Voting | Nie przeprowadzono |
-| ST-VOTE-05 | Głosowanie po zamknięciu ankiety | Voting | Nie przeprowadzono |
-| ST-PROF-02 | Edycja nicku/imienia | Profil | Nie przeprowadzono |
-| ST-PROF-03 | Zmiana hasła z profilu | Profil | Nie przeprowadzono |
-| ST-ADMIN-01 | Logowanie administratora | Admin | Nie przeprowadzono |
-| ST-ADMIN-02 | Przeglądanie listy użytkowników | Admin | Nie przeprowadzono |
-| ST-ADMIN-03 | Blokowanie konta użytkownika | Admin | Nie przeprowadzono |
+| ST-VOTE-03 | Wycofanie oddanego głosu | Voting | ZALICZONY | - |
+| ST-VOTE-04 | Głosowanie po zamknięciu ankiety | Voting | NIEZALICZONY | Można oddać głos w zarchiwizowanym głosowaniu |
+| ST-PROF-02 | Edycja nicku/imienia | Profil | ZALICZONY |
+| ST-PROF-03 | Zmiana hasła z profilu | Profil | ZALICZONY |
+| ST-ADMIN-01 | Logowanie administratora | Admin | ZALICZONY |
+| ST-ADMIN-02 | Przeglądanie listy użytkowników | Admin | ZALICZONY |
+| ST-ADMIN-03 | Blokowanie konta użytkownika | Admin | ZALICZONY |
 
 ### 3.3 Testy jednostkowe
 
