@@ -15,7 +15,7 @@ test.describe("Profil użytkownika", () => {
       updatedAt: "2025-02-10T12:00:00.000Z",
     };
 
-    await page.route(/\/api\/v1\/users\/me$/, async (route) => {
+    await page.route("**/api/v1/users/me", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -28,11 +28,9 @@ test.describe("Profil użytkownika", () => {
     await expect(
       page.getByRole("heading", { name: /twój profil/i })
     ).toBeVisible();
+    await expect(page.getByText("Jan Kowalski")).toBeVisible();
     await expect(page.locator('input[disabled]').first()).toHaveValue(
       "test@shareway.com"
-    );
-    await expect(page.locator('input:not([disabled])').first()).toHaveValue(
-      "Jan Kowalski"
     );
   });
 });

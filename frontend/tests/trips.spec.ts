@@ -27,8 +27,10 @@ test.describe("Podróże", () => {
     page,
   }) => {
     await loginAsUser(page);
+    let tripsFetched = false;
 
-    await page.route(/\/api\/v1\/trips$/, async (route) => {
+    await page.route("**/api/v1/trips", async (route) => {
+      tripsFetched = true;
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -47,6 +49,7 @@ test.describe("Podróże", () => {
     });
 
     await page.goto("/dashboard");
+    await expect.poll(() => tripsFetched).toBeTruthy();
 
     await expect(page.getByText("Majówka w Chorwacji")).toBeVisible();
     await expect(page.getByText("Split, Chorwacja")).toBeVisible();
@@ -74,18 +77,8 @@ test.describe("Podróże", () => {
     };
 
     let tripsRequestCount = 0;
-    let requestBody:
-      | {
-          name?: string;
-          description?: string;
-          location?: string;
-          startDate?: string;
-          endDate?: string;
-          baseCurrency?: string;
-        }
-      | undefined;
 
-    await page.route(/\/api\/destination-image\?/, async (route) => {
+    await page.route("**/api/destination-image**", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -93,7 +86,7 @@ test.describe("Podróże", () => {
       });
     });
 
-    await page.route(/\/api\/v1\/trips$/, async (route) => {
+    await page.route("**/api/v1/trips", async (route) => {
       if (route.request().method() === "GET") {
         tripsRequestCount += 1;
         await route.fulfill({
@@ -104,7 +97,6 @@ test.describe("Podróże", () => {
         return;
       }
 
-      requestBody = JSON.parse(route.request().postData() ?? "{}");
       await route.fulfill({
         status: 201,
         contentType: "application/json",
@@ -124,18 +116,21 @@ test.describe("Podróże", () => {
     await page
       .getByPlaceholder(/krótki opis podróży/i)
       .fill("Narty i trekking");
+    const createTripRequest = page.waitForRequest(
+      (request) =>
+        request.url().includes("/api/v1/trips") && request.method() === "POST"
+    );
     await page.getByRole("button", { name: /^utwórz podróż$/i }).click();
+    const requestBody = JSON.parse((await createTripRequest).postData() ?? "{}");
 
-    await expect
-      .poll(() => requestBody)
-      .toEqual({
-        name: "Weekend w Alpach",
-        description: "Narty i trekking",
-        location: "Zermatt, Szwajcaria",
-        startDate: "2026-02-12",
-        endDate: "2026-02-16",
-        baseCurrency: "PLN",
-      });
+    expect(requestBody).toEqual({
+      name: "Weekend w Alpach",
+      description: "Narty i trekking",
+      location: "Zermatt, Szwajcaria",
+      startDate: "2026-02-12",
+      endDate: "2026-02-16",
+      baseCurrency: "PLN",
+    });
 
     await expect(page.getByText("Weekend w Alpach")).toBeVisible();
   });
