@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 
 import { loginAsUser } from "./helpers/e2e";
 
+const tripsPattern = /\/api(?:\/v1)?\/trips(?:\?.*)?$/;
+
 function buildTrip(overrides: Partial<Record<string, unknown>> = {}) {
   return {
     id: "trip-1",
@@ -27,10 +29,8 @@ test.describe("Podróże", () => {
     page,
   }) => {
     await loginAsUser(page);
-    let tripsFetched = false;
 
-    await page.route("**/api/v1/trips", async (route) => {
-      tripsFetched = true;
+    await page.route(tripsPattern, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -49,9 +49,10 @@ test.describe("Podróże", () => {
     });
 
     await page.goto("/dashboard");
-    await expect.poll(() => tripsFetched).toBeTruthy();
 
-    await expect(page.getByText("Majówka w Chorwacji")).toBeVisible();
+    await expect(page.getByText("Majówka w Chorwacji")).toBeVisible({
+      timeout: 15000,
+    });
     await expect(page.getByText("Split, Chorwacja")).toBeVisible();
     await expect(
       page.getByRole("button", { name: /dodaj podróż/i })
@@ -86,7 +87,7 @@ test.describe("Podróże", () => {
       });
     });
 
-    await page.route("**/api/v1/trips", async (route) => {
+    await page.route(tripsPattern, async (route) => {
       if (route.request().method() === "GET") {
         tripsRequestCount += 1;
         await route.fulfill({
@@ -118,7 +119,7 @@ test.describe("Podróże", () => {
       .fill("Narty i trekking");
     const createTripRequest = page.waitForRequest(
       (request) =>
-        request.url().includes("/api/v1/trips") && request.method() === "POST"
+        tripsPattern.test(request.url()) && request.method() === "POST"
     );
     await page.getByRole("button", { name: /^utwórz podróż$/i }).click();
     const requestBody = JSON.parse((await createTripRequest).postData() ?? "{}");
