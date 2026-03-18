@@ -1,5 +1,4 @@
 import type { TripAccentPreset } from "@/lib/types/trip";
-import { getPrebakedQueries } from "@/lib/prebakedQueries";
 
 type LearnedDestination = {
   queries: string[];
@@ -210,8 +209,6 @@ export function buildDestinationQueries(
   const primary = parts[0] || translated || destination.trim() || "";
   const secondary = parts.length > 1 ? parts[1] : "";
 
-  const extraFromPrebaked = getPrebakedQueries(destination);
-
   const learned = learnedDestinations.get(normalizeKey(destination));
   const extraFromLearned = learned?.queries ?? [];
 
@@ -265,7 +262,6 @@ export function buildDestinationQueries(
 
   const all = [
     ...locationQueries,
-    ...extraFromPrebaked,
     ...extraFromLearned,
     ...contextual,
     ...descriptiveCombos,
