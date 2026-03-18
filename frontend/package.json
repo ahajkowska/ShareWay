@@ -7,9 +7,7 @@
     "dev": "next dev",
     "build": "NEXT_WEBPACK_BUILD=1 next build",
     "start": "next start",
-    "lint": "eslint",
-    "seed:pexels": "node scripts/seedPexels.js",
-    "generate:queries": "node scripts/generateSmartQueries.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.8",
