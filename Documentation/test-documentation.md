@@ -990,9 +990,9 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 | ST-REG-04 | Walidacja formatu e-mail | `register.spec.ts` | ZALICZONY |
 | ST-REG-05 | Błąd – e-mail już zajęty | `register.spec.ts` | ZALICZONY |
 | ST-REG-06 | Pomyślna rejestracja – nawigacja | `register.spec.ts` | ZALICZONY |
-| ST-TRIPS-01 | Tworzenie nowej podróży | - | Nie przeprowadzono |
-| ST-TRIPS-02 | Wyświetlanie listy podróży | - | Nie przeprowadzono  |
-| ST-PROF-01 | Wyświetlanie danych profilu | Profil | Nie przeprowadzono |
+| ST-TRIPS-01 | Tworzenie nowej podróży | `trips.spec.ts` | ZALICZONY |
+| ST-TRIPS-02 | Wyświetlanie listy podróży | `trips.spec.ts` | ZALICZONY |
+| ST-PROF-01 | Wyświetlanie danych profilu | `profile.spec.ts` | ZALICZONY |
 | ST-ROUTE-01 | Wejście niezalogowanego użytkownika na `/dashboard` | `routing.spec.ts` | ZALICZONY |
 | ST-ROUTE-02 | Dostęp zalogowanego użytkownika do `/dashboard` | `routing.spec.ts` | ZALICZONY |
 | ST-ROUTE-03 | Wylogowanie użytkownika | `routing.spec.ts` | ZALICZONY |
