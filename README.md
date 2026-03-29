@@ -100,12 +100,62 @@ Możesz korzystać lokalnie z aplikacji na `http://localhost:4000/`
    docker compose down -v
    ```
 
-### Testowanie API:
+### Testy automatyczne E2E (Playwright)
 
-```powershell
-# Test endpointu logowania (powinien zwrócić "Invalid credentials")
-Invoke-WebRequest -Uri http://localhost:4000/api/auth/login -Method POST -Headers @{"Content-Type"="application/json"} -Body '{"email":"test@example.com","password":"test123"}'
-```
+Testy E2E znajdują się w katalogu `frontend/tests` i sprawdzają krytyczne ścieżki użytkownika w aplikacji.
+
+Zakres testów:
+- `login.spec.ts` - formularz logowania, walidacja i obsługa błędnych danych.
+- `register.spec.ts` - formularz rejestracji, walidacje i scenariusz poprawnej rejestracji.
+- `routing.spec.ts` - ochrona ścieżek (`/dashboard`) i wylogowanie.
+- `trips.spec.ts` - lista podróży i tworzenie nowej podróży.
+- `profile.spec.ts` - odczyt danych profilu użytkownika.
+
+Uruchomienie testów lokalnie:
+
+1. Przejdź do katalogu frontendu:
+    ```powershell
+    cd frontend
+    ```
+
+2. Zainstaluj zależności (jeśli jeszcze nie są zainstalowane):
+    ```powershell
+    npm install
+    ```
+
+3. Zainstaluj przeglądarki Playwright:
+    ```powershell
+    npx playwright install
+    ```
+
+4. Uruchom testy:
+    ```powershell
+    npx playwright test
+    ```
+
+Uwagi:
+- Konfiguracja jest w `frontend/playwright.config.ts`.
+- Podczas uruchamiania testów Playwright automatycznie startuje aplikację komendą `npm run dev` na `http://localhost:3000`.
+
+Raport i wyniki:
+- Raport HTML:
+   ```powershell
+   npx playwright show-report
+   ```
+
+Szybkie komendy pomocnicze:
+- Uruchom tylko jeden plik testowy:
+   ```powershell
+   npx playwright test tests/login.spec.ts
+   ```
+- Uruchom testy tylko w Chromium:
+   ```powershell
+   npx playwright test --project=chromium
+   ```
+- Uruchom testy z interfejsem Playwright UI:
+   ```powershell
+   npx playwright test --ui
+   ```
 
 ### Rozwiązywanie problemów:
 
@@ -125,7 +175,7 @@ Invoke-WebRequest -Uri http://localhost:4000/api/auth/login -Method POST -Header
 
 ## Team
 
-- [@ahajkowskaa](https://github.com/ahajkowska)
+- [@ahajkowska](https://github.com/ahajkowska)
 - [@azegler](https://github.com/azegler)
 - [@ksvcchh](https://github.com/ksvcchh)
 - [@khumianka](https://github.com/khumianka)
