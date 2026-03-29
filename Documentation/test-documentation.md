@@ -244,8 +244,8 @@ blockquote {
   - [3.1. Testy automatyczne (E2E – Playwright)](#31-testy-automatyczne-e2e--playwright)
   - [3.2. Testy manualne (Funkcjonalne)](#32-testy-manualne-funkcjonalne)
   - [3.3 Testy jednostkowe](#33-testy-jednostkowe)
-  - [3.4 Zrzut z playwright](#34-zrzut-z-playwright)
-  - [3.5 Zrzut z testów jednostkowych](#35-zrzut-z-testów-jednostkowych)
+  - [3.4 Zrzut ekranu z testów automatycznych](#34-zrzut-ekranu-z-testów-automatycznych)
+  - [3.5 Zrzut ekranu z testów jednostkowych](#35-zrzut-ekranu-z-testów-jednostkowych)
 <!-- /TOC -->
 
 <div class="page-break"></div>
@@ -1003,38 +1003,40 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 |---|---|---|---|---|
 | ST-AUTH-04 | Prawidłowe logowanie użytkownika | Auth | ZALICZONY  | — |
 | ST-AUTH-05 | Odzyskiwanie hasła – wysłanie linku | Auth | ZALICZONY  | — |
-| ST-AUTH-06 | Resetowanie hasła przez link z e-maila | Auth | ZALICZONY |
-| ST-REG-07 | Walidacja siły hasła | Register | ZALICZONY |
+| ST-AUTH-06 | Resetowanie hasła przez link z e-maila | Auth | ZALICZONY | — |
+| ST-REG-07 | Walidacja siły hasła | Register | ZALICZONY | — |
 | ST-TRIPS-03 | Dołączanie przez kod zaproszenia | Trips | ZALICZONY  | — |
-| ST-TRIPS-04 | Edycja szczegółów podróży | Trips | ZALICZONY |
-| ST-TRIPS-05 | Usunięcie podróży | Trips | ZALICZONY |
-| ST-TRIPS-06 | Opuszczenie podróży przez uczestnika | Trips | ZALICZONY |
-| ST-TRIPS-07 | Dostęp nieuprawnionego użytkownika | Trips | ZALICZONY |
+| ST-TRIPS-04 | Edycja szczegółów podróży | Trips | ZALICZONY | — |
+| ST-TRIPS-05 | Usunięcie podróży | Trips | ZALICZONY | — |
+| ST-TRIPS-06 | Opuszczenie podróży przez uczestnika | Trips | ZALICZONY | — |
+| ST-TRIPS-07 | Dostęp nieuprawnionego użytkownika | Trips | ZALICZONY | — |
 | ST-FIN-01 | Dodanie wydatku i podział kosztów | Finance | ZALICZONY  | — |
 | ST-FIN-02 | Wyświetlanie listy wydatków | Finance | ZALICZONY  | — |
 | ST-FIN-03 | Usunięcie wydatku | Finance | NIEZALICZONY | Całościowe saldo i główny spis wydatku zostaje zaktualizowany poprawnie, ale spis rozliczeń z innymi osobami we własnym saldzie zostaje zaktualizowany dopiero po odświeżeniu strony. |
 | ST-FIN-04 | Walidacja kwoty 0 lub ujemnej | Finance | NIEZALICZONY | W przypadku kwoty ujemnej - wszystko działa poprawnie, przy kwocie 0 dostajemy natomiast komunikat "Wpisz poprawną kwotę", zamiast informacji o kwocie nieujemnej |
 | ST-PLAN-01 | Dodanie dnia do harmonogramu | Planning | NIEZALICZONY  | Dodanie dnia działa tylko za pomocą przycisku "Dodaj dzień"; w przypadku kliknięcia entera - modal z dodaniem dnia się zamyka, ale dzień się nie dodaje. |
 | ST-PLAN-02 | Dodanie aktywności do dnia | Planning | NIEZALICZONY  | Dodanie aktywności działa tylko za pomocą przycisku "Dodaj aktywność"; w przypadku kliknięcia entera - modal z dodaniem aktywności się zamyka, ale aktywność nie zostaje dodana. |
-| ST-PLAN-03 | Edycja aktywności | Planning | ZALICZONY |
-| ST-PLAN-04 | Usunięcie dnia z aktywnościami | Planning | ZALICZONY |
-| ST-PLAN-05 | Dzień spoza zakresu dat podróży | Planning | ZALICZONY |
+| ST-PLAN-03 | Edycja aktywności | Planning | ZALICZONY | — |
+| ST-PLAN-04 | Usunięcie dnia z aktywnościami | Planning | ZALICZONY | — |
+| ST-PLAN-05 | Dzień spoza zakresu dat podróży | Planning | ZALICZONY | — |
 | ST-CHECK-01 | Dodanie elementu listy kontrolnej | Checklist | ZALICZONY  | — |
 | ST-CHECK-02 | Odznaczenie elementu listy kontrolnej | Checklist | ZALICZONY | — |
-| ST-CHECK-03 | Usunięcie elementu listy kontrolnej | Checklist | ZALICZONY |
-| ST-CHECK-04 | Widoczność statusu dla uczestników | Checklist | ZALICZONY |
+| ST-CHECK-03 | Usunięcie elementu listy kontrolnej | Checklist | ZALICZONY | — |
+| ST-CHECK-04 | Widoczność statusu dla uczestników | Checklist | ZALICZONY | — |
 | ST-VOTE-01 | Tworzenie nowego głosowania | Voting | ZALICZONY  | — |
 | ST-VOTE-02 | Oddanie głosu | Voting | ZALICZONY  | — |
 | ST-VOTE-03 | Wycofanie oddanego głosu | Voting | ZALICZONY | - |
 | ST-VOTE-04 | Głosowanie po zamknięciu ankiety | Voting | NIEZALICZONY | Można oddać głos w zarchiwizowanym głosowaniu |
-| ST-PROF-02 | Edycja nicku/imienia | Profil | ZALICZONY |
-| ST-PROF-03 | Zmiana hasła z profilu | Profil | ZALICZONY |
-| ST-ADMIN-01 | Logowanie administratora | Admin | ZALICZONY |
-| ST-ADMIN-02 | Przeglądanie listy użytkowników | Admin | ZALICZONY |
-| ST-ADMIN-03 | Blokowanie konta użytkownika | Admin | ZALICZONY |
+| ST-PROF-02 | Edycja nicku/imienia | Profil | ZALICZONY | — |
+| ST-PROF-03 | Zmiana hasła z profilu | Profil | ZALICZONY | — |
+| ST-ADMIN-01 | Logowanie administratora | Admin | ZALICZONY | — |
+| ST-ADMIN-02 | Przeglądanie listy użytkowników | Admin | ZALICZONY | — |
+| ST-ADMIN-03 | Blokowanie konta użytkownika | Admin | ZALICZONY | — |
 
 ### 3.3 Testy jednostkowe
 
-### 3.4 Zrzut z playwright
+### 3.4 Zrzut ekranu z testów automatycznych
 
-### 3.5 Zrzut z testów jednostkowych
+![Testy Playwright](img/playwright-tests.png)
+
+### 3.5 Zrzut ekranu z testów jednostkowych
