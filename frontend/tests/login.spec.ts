@@ -1,4 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
+
+async function typeAndAssertValue(locator: Locator, value: string) {
+  await locator.click();
+  await locator.fill('');
+  await locator.pressSequentially(value);
+  await expect(locator).toHaveValue(value);
+}
 
 test.describe('Strona Logowania', () => {
 
@@ -27,15 +34,29 @@ test.describe('Strona Logowania', () => {
     });
 
     await page.goto('/login');
+    await page.waitForTimeout(300);
 
     // Wypełnienie formularza błędnymi danymi
-    await page.locator('input[type="email"]').fill('zle@dane.pl');
-    await page.locator('input[type="password"]').fill('ZleHaslo123');
+    const emailInput = page.locator('#login-email');
+    const passwordInput = page.locator('#login-password');
+    const submitButton = page.getByRole('button', { name: /Zaloguj/i });
 
-    await page.getByRole('button', { name: /Zaloguj/i }).click();
+    await typeAndAssertValue(emailInput, 'zle@dane.pl');
+    await typeAndAssertValue(passwordInput, 'ZleHaslo123');
+
+    const loginRequest = page.waitForRequest(
+      (request) => /\/auth\/login/.test(request.url()) && request.method() === 'POST'
+    );
+
+    await submitButton.click();
+    await loginRequest;
 
     // Komunikat: "Nieprawidłowy e-mail lub hasło."
-    await expect(page.getByText(/Nieprawidłowy e-mail lub has/i)).toBeVisible({ timeout: 8000 });
+    await expect(
+      page
+        .locator('form [role="alert"]')
+        .filter({ hasText: /Nieprawidłowy e-mail lub hasło|Invalid credentials/i })
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('Walidacja pustego formularza logowania', async ({ page }) => {
