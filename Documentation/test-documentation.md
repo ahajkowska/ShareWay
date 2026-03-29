@@ -228,7 +228,7 @@ blockquote {
 <div class="page-break"></div>
 
 <!-- TOC -->
-- [1. Strategia testowania i zakres](#1-strategia-testowania-i-zakres)
+- [1. Strategia testowania i zakres testów](#1-strategia-testowania-i-zakres-testów)
 - [2. Scenariusze testowe](#2-scenariusze-testowe)
   - [2.1. Uwierzytelnianie (Auth)](#21-uwierzytelnianie-auth)
   - [2.2. Rejestracja (Register)](#22-rejestracja-register)
@@ -244,36 +244,38 @@ blockquote {
   - [3.1. Testy automatyczne (E2E – Playwright)](#31-testy-automatyczne-e2e--playwright)
   - [3.2. Testy manualne (Funkcjonalne)](#32-testy-manualne-funkcjonalne)
   - [3.3 Testy jednostkowe](#33-testy-jednostkowe)
-  - [3.4 Zrzut ekranu z testów automatycznych](#34-zrzut-ekranu-z-testów-automatycznych)
-  - [3.5 Zrzut ekranu z testów jednostkowych](#35-zrzut-ekranu-z-testów-jednostkowych)
+  - [3.4 Zrzut ekranu z testów jednostkowych](#34-zrzut-ekranu-z-testów-jednostkowych)
+  - [4. Wnioski](#4-wnioski)
 <!-- /TOC -->
 
 <div class="page-break"></div>
 
-## 1. Strategia testowania i zakres
+## 1. Strategia testowania i zakres testów
 
 W projekcie ShareWay przyjęto hybrydowy model testowania, łączący testy jednostkowe, testy automatyczne (zapewniające stabilność kluczowych ścieżek) oraz testy manualne (weryfikujące użyteczność i przypadki brzegowe z perspektywy końcowego użytkownika).
 
 **Podział metodologiczny:**
 
 **Testy Automatyczne (End-to-End / E2E):**
-- Narzędzie: Playwright
-- Zakres: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. Obejmują proces logowania, rejestracji, walidację formularzy wejściowych oraz ochronę ścieżek (routing).
-- Dlaczego użyto?: Sprawdzają najważniejsze ścieżki użytkownika od początku do końca. Czyli to, co jest najbardziej kluczowe do działania aplikacji i "zepsucie" tych funkcjonalności skutkowałoby największymi problemami w aplikacji.
-- Uruchamianie: Automatycznie w procesie CI (Continuous Integration) przy użyciu GitHub Actions po każdym dodaniu nowego kodu do głównej gałęzi repozytorium.
+- **Narzędzie**: Playwright
+- **Zakres**: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. 
+- **Dlaczego użyto?**: Sprawdzają najważniejsze ścieżki użytkownika od początku do końca. Czyli to, co jest najbardziej kluczowe do działania aplikacji i "zepsucie" tych funkcjonalności skutkowałoby największymi problemami w aplikacji.
+- **Uruchamianie**: Automatycznie w procesie CI przy użyciu GitHub Actions po każdym dodaniu nowego kodu do głównej gałęzi repozytorium lub lokalnie.
 
 **Testy Manualne:**
-- Zakres: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram.
-- Dlaczego użyto?: Automatyzacja byłaby kosztowna, logika jest bardzo skomplikowana i łatwiej wytestować ją manualnie niż zakodować w E2E. Można też sprawdzić wygodność realnego użycia funkcjonalności.
+- **Zakres**: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram.
+- **Dlaczego użyto?**: Automatyzacja byłaby kosztowna, logika jest bardzo skomplikowana i łatwiej wytestować ją manualnie niż zakodować w E2E. Można też sprawdzić wygodność realnego użycia funkcjonalności.
 
 **Testy Jednostkowe**
-- Zakres: Najmniejsze elementy logiki w izolacji (funkcje, serwisy, walidacje)
-- Dlaczego użyto?: Są najszybsze i najtańsze w utrzymaniu. Są bardzo dobre do łapania błędów zanim problem "wyjdzie" do UI. Daja peewność, że rdzeń działa poprawnie niezależnie od frontendu.
+- **Zakres**: Najmniejsze elementy logiki w izolacji (funkcje, serwisy, walidacje)
+- **Dlaczego użyto?**: Są najszybsze i najtańsze w utrzymaniu. Są bardzo dobre do łapania błędów zanim problem "wyjdzie" do UI. Dają pewność, że rdzeń działa poprawnie niezależnie od frontendu.
 
 **Uzasadnienie wyboru strategii hybrydowej:**
-Zdecydowaliśmy się na podejście hybrydowe ze względu na specyfikę projektu ShareWay. Zastosowanie testów automatycznych End-to-End (E2E) przy użyciu frameworka Playwright dla modułu uwierzytelniania (Auth/Register) wynika z faktu, że są to najbardziej krytyczne ścieżki w systemie. Ewentualne błędy w tym miejscu całkowicie blokują użytkownikom dostęp do aplikacji. Playwright został wybrany ze względu na doskonałą integrację z Next.js, szybkość działania oraz generowanie czytelnych raportów wizualnych (HTML).
 
-Z kolei moduły takie jak Finanse (podział kosztów), Harmonogram czy Głosowania charakteryzują się bardzo dużą dynamiką interfejsu i skomplikowanymi interakcjami po stronie użytkownika. Z uwagi na ograniczenia czasowe projektu, ich automatyzacja na poziomie E2E przyniosłaby mniejszy zwrot z inwestycji (ROI) niż gruntowne przetestowanie manualne. Testy manualne pozwalają na szybką weryfikację logiki biznesowej i użyteczności (UX) bezpośrednio z perspektywy końcowego użytkownika.
+* **Testy automatyczne E2E** (Playwright): Zabezpieczają ścieżki krytyczne, których ewentualna awaria całkowicie odcięłaby użytkowników od systemu (np. logowanie). Narzędzie wybrano ze względu na szybkość, płynną integrację z Next.js oraz czytelne raporty HTML.
+
+* **Testy manualne**: Obejmują moduły o złożonych interakcjach (Finanse, Harmonogram, Głosowania). Podejście manualne pozwala znacznie szybko zweryfikować logikę biznesową i użyteczność (UX) bezpośrednio z perspektywy końcowego użytkownika.
+  
 
 <div class="page-break"></div>
 
@@ -977,6 +979,14 @@ Poniżej przedstawiono scenariusze testowe, według których weryfikowano popraw
 
 Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 
+<p><strong>W ramach weryfikacji aplikacji przeprowadzono łącznie:</strong></p>
+<ul>
+  <li>15 testów automatycznych E2E (Playwright),</li>
+  <li>31 testów manualnych,</li>
+  <li>X testów jednostkowych,</li>
+  <li>uzyskując pokrycie kodu na poziomie ok. X%.</li>
+</ul>
+
 ### 3.1. Testy automatyczne (E2E – Playwright)
 
 | ID | Nazwa scenariusza | Plik testu | Wynik |
@@ -996,6 +1006,8 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 | ST-ROUTE-01 | Wejście niezalogowanego użytkownika na `/dashboard` | `routing.spec.ts` | ZALICZONY |
 | ST-ROUTE-02 | Dostęp zalogowanego użytkownika do `/dashboard` | `routing.spec.ts` | ZALICZONY |
 | ST-ROUTE-03 | Wylogowanie użytkownika | `routing.spec.ts` | ZALICZONY |
+
+![Testy Playwright](img/playwright-tests.png)
 
 ### 3.2. Testy manualne (Funkcjonalne)
 
@@ -1035,8 +1047,10 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 
 ### 3.3 Testy jednostkowe
 
-### 3.4 Zrzut ekranu z testów automatycznych
+### 3.4 Zrzut ekranu z testów jednostkowych
 
-![Testy Playwright](img/playwright-tests.png)
+### 4. Wnioski
 
-### 3.5 Zrzut ekranu z testów jednostkowych
+<p>Przeprowadzone testy pozwoliły na dokładną weryfikację działania systemu ShareWay. Połączenie testów automatycznych i jednostkowych zagwarantowało stabilność kluczowych ścieżek, co ułatwiło wczesne wykrywanie błędów.</p>
+<p>Testy manualne wykazały kilka drobnych błędów w zachowaniu interfejsu (m.in. konieczność odświeżania strony po dodaniu wydatku w module finansów oraz usterki przy zatwierdzaniu formularzy klawiszem Enter w module planowania). Błędy te nie blokują jednak głównych funkcjonalności aplikacji, a system odpowiednio radzi sobie z danymi brzegowymi i walidacją po stronie serwera.</p>
+<p>Całościowe pokrycie kodu oceniane jest na zadowalającym poziomie, a wrażliwe punkty dostępowe (Routing) są poprawnie chronione przed nieautoryzowanym dostępem.</p>
