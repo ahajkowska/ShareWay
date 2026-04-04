@@ -157,6 +157,48 @@ Szybkie komendy pomocnicze:
    npx playwright test --ui
    ```
 
+### Testy jednostkowe backendu (Jest)
+
+Testy jednostkowe backendu znajduja sie w katalogu `backend/api/src` i wykorzystuja pliki `*.spec.ts` uruchamiane przez Jest.
+
+Uruchomienie testow lokalnie:
+
+1. Przejdz do katalogu API:
+   ```powershell
+   cd backend/api
+   ```
+
+2. Zainstaluj zaleznosci:
+   ```powershell
+   npm install
+   ```
+
+3. Uruchom wszystkie testy jednostkowe:
+   ```powershell
+   npm run test
+   ```
+
+4. Tryb watch (automatyczne ponawianie testow po zmianach):
+   ```powershell
+   npm run test:watch
+   ```
+
+5. Raport pokrycia kodu:
+   ```powershell
+   npm run test:cov
+   ```
+
+Przydatne komendy:
+
+- Lista testow wykrywanych przez Jest:
+   ```powershell
+   npm test -- --listTests
+   ```
+- Debug pojedynczego przebiegu testow:
+   ```powershell
+   npm run test:debug
+   ```
+
 ### Rozwiązywanie problemów:
 
 1. **Port jest już zajęty:**
