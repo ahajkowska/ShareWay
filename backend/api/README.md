@@ -139,6 +139,34 @@ npm run build
 npm run start:prod
 ```
 
+## Unit Tests (Jest)
+
+Backend API uses Jest for unit testing (`*.spec.ts` files under `src/`).
+
+Run tests:
+
+```bash
+npm run test
+```
+
+Watch mode:
+
+```bash
+npm run test:watch
+```
+
+Coverage report:
+
+```bash
+npm run test:cov
+```
+
+List detected tests:
+
+```bash
+npm test -- --listTests
+```
+
 ## DTOs
 
 ### RegisterDto

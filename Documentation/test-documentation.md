@@ -227,7 +227,6 @@ blockquote {
 
 <div class="page-break"></div>
 
-<!-- TOC -->
 - [1. Strategia testowania i zakres testów](#1-strategia-testowania-i-zakres-testów)
 - [2. Scenariusze testowe](#2-scenariusze-testowe)
   - [2.1. Uwierzytelnianie (Auth)](#21-uwierzytelnianie-auth)
@@ -244,9 +243,8 @@ blockquote {
   - [3.1. Testy automatyczne (E2E – Playwright)](#31-testy-automatyczne-e2e--playwright)
   - [3.2. Testy manualne (Funkcjonalne)](#32-testy-manualne-funkcjonalne)
   - [3.3 Testy jednostkowe](#33-testy-jednostkowe)
-  - [3.4 Zrzut ekranu z testów jednostkowych](#34-zrzut-ekranu-z-testów-jednostkowych)
   - [4. Wnioski](#4-wnioski)
-<!-- /TOC -->
+
 
 <div class="page-break"></div>
 
@@ -983,11 +981,15 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 <ul>
   <li>15 testów automatycznych E2E (Playwright),</li>
   <li>31 testów manualnych,</li>
-  <li>X testów jednostkowych,</li>
-  <li>uzyskując pokrycie kodu na poziomie ok. X%.</li>
+  <li>239 testów jednostkowych backendu (Jest),</li>
+  <li>uzyskując pokrycie kodu backendu na poziomie 84.29% linii (testy jednostkowe).</li>
 </ul>
 
 ### 3.1. Testy automatyczne (E2E – Playwright)
+
+Testy automatyczne frontendu zrealizowane zostały przy uzyciu Playwright. Obejmują one krytyczne scieżki użytkownika i uruchamiane są na poziomie przeglądarki.
+
+**Zakres testow automatycznych:**
 
 | ID | Nazwa scenariusza | Plik testu | Wynik |
 |---|---|---|---|
@@ -1009,7 +1011,18 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 
 ![Testy Playwright](img/playwright-tests.png)
 
+- Liczba scenariuszy: **15**
+- Wynik: **15/15 zaliczonych**
+
 ### 3.2. Testy manualne (Funkcjonalne)
+
+Testy manualne obejmują scenariusze funkcjonalne wymagające weryfikacji z perspektywy realnego użytkownika, szczególnie tam, gdzie wystepuje bardziej złożona logika biznesowa i interakcje UI.
+
+**Zakres testow manualnych:**
+
+- Moduly: `auth`, `register`, `trips`, `finance`, `planning`, `checklist`, `voting`, `profil`, `admin`
+- Typowe obszary: walidacje formularzy, zachowanie po operacjach CRUD, poprawne odswiezanie danych, scenariusze brzegowe i regresja UX
+- Liczba scenariuszy: **31**
 
 | ID | Nazwa scenariusza | Moduł | Wynik | Uwagi |
 |---|---|---|---|---|
@@ -1045,12 +1058,88 @@ Tabela poniżej stanowi zestawienie wyników z przeprowadzonych testów.
 | ST-ADMIN-02 | Przeglądanie listy użytkowników | Admin | ZALICZONY | — |
 | ST-ADMIN-03 | Blokowanie konta użytkownika | Admin | ZALICZONY | — |
 
+**Podsumowanie wynikow testow manualnych:**
+
+- Zaliczone: **26/31**
+- Niezaliczone: **5/31**
+- Najczesciej powtarzajace sie problemy: odswiezanie widoku po zmianach danych oraz obsluga akcji klawiszem Enter w modalach
+
+**Niezaliczone testy wymagające poprawy:**
+
+- `ST-FIN-03` - opóźniona aktualizacja części danych salda po usunięciu wydatku
+- `ST-FIN-04` - niespójny komunikat walidacji dla kwoty równej 0
+- `ST-PLAN-01` - brak zapisu dnia po zatwierdzeniu Enterem
+- `ST-PLAN-02` - brak zapisu aktywnosci po zatwierdzeniu Enterem
+- `ST-VOTE-04` - możliwosc oddania głosu po zamknięciu ankiety
+
 ### 3.3 Testy jednostkowe
 
-### 3.4 Zrzut ekranu z testów jednostkowych
+Testy jednostkowe backendu realizowane są w NestJS przy użyciu frameworka Jest. Obejmują testy kontrolerów, serwisów, guardów, strategii autoryzacji oraz walidacji konfiguracji środowiskowej.
+
+
+**Zakres testow jednostkowych wg modulow:**
+
+- **Core aplikacji (`app`)**
+  - `backend/api/src/app.controller.spec.ts`
+  - `backend/api/src/app.module.spec.ts`
+  - `backend/api/src/app.service.spec.ts`
+  - `backend/api/src/entities.coverage.spec.ts`
+- **Admin (`admin`)**
+  - `backend/api/src/admin/admin.controller.spec.ts`
+  - `backend/api/src/admin/admin.service.spec.ts`
+- **Autoryzacja (`auth`)**
+  - `backend/api/src/auth/auth.controller.spec.ts`
+  - `backend/api/src/auth/auth.service.spec.ts`
+  - `backend/api/src/auth/guards/jwt-auth.guard.spec.ts`
+  - `backend/api/src/auth/guards/roles.guard.spec.ts`
+  - `backend/api/src/auth/strategies/jwt.strategy.spec.ts`
+  - `backend/api/src/auth/strategies/refresh-token.strategy.spec.ts`
+- **Głosowanie (`engagement`)**
+  - `backend/api/src/engagement/engagement.controller.spec.ts`
+  - `backend/api/src/engagement/engagement.service.spec.ts`
+- **Finanse (`finance`)**
+  - `backend/api/src/finance/finance.controller.spec.ts`
+  - `backend/api/src/finance/finance.service.spec.ts`
+- **Powiadomienia e-mail (`mailer`)**
+  - `backend/api/src/mailer/mailer.module.spec.ts`
+  - `backend/api/src/mailer/mailer.service.spec.ts`
+- **Planowanie (`planning`)**
+  - `backend/api/src/planning/planning.controller.spec.ts`
+  - `backend/api/src/planning/planning.service.spec.ts`
+- **Redis (`redis`)**
+  - `backend/api/src/redis/redis.module.spec.ts`
+  - `backend/api/src/redis/redis.repository.spec.ts`
+- **Podróże (`trips`)**
+  - `backend/api/src/trips/trips.controller.spec.ts`
+  - `backend/api/src/trips/trips.service.spec.ts`
+  - `backend/api/src/trips/guards/trip-access.guard.spec.ts`
+- **Użytkownicy (`users`)**
+  - `backend/api/src/users/users.controller.spec.ts`
+  - `backend/api/src/users/users.service.spec.ts`
+- **Walidacja konfiguracji (`validation`)**
+  - `backend/api/src/validation/env-validation.spec.ts`
+
+Łącznie backend zawiera **28 plików testów jednostkowych**.
+- Wynik: **239/239 zaliczonych**
+- Procent zaliczonych testow: **100%**
+
+![Terminal passed testy](img/unit-passed-tests.png)
+
+
+**Pokrycie kodu (na podstawie wygenerowanego raportu):**
+
+- Lines: **84.29%**
+- Branches: **67.82%**
+- Functions: **73.64%**
+- Statements: **83.82%**
+
+Pokrycie odzwierciedla stan po przejsciu wszystkich testow jednostkowych.
+
+![Zrzut ekranu testy jednostkowe](img/unit-tests.jpeg)
+
 
 ### 4. Wnioski
 
 <p>Przeprowadzone testy pozwoliły na dokładną weryfikację działania systemu ShareWay. Połączenie testów automatycznych i jednostkowych zagwarantowało stabilność kluczowych ścieżek, co ułatwiło wczesne wykrywanie błędów.</p>
 <p>Testy manualne wykazały kilka drobnych błędów w zachowaniu interfejsu (m.in. konieczność odświeżania strony po dodaniu wydatku w module finansów oraz usterki przy zatwierdzaniu formularzy klawiszem Enter w module planowania). Błędy te nie blokują jednak głównych funkcjonalności aplikacji, a system odpowiednio radzi sobie z danymi brzegowymi i walidacją po stronie serwera.</p>
-<p>Całościowe pokrycie kodu oceniane jest na zadowalającym poziomie, a wrażliwe punkty dostępowe (Routing) są poprawnie chronione przed nieautoryzowanym dostępem.</p>
+<p>W testach jednostkowych backendu wszystkie testy przeszly pomyslnie. Aktualny raport pokrycia (Statements 83.82%, Lines 84.29%, Branches 67.82%, Functions 73.64%) wskazuje na wysoki poziom zabezpieczenia logiki backendowej.</p>
