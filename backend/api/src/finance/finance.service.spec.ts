@@ -7,6 +7,7 @@ import { Expense } from './entities/expense.entity';
 import { ExpenseDebtor } from './entities/expense-debtor.entity';
 import { TripsService } from '../trips/trips.service';
 import { ParticipantRole } from '../trips/entities/participant.entity';
+import { User } from '../users/entities/user.entity';
 
 const makeExpense = (overrides: Partial<Expense> = {}): Expense =>
   ({
@@ -48,6 +49,13 @@ const mockExpenseRepo = {
 
 const mockExpenseDebtorRepo = {
   findOne: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockUserRepo = {
+  findOne: jest.fn(),
+  findOneBy: jest.fn().mockResolvedValue(null),
+  findBy: jest.fn().mockResolvedValue([]),
 };
 
 const mockTripsService = {
@@ -68,6 +76,7 @@ describe('FinanceService', () => {
           provide: getRepositoryToken(ExpenseDebtor),
           useValue: mockExpenseDebtorRepo,
         },
+        { provide: getRepositoryToken(User), useValue: mockUserRepo },
         { provide: TripsService, useValue: mockTripsService },
         { provide: DataSource, useValue: mockDataSource },
       ],
@@ -78,17 +87,26 @@ describe('FinanceService', () => {
 
   describe('create', () => {
     it('converts amount to cents and uses transaction', async () => {
-      const expense = makeExpense();
+      const expense = makeExpense({
+        debtors: [
+          {
+            expenseId: 'exp-1',
+            debtorId: 'user-2',
+            debtor: { id: 'user-2', nickname: 'Bob' },
+          } as any,
+        ],
+      });
       mockQueryRunner.manager.create.mockReturnValue(expense);
       mockQueryRunner.manager.save
         .mockResolvedValueOnce(expense) // save expense
-        .mockResolvedValueOnce([]); // save debtors
+        .mockResolvedValueOnce([expense.debtors[0]]); // save debtors
       mockExpenseRepo.findOne.mockResolvedValue(expense);
+      mockTripsService.findById.mockResolvedValue({ baseCurrency: 'USD' });
 
-      await service.create('trip-1', 'user-1', {
+      const result = await service.create('trip-1', 'user-1', {
         title: 'Dinner',
         amount: 30,
-        splitBetween: ['user-1', 'user-2'],
+        debtorIds: ['user-1', 'user-2'],
         currency: 'USD',
       } as any);
 
@@ -97,17 +115,19 @@ describe('FinanceService', () => {
         expect.objectContaining({ amount: 3000 }),
       );
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+      expect(result).toBeDefined();
     });
 
     it('rolls back on error', async () => {
       mockQueryRunner.manager.create.mockReturnValue(makeExpense());
       mockQueryRunner.manager.save.mockRejectedValueOnce(new Error('DB error'));
+      mockTripsService.findById.mockResolvedValue({ baseCurrency: 'USD' });
 
       await expect(
         service.create('trip-1', 'user-1', {
           title: 'Dinner',
           amount: 30,
-          splitBetween: [],
+          debtorIds: ['user-1'],
           currency: 'USD',
         } as any),
       ).rejects.toThrow('DB error');
@@ -115,16 +135,17 @@ describe('FinanceService', () => {
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
     });
 
-    it('skips debtor creation when splitBetween is empty', async () => {
+    it('skips debtor creation when debtorIds is empty', async () => {
       const expense = makeExpense();
       mockQueryRunner.manager.create.mockReturnValue(expense);
       mockQueryRunner.manager.save.mockResolvedValueOnce(expense);
       mockExpenseRepo.findOne.mockResolvedValue(expense);
+      mockTripsService.findById.mockResolvedValue({ baseCurrency: 'USD' });
 
       await service.create('trip-1', 'user-1', {
         title: 'Dinner',
         amount: 30,
-        splitBetween: [],
+        debtorIds: [],
         currency: 'USD',
       } as any);
 
@@ -134,11 +155,13 @@ describe('FinanceService', () => {
   });
 
   describe('findAllByTrip', () => {
-    it('returns expenses for a trip', async () => {
+    it('returns mapped expenses for a trip', async () => {
       const expenses = [makeExpense()];
       mockExpenseRepo.find.mockResolvedValue(expenses);
       const result = await service.findAllByTrip('trip-1');
-      expect(result).toBe(expenses);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('exp-1');
+      expect(result[0].amount).toBe(30); // cents → float
     });
   });
 
@@ -209,6 +232,7 @@ describe('FinanceService', () => {
       mockTripsService.findById.mockResolvedValue({
         participants: [],
       });
+      mockUserRepo.findBy = jest.fn().mockResolvedValue([]);
       const result = await service.calculateBalance('trip-1');
       expect(result.settlements).toHaveLength(0);
       expect(result.totalExpenses).toBe(0);
@@ -227,6 +251,10 @@ describe('FinanceService', () => {
           { userId: 'user-2', user: { nickname: 'Bob' } },
         ],
       });
+      mockUserRepo.findBy = jest.fn().mockResolvedValue([
+        { id: 'user-1', nickname: 'Alice' },
+        { id: 'user-2', nickname: 'Bob' },
+      ]);
 
       const result = await service.calculateBalance('trip-1');
       expect(result.totalExpenses).toBe(30); // 3000 cents = $30
@@ -243,6 +271,7 @@ describe('FinanceService', () => {
       const expense = makeExpense({ debtors: [] });
       mockExpenseRepo.find.mockResolvedValue([expense]);
       mockTripsService.findById.mockResolvedValue({ participants: [] });
+      mockUserRepo.findBy = jest.fn().mockResolvedValue([]);
       const result = await service.calculateBalance('trip-1');
       expect(result.settlements).toHaveLength(0);
     });
@@ -266,6 +295,11 @@ describe('FinanceService', () => {
           { userId: 'user-3', user: { nickname: 'Charlie' } },
         ],
       });
+      mockUserRepo.findBy = jest.fn().mockResolvedValue([
+        { id: 'user-1', nickname: 'Alice' },
+        { id: 'user-2', nickname: 'Bob' },
+        { id: 'user-3', nickname: 'Charlie' },
+      ]);
       const result = await service.calculateBalance('trip-1');
       // user-1 paid 1001, deducted 334 share → net +667
       // user-2 net: -334
@@ -275,7 +309,7 @@ describe('FinanceService', () => {
     });
   });
 
-  describe('calculateBalanceSummary', () => {
+  describe('calculateMyBalance', () => {
     it('returns summary for a user', async () => {
       const expense = makeExpense({
         amount: 3000,
@@ -294,7 +328,7 @@ describe('FinanceService', () => {
         ],
       });
 
-      const result = await service.calculateBalanceSummary('trip-1', 'user-2');
+      const result = await service.calculateMyBalance('trip-1', 'user-2');
       expect(result.myUserId).toBe('user-2');
       // user-2 owes user-1 their share
       expect(result.totalIOweThem).toBeGreaterThan(0);
@@ -319,7 +353,7 @@ describe('FinanceService', () => {
         ],
       });
 
-      const result = await service.calculateBalanceSummary('trip-1', 'user-1');
+      const result = await service.calculateMyBalance('trip-1', 'user-1');
       expect(result.myUserId).toBe('user-1');
       expect(result.totalTheyOweMe).toBeGreaterThan(0);
     });

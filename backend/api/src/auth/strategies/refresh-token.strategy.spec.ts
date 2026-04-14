@@ -3,6 +3,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenStrategy } from './refresh-token.strategy';
 import { RedisRepository } from '../../redis/redis.repository';
+import { UsersService } from '../../users/users.service';
 
 const mockConfigService = {
   getOrThrow: jest.fn().mockReturnValue('test_refresh_secret'),
@@ -10,6 +11,10 @@ const mockConfigService = {
 
 const mockRedisRepository = {
   validateRefreshToken: jest.fn(),
+};
+
+const mockUsersService = {
+  findById: jest.fn(),
 };
 
 describe('RefreshTokenStrategy', () => {
@@ -24,6 +29,7 @@ describe('RefreshTokenStrategy', () => {
         RefreshTokenStrategy,
         { provide: ConfigService, useValue: mockConfigService },
         { provide: RedisRepository, useValue: mockRedisRepository },
+        { provide: UsersService, useValue: mockUsersService },
       ],
     }).compile();
 
@@ -62,9 +68,19 @@ describe('RefreshTokenStrategy', () => {
       ).rejects.toThrow(UnauthorizedException);
     });
 
+    it('throws UnauthorizedException when user is not found or inactive', async () => {
+      const req: any = { cookies: { refresh_token: 'valid_token' } };
+      mockRedisRepository.validateRefreshToken.mockResolvedValue(true);
+      mockUsersService.findById.mockResolvedValue(null);
+      await expect(
+        strategy.validate(req, { sub: 'uuid-1' }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
     it('returns userId and refreshToken on success', async () => {
       const req: any = { cookies: { refresh_token: 'valid_token' } };
       mockRedisRepository.validateRefreshToken.mockResolvedValue(true);
+      mockUsersService.findById.mockResolvedValue({ id: 'uuid-1', isActive: true });
       const result = await strategy.validate(req, { sub: 'uuid-1' });
       expect(result).toEqual({ userId: 'uuid-1', refreshToken: 'valid_token' });
     });
