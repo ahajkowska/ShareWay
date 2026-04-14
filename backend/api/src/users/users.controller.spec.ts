@@ -43,10 +43,12 @@ describe('UsersController', () => {
       expect(await controller.getProfile(req)).toBeNull();
     });
 
-    it('returns null when user not found', async () => {
+    it('throws NotFoundException when user not found', async () => {
       mockUsersService.findById.mockResolvedValue(null);
       const req: any = { user: { userId: 'uuid-1' } };
-      expect(await controller.getProfile(req)).toBeNull();
+      await expect(controller.getProfile(req)).rejects.toThrow(
+        'User not found',
+      );
     });
 
     it('returns user profile shape', async () => {
@@ -66,7 +68,9 @@ describe('UsersController', () => {
   describe('updateProfile', () => {
     it('returns null when no userId', async () => {
       const req: any = { user: undefined };
-      expect(await controller.updateProfile(req, { nickname: 'New' })).toBeNull();
+      expect(
+        await controller.updateProfile(req, { nickname: 'New' }),
+      ).toBeNull();
     });
 
     it('returns updated profile', async () => {
@@ -90,7 +94,9 @@ describe('UsersController', () => {
     });
 
     it('delegates to usersService.changePassword', async () => {
-      mockUsersService.changePassword.mockResolvedValue({ message: 'Password changed successfully' });
+      mockUsersService.changePassword.mockResolvedValue({
+        message: 'Password changed successfully',
+      });
       const req: any = { user: { userId: 'uuid-1' } };
       const result = await controller.changePassword(req, {
         oldPassword: 'old',

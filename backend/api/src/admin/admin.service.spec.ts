@@ -5,6 +5,7 @@ import { AdminService } from './admin.service';
 import { UsersService } from '../users/users.service';
 import { RedisRepository } from '../redis/redis.repository';
 import { MailerService } from '../mailer/mailer.service';
+import { TripsService } from '../trips/trips.service';
 import { UserRole } from '../users/entities/user.entity';
 
 const makeUser = (overrides = {}) => ({
@@ -38,6 +39,10 @@ const mockConfigService = {
   get: jest.fn().mockReturnValue('http://localhost:3000'),
 };
 
+const mockTripsService = {
+  findAllPaginated: jest.fn(),
+};
+
 describe('AdminService', () => {
   let service: AdminService;
 
@@ -52,6 +57,7 @@ describe('AdminService', () => {
         { provide: RedisRepository, useValue: mockRedisRepository },
         { provide: MailerService, useValue: mockMailerService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: TripsService, useValue: mockTripsService },
       ],
     }).compile();
 

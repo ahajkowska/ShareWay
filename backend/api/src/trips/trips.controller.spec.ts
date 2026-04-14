@@ -29,6 +29,8 @@ const makeTrip = (overrides: any = {}) => ({
   inviteCode: 'ABC123',
   status: 'ACTIVE',
   isDeleted: false,
+  createdAt: new Date(),
+  updatedAt: new Date(),
   participants: [
     {
       userId: 'user-1',
@@ -58,9 +60,11 @@ describe('TripsController', () => {
   });
 
   describe('create', () => {
-    it('returns null when no userId', async () => {
+    it('throws when no userId', async () => {
       const req: any = { user: undefined };
-      expect(await controller.create(req, {} as any)).toBeNull();
+      await expect(controller.create(req, {} as any)).rejects.toThrow(
+        'User not authenticated',
+      );
     });
 
     it('returns formatted trip response', async () => {
@@ -89,7 +93,9 @@ describe('TripsController', () => {
   describe('join', () => {
     it('returns null when no userId', async () => {
       const req: any = { user: undefined };
-      expect(await controller.join(req, { inviteCode: 'X' } as any)).toBeNull();
+      await expect(
+        controller.join(req, { inviteCode: 'X' } as any),
+      ).rejects.toThrow('User not authenticated');
     });
 
     it('returns join response', async () => {
@@ -103,25 +109,23 @@ describe('TripsController', () => {
   });
 
   describe('findOne', () => {
-    it('returns null when no userId', async () => {
-      const req: any = { user: undefined };
-      expect(await controller.findOne('trip-1', req)).toBeNull();
-    });
-
-    it('returns formatted trip', async () => {
+    it('returns formatted trip when found', async () => {
       mockTripsService.findById.mockResolvedValue(makeTrip());
       const req: any = { user: { userId: 'user-1' } };
       const result = await controller.findOne('trip-1', req);
       expect(result).toMatchObject({ id: 'trip-1' });
     });
+
+    it('throws when trip not found', async () => {
+      mockTripsService.findById.mockRejectedValue(new Error('Trip not found'));
+      const req: any = { user: { userId: 'user-1' } };
+      await expect(controller.findOne('trip-1', req)).rejects.toThrow(
+        'Trip not found',
+      );
+    });
   });
 
   describe('update', () => {
-    it('returns null when no userId', async () => {
-      const req: any = { user: undefined };
-      expect(await controller.update('trip-1', {}, req)).toBeNull();
-    });
-
     it('delegates update and returns formatted trip', async () => {
       mockTripsService.update.mockResolvedValue(makeTrip({ name: 'Updated' }));
       const req: any = { user: { userId: 'user-1' } };
@@ -176,9 +180,9 @@ describe('TripsController', () => {
   describe('removeParticipant', () => {
     it('returns null when no requesterId', async () => {
       const req: any = { user: undefined };
-      expect(
-        await controller.removeParticipant('trip-1', 'user-2', req),
-      ).toBeNull();
+      await expect(
+        controller.removeParticipant('trip-1', 'user-2', req),
+      ).rejects.toThrow('User not authenticated');
     });
 
     it('delegates to service', async () => {

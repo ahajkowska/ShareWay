@@ -19,16 +19,14 @@ const makeVote = (overrides: Partial<Vote> = {}): Vote =>
   ({
     id: 'vote-1',
     tripId: 'trip-1',
-    title: 'Where to eat?',
     question: 'Where to eat?',
     description: null,
     endsAt: null,
-    createdBy: 'user-1',
+    creatorId: 'user-1',
     status: 'active',
     options: [],
     creator: { id: 'user-1', nickname: 'Alice' } as any,
     createdAt: new Date(),
-    updatedAt: new Date(),
     ...overrides,
   }) as unknown as Vote;
 
@@ -117,6 +115,7 @@ const mockChecklistItemStateRepo = {
 const mockTripsService = {
   isParticipant: jest.fn(),
   findById: jest.fn(),
+  getParticipant: jest.fn(),
 };
 
 describe('EngagementService', () => {
@@ -152,9 +151,10 @@ describe('EngagementService', () => {
       mockVoteRepo.save.mockResolvedValue(vote);
 
       const result = await service.createVote('trip-1', 'user-1', {
-        title: 'Where to eat?',
-        initialOptions: ['Pizza', 'Sushi'],
-        endsAt: null,
+        question: 'Where to eat?',
+        options: ['Pizza', 'Sushi'],
+        description: null,
+        endDate: null,
       } as any);
 
       expect(mockVoteRepo.create).toHaveBeenCalled();
@@ -167,8 +167,11 @@ describe('EngagementService', () => {
     it('returns votes for a trip', async () => {
       const votes = [makeVote()];
       mockVoteRepo.find.mockResolvedValue(votes);
-      const result = await service.getVotes('trip-1');
-      expect(result).toBe(votes);
+      const result = await service.getVotes('trip-1', 'user-1');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('vote-1');
+      expect(result[0].title).toBe('Where to eat?');
+      expect(result[0].status).toBe('active');
     });
   });
 
@@ -176,7 +179,7 @@ describe('EngagementService', () => {
     it('throws NotFoundException when option not found', async () => {
       mockVoteOptionRepo.findOne.mockResolvedValue(null);
       await expect(
-        service.castVote('vote-1', 'user-1', { optionId: 'opt-99' }),
+        service.castVote('vote-1', 'user-1', { optionIds: ['opt-99'] }),
       ).rejects.toThrow(NotFoundException);
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
     });
@@ -185,7 +188,7 @@ describe('EngagementService', () => {
       const opt = makeVoteOption({ voteId: 'OTHER-VOTE' });
       mockVoteOptionRepo.findOne.mockResolvedValue(opt);
       await expect(
-        service.castVote('vote-1', 'user-1', { optionId: 'opt-1' }),
+        service.castVote('vote-1', 'user-1', { optionIds: ['opt-1'] }),
       ).rejects.toThrow(BadRequestException);
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
     });
@@ -196,7 +199,7 @@ describe('EngagementService', () => {
       mockTripsService.isParticipant.mockResolvedValue(false);
 
       await expect(
-        service.castVote('vote-1', 'user-99', { optionId: 'opt-1' }),
+        service.castVote('vote-1', 'user-99', { optionIds: ['opt-1'] }),
       ).rejects.toThrow(ForbiddenException);
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
     });
@@ -212,10 +215,10 @@ describe('EngagementService', () => {
       mockQueryRunner.manager.create.mockReturnValue(newCast);
       mockQueryRunner.manager.save.mockResolvedValue(newCast);
 
-      const result = await service.castVote('vote-1', 'user-1', { optionId: 'opt-1' });
+      const result = await service.castVote('vote-1', 'user-1', { optionIds: ['opt-1'] });
       expect(mockQueryRunner.manager.remove).toHaveBeenCalledWith(existingCast);
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-      expect(result).toBe(newCast);
+      expect(result[0]).toBe(newCast);
     });
 
     it('creates new cast when no existing cast', async () => {
@@ -227,9 +230,9 @@ describe('EngagementService', () => {
       mockQueryRunner.manager.create.mockReturnValue(newCast);
       mockQueryRunner.manager.save.mockResolvedValue(newCast);
 
-      const result = await service.castVote('vote-1', 'user-1', { optionId: 'opt-1' });
+      const result = await service.castVote('vote-1', 'user-1', { optionIds: ['opt-1'] });
       expect(mockQueryRunner.manager.remove).not.toHaveBeenCalled();
-      expect(result).toBe(newCast);
+      expect(result[0]).toBe(newCast);
     });
   });
 
@@ -263,11 +266,11 @@ describe('EngagementService', () => {
     });
   });
 
-  describe('addOption', () => {
+  describe('addVoteOption', () => {
     it('throws NotFoundException when vote not found', async () => {
       mockVoteRepo.findOne.mockResolvedValue(null);
       await expect(
-        service.addOption('vote-1', { text: 'Sushi' }, 'user-1'),
+        service.addVoteOption('vote-1', 'user-1', { text: 'Sushi' }),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -275,7 +278,7 @@ describe('EngagementService', () => {
       mockVoteRepo.findOne.mockResolvedValue(makeVote());
       mockTripsService.isParticipant.mockResolvedValue(false);
       await expect(
-        service.addOption('vote-1', { text: 'Sushi' }, 'stranger'),
+        service.addVoteOption('vote-1', 'stranger', { text: 'Sushi' }),
       ).rejects.toThrow(ForbiddenException);
     });
 
@@ -286,7 +289,7 @@ describe('EngagementService', () => {
       mockVoteOptionRepo.create.mockReturnValue(newOpt);
       mockVoteOptionRepo.save.mockResolvedValue(newOpt);
 
-      const result = await service.addOption('vote-1', { text: 'Sushi' }, 'user-1');
+      const result = await service.addVoteOption('vote-1', 'user-1', { text: 'Sushi' });
       expect(result).toBe(newOpt);
     });
   });
@@ -298,20 +301,23 @@ describe('EngagementService', () => {
     });
 
     it('throws ForbiddenException when user is neither creator nor organizer', async () => {
-      const vote = makeVote({ createdBy: 'user-1' });
+      const vote = makeVote({ creatorId: 'user-1' });
       mockVoteRepo.findOne.mockResolvedValue(vote);
-      mockTripsService.findById.mockResolvedValue({
-        participants: [
-          { userId: 'user-99', role: ParticipantRole.PARTICIPANT },
-        ],
+      // user-99 is not creator, and getParticipant returns PARTICIPANT role
+      mockTripsService.getParticipant.mockResolvedValue({
+        userId: 'user-99',
+        role: ParticipantRole.PARTICIPANT,
       });
       await expect(service.deleteVote('vote-1', 'user-99')).rejects.toThrow(ForbiddenException);
     });
 
     it('deletes vote when user is creator', async () => {
-      const vote = makeVote({ createdBy: 'user-1' });
+      const vote = makeVote({ creatorId: 'user-1' });
       mockVoteRepo.findOne.mockResolvedValue(vote);
-      mockTripsService.findById.mockResolvedValue({ participants: [] });
+      mockTripsService.getParticipant.mockResolvedValue({
+        userId: 'user-1',
+        role: ParticipantRole.PARTICIPANT,
+      });
       mockVoteRepo.remove.mockResolvedValue({});
 
       await service.deleteVote('vote-1', 'user-1');
@@ -319,12 +325,11 @@ describe('EngagementService', () => {
     });
 
     it('deletes vote when user is organizer', async () => {
-      const vote = makeVote({ createdBy: 'other-user' });
+      const vote = makeVote({ creatorId: 'other-user' });
       mockVoteRepo.findOne.mockResolvedValue(vote);
-      mockTripsService.findById.mockResolvedValue({
-        participants: [
-          { userId: 'org-1', role: ParticipantRole.ORGANIZER },
-        ],
+      mockTripsService.getParticipant.mockResolvedValue({
+        userId: 'org-1',
+        role: ParticipantRole.ORGANIZER,
       });
       mockVoteRepo.remove.mockResolvedValue({});
 
@@ -339,7 +344,7 @@ describe('EngagementService', () => {
       mockChecklistItemRepo.create.mockReturnValue(item);
       mockChecklistItemRepo.save.mockResolvedValue(item);
 
-      const result = await service.createChecklistItem('trip-1', { text: 'Pack sunscreen' });
+      const result = await service.createChecklistItem('trip-1', 'user-1', { text: 'Pack sunscreen' });
       expect(result).toBe(item);
     });
   });
@@ -435,11 +440,31 @@ describe('EngagementService', () => {
       );
     });
 
-    it('deletes item when user is participant', async () => {
-      mockChecklistItemRepo.findOne.mockResolvedValue(makeChecklistItem());
+    it('deletes item when user is the creator', async () => {
+      mockChecklistItemRepo.findOne.mockResolvedValue(
+        makeChecklistItem({ creatorId: 'user-1' }),
+      );
       mockTripsService.isParticipant.mockResolvedValue(true);
+      mockTripsService.getParticipant.mockResolvedValue({
+        userId: 'user-1',
+        role: ParticipantRole.PARTICIPANT,
+      });
       mockChecklistItemRepo.delete.mockResolvedValue({});
       await service.deleteChecklistItem('item-1', 'user-1');
+      expect(mockChecklistItemRepo.delete).toHaveBeenCalledWith('item-1');
+    });
+
+    it('deletes item when user is organizer', async () => {
+      mockChecklistItemRepo.findOne.mockResolvedValue(
+        makeChecklistItem({ creatorId: 'other-user' }),
+      );
+      mockTripsService.isParticipant.mockResolvedValue(true);
+      mockTripsService.getParticipant.mockResolvedValue({
+        userId: 'org-1',
+        role: ParticipantRole.ORGANIZER,
+      });
+      mockChecklistItemRepo.delete.mockResolvedValue({});
+      await service.deleteChecklistItem('item-1', 'org-1');
       expect(mockChecklistItemRepo.delete).toHaveBeenCalledWith('item-1');
     });
   });

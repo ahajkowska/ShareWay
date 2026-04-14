@@ -6,9 +6,10 @@ import { TripAccessGuard } from '../trips/guards/trip-access.guard';
 
 const mockFinanceService = {
   create: jest.fn(),
+  findAllByTripPaginated: jest.fn(),
   findAllByTrip: jest.fn(),
   calculateBalance: jest.fn(),
-  calculateBalanceSummary: jest.fn(),
+  calculateMyBalance: jest.fn(),
   remove: jest.fn(),
 };
 
@@ -45,25 +46,26 @@ describe('FinanceController', () => {
   });
 
   describe('create', () => {
-    it('creates expense and returns formatted response', async () => {
+    it('creates expense and delegates to service', async () => {
       const expense = makeExpense();
       mockFinanceService.create.mockResolvedValue(expense);
       const req: any = { user: { userId: 'user-1' } };
       const result = await controller.create('trip-1', req, {
         title: 'Dinner',
         amount: 30,
-        splitBetween: [],
+        debtorIds: [],
       } as any);
-      expect(result).toMatchObject({ id: 'exp-1', amount: 30 }); // 3000 / 100
+      expect(result).toBe(expense);
+      expect(mockFinanceService.create).toHaveBeenCalledWith('trip-1', 'user-1', expect.any(Object));
     });
   });
 
   describe('findAll', () => {
-    it('returns formatted expense list', async () => {
-      mockFinanceService.findAllByTrip.mockResolvedValue([makeExpense()]);
-      const result = await controller.findAll('trip-1');
-      expect(result).toHaveLength(1);
-      expect(result[0].amount).toBe(30);
+    it('returns paginated expense list', async () => {
+      const paginatedResult = { data: [makeExpense()], meta: { total: 1, page: 1, limit: 20, totalPages: 1 } };
+      mockFinanceService.findAllByTripPaginated.mockResolvedValue(paginatedResult);
+      const result = await controller.findAll('trip-1', {} as any);
+      expect(result).toBe(paginatedResult);
     });
   });
 
@@ -76,12 +78,12 @@ describe('FinanceController', () => {
     });
   });
 
-  describe('getBalanceSummary', () => {
-    it('returns balance summary', async () => {
+  describe('getMyBalance', () => {
+    it('returns personal balance summary', async () => {
       const summary = { myUserId: 'user-1', balances: [] };
-      mockFinanceService.calculateBalanceSummary.mockResolvedValue(summary);
+      mockFinanceService.calculateMyBalance.mockResolvedValue(summary);
       const req: any = { user: { userId: 'user-1' } };
-      const result = await controller.getBalanceSummary('trip-1', req);
+      const result = await controller.getMyBalance('trip-1', req);
       expect(result).toBe(summary);
     });
   });

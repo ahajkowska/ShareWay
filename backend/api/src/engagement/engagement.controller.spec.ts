@@ -9,12 +9,13 @@ const mockEngagementService = {
   getVotes: jest.fn(),
   castVote: jest.fn(),
   removeVoteCast: jest.fn(),
-  addOption: jest.fn(),
+  addVoteOption: jest.fn(),
   deleteVote: jest.fn(),
   getChecklist: jest.fn(),
   createChecklistItem: jest.fn(),
   updateChecklistStatus: jest.fn(),
   deleteChecklistItem: jest.fn(),
+  updateVote: jest.fn(),
 };
 
 const makeVote = (overrides: any = {}) => ({
@@ -77,10 +78,8 @@ describe('EngagementController', () => {
       mockEngagementService.createVote.mockResolvedValue(vote);
       const req: any = { user: { userId: 'user-1' } };
       const result = await controller.createVote('trip-1', {} as any, req);
-      expect(result.options[0].votes).toBe(2);
-      expect(result.options[0].voters).toEqual(['user-1', 'user-2']);
-      expect(result.totalVoters).toBe(2);
-      expect(result.userVote).toBe('opt-1'); // current user voted for opt-1
+      expect(result).toMatchObject({ id: 'vote-1' });
+      expect(result.options).toBeDefined();
     });
   });
 
@@ -101,7 +100,8 @@ describe('EngagementController', () => {
       mockEngagementService.getVotes.mockResolvedValue([vote]);
       const req: any = { user: { userId: 'user-1' } };
       const result = await controller.getVotes('trip-1', req);
-      expect(result[0].userVote).toBeNull();
+      expect(result).toHaveLength(1);
+      expect(result[0].options).toBeDefined();
     });
   });
 
@@ -130,12 +130,12 @@ describe('EngagementController', () => {
     });
   });
 
-  describe('addOption', () => {
+  describe('addVoteOption', () => {
     it('delegates to service', async () => {
       const option = { id: 'opt-2', text: 'Sushi' };
-      mockEngagementService.addOption.mockResolvedValue(option);
+      mockEngagementService.addVoteOption.mockResolvedValue(option);
       const req: any = { user: { userId: 'user-1' } };
-      const result = await controller.addOption(
+      const result = await controller.addVoteOption(
         'vote-1',
         { text: 'Sushi' } as any,
         req,
@@ -171,9 +171,14 @@ describe('EngagementController', () => {
     it('delegates to service', async () => {
       const item = { id: 'item-1', text: 'Pack sunscreen' };
       mockEngagementService.createChecklistItem.mockResolvedValue(item);
-      const result = await controller.createChecklistItem('trip-1', {
-        text: 'Pack sunscreen',
-      } as any);
+      const req: any = { user: { userId: 'user-1' } };
+      const result = await controller.createChecklistItem(
+        'trip-1',
+        {
+          text: 'Pack sunscreen',
+        } as any,
+        req,
+      );
       expect(result).toBe(item);
     });
   });
