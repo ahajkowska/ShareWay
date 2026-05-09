@@ -14,6 +14,7 @@ body {
    font-size: 12pt;
    line-height: 1.6;
    color: #000;
+   margin: 0;
    counter-reset: page;
 }
 
@@ -23,7 +24,7 @@ body {
 
 header {
    position: fixed;
-   top: -2cm;
+   top: 0;
    left: 0;
    right: 0;
    height: 1.6cm;
@@ -40,7 +41,7 @@ header::after {
 
 footer {
    position: fixed;
-   bottom: -2cm;
+   bottom: 0;
    left: 0;
    right: 0;
    height: 1.6cm;
@@ -100,6 +101,10 @@ h1 {
    font-size: 18pt;
    text-align: center;
    page-break-before: always;
+}
+
+.cover h1 {
+   page-break-before: auto;
 }
 
 h2 {
@@ -190,10 +195,6 @@ img {
    page-break-after: always;
 }
 
-h1 {
-   page-break-before: always;
-}
-
 </style>
 
 <div class="cover">
@@ -210,9 +211,9 @@ h1 {
 
 <div class="page-break"></div>
 
-## Spis tresci
+## Spis treści
 
-- [Spis tresci](#spis-tresci)
+- [Spis treści](#spis-treści)
 - [1. Opis problemu](#1-opis-problemu)
   - [1.1. Opis projektu](#11-opis-projektu)
   - [1.2. Porównanie dostępnych rozwiązań](#12-porównanie-dostępnych-rozwiązań)
@@ -282,11 +283,11 @@ ShareWay wyróżnia się integracją wszystkich niezbędnych narzędzi w jednej 
 
 Aplikacja ShareWay może być wykorzystana w następujących sytuacjach:
 
-- **Wyjazdy wakacyjne** grup znajomych lub rodzin - planowanie trasy, podział kosztów noclegów i atrakcji, wspólna lista rzeczy do spakowania.
-- **Firmowe wyjazdy integracyjne** - koordynacja harmonogramu, głosowania nad atrakcjami, przejrzyste rozliczenia.
-- **Wycieczki studenckie i szkolne** - organizator zarządza grupą, uczestnicy śledzą plan i listę wymagań.
-- **Eventy i imprezy okolicznościowe** (np. wieczory kawalerskie) - szybkie ustalanie szczegółów przez głosowania, podział kosztów.
-- **Długoterminowe projekty podróżnicze** - wieloetapowe wyprawy wymagające szczegółowego planowania harmonogramu.
+* **Wyjazdy wakacyjne** grup znajomych lub rodzin - planowanie trasy, podział kosztów noclegów i atrakcji, wspólna lista rzeczy do spakowania.
+* **Firmowe wyjazdy integracyjne** - koordynacja harmonogramu, głosowania nad atrakcjami, przejrzyste rozliczenia.
+* **Wycieczki studenckie i szkolne** - organizator zarządza grupą, uczestnicy śledzą plan i listę wymagań.
+* **Eventy i imprezy okolicznościowe** (np. wieczory kawalerskie) - szybkie ustalanie szczegółów przez głosowania, podział kosztów.
+* **Długoterminowe projekty podróżnicze** - wieloetapowe wyprawy wymagające szczegółowego planowania harmonogramu.
 
 ---
 
@@ -601,13 +602,14 @@ Poniższe wymagania wynikają bezpośrednio z przypadków użycia. Dla czytelno�
 
 ### 2.2. Diagram klas
 
-Diagram klas opisuje główne encje domenowe oraz ich relacje w module podróży.
+<img src="img/shareway_class_diagram.png" alt="Diagram klas ShareWay" style="max-width:84%;height:auto;display:block;margin:0 auto;" />
 
-TUTAJ SCREEN + MOZE MINI OPIS DO DIAGRAMU KLAS
+Diagram klas pokazuje, jakie obiekty są w aplikacji i jak się ze sobą łączą. Najważniejszy jest `User`, który łączy się z `Trip` przez `Participant` - tam zapisujemy, kto jest w podróży i jaką ma rolę. Plan podróży to `Day` i jego `Activity`, finanse to `Expense` oraz osoby, które spłacają koszt (`ExpenseDebtor`). Głosowania tworzą `Vote`, możliwe odpowiedzi to `VoteOption`, a oddane głosy to `VoteCast`. Lista kontrolna to `ChecklistItem` i stan odznaczenia każdego użytkownika (`ChecklistItemState`). Dzięki temu widać, z jakich elementów składa się aplikacja i jak są ze sobą powiązane w kodzie.
 
 ### 2.3. Diagram modelu danych (ERD)
 
 Poniżej znajduje się diagram ERD. Diagram pokazuje tabele relacyjnej bazy danych i ich powiązania.
+Można na nim zauważyć jak dane są przechowywane w bazie i jak tabele łączą się ze sobą.
 
 **Diagram ERD:**
 
@@ -636,6 +638,15 @@ Aplikacja posiada następujące główne widoki:
 
 **Przykładowe zrzuty ekranów:**
 
+<img src="img/projectmain_page.png" alt="Strona główna" style="max-width:84%;height:auto;display:block;margin:0 auto;" />
+
+<img src="img/project_login.png" alt="Logowanie" style="max-width:84%;height:auto;display:block;margin:0 auto;" />
+
+<img src="img/project_dashboard.png" alt="Dashboard z podróżami" style="max-width:84%;height:auto;display:block;margin:0 auto;" />
+
+<img src="img/project_cost_module.png" alt="Moduł kosztów" style="max-width:84%;height:auto;display:block;margin:0 auto;" />
+
+<img src="img/project_checklist.png" alt="Moduł listy kontrolnej" style="max-width:84%;height:auto;display:block;margin:0 auto;" />
 
 ### 2.5. Diagramy sekwencji (kluczowe procesy)
 
@@ -714,12 +725,12 @@ Aplikacja ShareWay zbudowana jest w architekturze klient–serwer z rozdzielenie
 
 #### Wzorce projektowe
 
-- **MVC (Model-View-Controller)** - NestJS stosuje podział na kontrolery (Controller), serwisy (Service) i encje (Model/Entity).
-- **Repository Pattern** - TypeORM zapewnia warstwę abstrakcji dostępu do danych przez repozytoria encji.
-- **Guard Pattern** - NestJS Guards (JwtAuthGuard, RolesGuard, TripAccessGuard) realizują kontrolę dostępu przed wykonaniem akcji kontrolera.
-- **DTO** - oddzielenie modelu danych od formatu wejścia/wyjścia API, walidacja przez class-validator.
-- **Module Pattern** - backend podzielony na niezależne moduły NestJS (AuthModule, TripsModule, FinanceModule itp.).
-- **REST API** - backend udostępnia interfejs RESTful pod prefiksem `/api/v1` z wersjonowaniem.
+* **MVC (Model-View-Controller)** - NestJS stosuje podział na kontrolery (Controller), serwisy (Service) i encje (Model/Entity).
+* **Repository Pattern** - TypeORM zapewnia warstwę abstrakcji dostępu do danych przez repozytoria encji.
+* **Guard Pattern** - NestJS Guards (JwtAuthGuard, RolesGuard, TripAccessGuard) realizują kontrolę dostępu przed wykonaniem akcji kontrolera.
+* **DTO** - oddzielenie modelu danych od formatu wejścia/wyjścia API, walidacja przez class-validator.
+* **Module Pattern** - backend podzielony na niezależne moduły NestJS (AuthModule, TripsModule, FinanceModule itp.).
+* **REST API** - backend udostępnia interfejs RESTful pod prefiksem `/api/v1` z wersjonowaniem.
 
 ### 3.2. Użyte technologie
 
@@ -757,24 +768,24 @@ W projekcie ShareWay przyjęto hybrydowy model testowania, łączący testy jedn
 **Podział metodologiczny:**
 
 **Testy Automatyczne (End-to-End / E2E):**
-- **Narzędzie**: Playwright
-- **Zakres**: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. 
-- **Dlaczego użyto?**: Sprawdzają najważniejsze ścieżki użytkownika od początku do końca. Czyli to, co jest najbardziej kluczowe do działania aplikacji i "zepsucie" tych funkcjonalności skutkowałoby największymi problemami w aplikacji.
-- **Uruchamianie**: Automatycznie w procesie CI przy użyciu GitHub Actions po każdym dodaniu nowego kodu do głównej gałęzi repozytorium lub lokalnie.
+* **Narzędzie**: Playwright
+* **Zakres**: Zautomatyzowano tzw. "Krytyczne Ścieżki Użytkownika" na frontendzie. Skrypty uruchamiają prawdziwą przeglądarkę i symulują zachowanie użytkownika. 
+* **Dlaczego użyto?**: Sprawdzają najważniejsze ścieżki użytkownika od początku do końca. Czyli to, co jest najbardziej kluczowe do działania aplikacji i "zepsucie" tych funkcjonalności skutkowałoby największymi problemami w aplikacji.
+* **Uruchamianie**: Automatycznie w procesie CI przy użyciu GitHub Actions po każdym dodaniu nowego kodu do głównej gałęzi repozytorium lub lokalnie.
 
 **Testy Manualne:**
-- **Zakres**: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram.
-- **Dlaczego użyto?**: Automatyzacja byłaby kosztowna, logika jest bardzo skomplikowana i łatwiej wytestować ją manualnie niż zakodować w E2E. Można też sprawdzić wygodność realnego użycia funkcjonalności.
+* **Zakres**: Złożone interakcje wewnątrz konkretnej podróży, takie jak: podział kosztów i algorytm ich wyliczania, tworzenie i odznaczanie list kontrolnych, system głosowania oraz harmonogram.
+* **Dlaczego użyto?**: Automatyzacja byłaby kosztowna, logika jest bardzo skomplikowana i łatwiej wytestować ją manualnie niż zakodować w E2E. Można też sprawdzić wygodność realnego użycia funkcjonalności.
 
 **Testy Jednostkowe**
-- **Zakres**: Najmniejsze elementy logiki w izolacji (funkcje, serwisy, walidacje)
-- **Dlaczego użyto?**: Są najszybsze i najtańsze w utrzymaniu. Są bardzo dobre do łapania błędów zanim problem "wyjdzie" do UI. Dają pewność, że rdzeń działa poprawnie niezależnie od frontendu.
+* **Zakres**: Najmniejsze elementy logiki w izolacji (funkcje, serwisy, walidacje)
+* **Dlaczego użyto?**: Są najszybsze i najtańsze w utrzymaniu. Są bardzo dobre do łapania błędów zanim problem "wyjdzie" do UI. Dają pewność, że rdzeń działa poprawnie niezależnie od frontendu.
 
 **Uzasadnienie wyboru strategii hybrydowej:**
 
-* **Testy automatyczne E2E** (Playwright): Zabezpieczają ścieżki krytyczne, których ewentualna awaria całkowicie odcięłaby użytkowników od systemu (np. logowanie). Narzędzie wybrano ze względu na szybkość, płynną integrację z Next.js oraz czytelne raporty HTML.
+**Testy automatyczne E2E (Playwright)** zabezpieczają ścieżki krytyczne, których awaria odcięłaby użytkowników od systemu (np. logowanie). Narzędzie wybrano ze względu na szybkość, płynną integrację z Next.js oraz czytelne raporty HTML.
 
-* **Testy manualne**: Obejmują moduły o złożonych interakcjach (Finanse, Harmonogram, Głosowania). Podejście manualne pozwala znacznie szybko zweryfikować logikę biznesową i użyteczność (UX) bezpośrednio z perspektywy końcowego użytkownika.
+**Testy manualne** obejmują moduły o złożonych interakcjach (Finanse, Harmonogram, Głosowania). Podejście manualne pozwala szybko zweryfikować logikę biznesową i użyteczność (UX) bezpośrednio z perspektywy końcowego użytkownika.
   
 
 <div class="page-break"></div>
@@ -1581,45 +1592,45 @@ Testy jednostkowe backendu realizowane są w NestJS przy użyciu frameworka Jest
 
 **Zakres testow jednostkowych wg modulow:**
 
-- **Core aplikacji (`app`)**
-  - `backend/api/src/app.controller.spec.ts`
-  - `backend/api/src/app.module.spec.ts`
-  - `backend/api/src/app.service.spec.ts`
-  - `backend/api/src/entities.coverage.spec.ts`
-- **Admin (`admin`)**
-  - `backend/api/src/admin/admin.controller.spec.ts`
-  - `backend/api/src/admin/admin.service.spec.ts`
-- **Autoryzacja (`auth`)**
-  - `backend/api/src/auth/auth.controller.spec.ts`
-  - `backend/api/src/auth/auth.service.spec.ts`
-  - `backend/api/src/auth/guards/jwt-auth.guard.spec.ts`
-  - `backend/api/src/auth/guards/roles.guard.spec.ts`
-  - `backend/api/src/auth/strategies/jwt.strategy.spec.ts`
-  - `backend/api/src/auth/strategies/refresh-token.strategy.spec.ts`
-- **Głosowanie (`engagement`)**
-  - `backend/api/src/engagement/engagement.controller.spec.ts`
-  - `backend/api/src/engagement/engagement.service.spec.ts`
-- **Finanse (`finance`)**
-  - `backend/api/src/finance/finance.controller.spec.ts`
-  - `backend/api/src/finance/finance.service.spec.ts`
-- **Powiadomienia e-mail (`mailer`)**
-  - `backend/api/src/mailer/mailer.module.spec.ts`
-  - `backend/api/src/mailer/mailer.service.spec.ts`
-- **Planowanie (`planning`)**
-  - `backend/api/src/planning/planning.controller.spec.ts`
-  - `backend/api/src/planning/planning.service.spec.ts`
-- **Redis (`redis`)**
-  - `backend/api/src/redis/redis.module.spec.ts`
-  - `backend/api/src/redis/redis.repository.spec.ts`
-- **Podróże (`trips`)**
-  - `backend/api/src/trips/trips.controller.spec.ts`
-  - `backend/api/src/trips/trips.service.spec.ts`
-  - `backend/api/src/trips/guards/trip-access.guard.spec.ts`
-- **Użytkownicy (`users`)**
-  - `backend/api/src/users/users.controller.spec.ts`
-  - `backend/api/src/users/users.service.spec.ts`
-- **Walidacja konfiguracji (`validation`)**
-  - `backend/api/src/validation/env-validation.spec.ts`
+* **Core aplikacji (`app`)**
+  * `backend/api/src/app.controller.spec.ts`
+  * `backend/api/src/app.module.spec.ts`
+  * `backend/api/src/app.service.spec.ts`
+  * `backend/api/src/entities.coverage.spec.ts`
+* **Admin (`admin`)**
+  * `backend/api/src/admin/admin.controller.spec.ts`
+  * `backend/api/src/admin/admin.service.spec.ts`
+* **Autoryzacja (`auth`)**
+  * `backend/api/src/auth/auth.controller.spec.ts`
+  * `backend/api/src/auth/auth.service.spec.ts`
+  * `backend/api/src/auth/guards/jwt-auth.guard.spec.ts`
+  * `backend/api/src/auth/guards/roles.guard.spec.ts`
+  * `backend/api/src/auth/strategies/jwt.strategy.spec.ts`
+  * `backend/api/src/auth/strategies/refresh-token.strategy.spec.ts`
+* **Głosowanie (`engagement`)**
+  * `backend/api/src/engagement/engagement.controller.spec.ts`
+  * `backend/api/src/engagement/engagement.service.spec.ts`
+* **Finanse (`finance`)**
+  * `backend/api/src/finance/finance.controller.spec.ts`
+  * `backend/api/src/finance/finance.service.spec.ts`
+* **Powiadomienia e-mail (`mailer`)**
+  * `backend/api/src/mailer/mailer.module.spec.ts`
+  * `backend/api/src/mailer/mailer.service.spec.ts`
+* **Planowanie (`planning`)**
+  * `backend/api/src/planning/planning.controller.spec.ts`
+  * `backend/api/src/planning/planning.service.spec.ts`
+* **Redis (`redis`)**
+  * `backend/api/src/redis/redis.module.spec.ts`
+  * `backend/api/src/redis/redis.repository.spec.ts`
+* **Podróże (`trips`)**
+  * `backend/api/src/trips/trips.controller.spec.ts`
+  * `backend/api/src/trips/trips.service.spec.ts`
+  * `backend/api/src/trips/guards/trip-access.guard.spec.ts`
+* **Użytkownicy (`users`)**
+  * `backend/api/src/users/users.controller.spec.ts`
+  * `backend/api/src/users/users.service.spec.ts`
+* **Walidacja konfiguracji (`validation`)**
+  * `backend/api/src/validation/env-validation.spec.ts`
 
 Łącznie backend zawiera **28 plików testów jednostkowych**.
 - Wynik: **239/239 zaliczonych**
