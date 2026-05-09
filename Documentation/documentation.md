@@ -1550,10 +1550,10 @@ Testy manualne obejmują scenariusze funkcjonalne wymagające weryfikacji z pers
 | ST-TRIPS-07 | Dostęp nieuprawnionego użytkownika | Trips | ZALICZONY | — |
 | ST-FIN-01 | Dodanie wydatku i podział kosztów | Finance | ZALICZONY  | — |
 | ST-FIN-02 | Wyświetlanie listy wydatków | Finance | ZALICZONY  | — |
-| ST-FIN-03 | Usunięcie wydatku | Finance | NIEZALICZONY | Całościowe saldo i główny spis wydatku zostaje zaktualizowany poprawnie, ale spis rozliczeń z innymi osobami we własnym saldzie zostaje zaktualizowany dopiero po odświeżeniu strony. |
-| ST-FIN-04 | Walidacja kwoty 0 lub ujemnej | Finance | NIEZALICZONY | W przypadku kwoty ujemnej - wszystko działa poprawnie, przy kwocie 0 dostajemy natomiast komunikat "Wpisz poprawną kwotę", zamiast informacji o kwocie nieujemnej |
-| ST-PLAN-01 | Dodanie dnia do harmonogramu | Planning | NIEZALICZONY  | Dodanie dnia działa tylko za pomocą przycisku "Dodaj dzień"; w przypadku kliknięcia entera - modal z dodaniem dnia się zamyka, ale dzień się nie dodaje. |
-| ST-PLAN-02 | Dodanie aktywności do dnia | Planning | NIEZALICZONY  | Dodanie aktywności działa tylko za pomocą przycisku "Dodaj aktywność"; w przypadku kliknięcia entera - modal z dodaniem aktywności się zamyka, ale aktywność nie zostaje dodana. |
+| ST-FIN-03 | Usunięcie wydatku | Finance | ZALICZONY | - |
+| ST-FIN-04 | Walidacja kwoty 0 lub ujemnej | Finance | ZALICZONY | - |
+| ST-PLAN-01 | Dodanie dnia do harmonogramu | Planning | ZALICZONY  | - |
+| ST-PLAN-02 | Dodanie aktywności do dnia | Planning | ZALICZONY  | - |
 | ST-PLAN-03 | Edycja aktywności | Planning | ZALICZONY | — |
 | ST-PLAN-04 | Usunięcie dnia z aktywnościami | Planning | ZALICZONY | — |
 | ST-PLAN-05 | Dzień spoza zakresu dat podróży | Planning | ZALICZONY | — |
@@ -1564,7 +1564,7 @@ Testy manualne obejmują scenariusze funkcjonalne wymagające weryfikacji z pers
 | ST-VOTE-01 | Tworzenie nowego głosowania | Voting | ZALICZONY  | — |
 | ST-VOTE-02 | Oddanie głosu | Voting | ZALICZONY  | — |
 | ST-VOTE-03 | Wycofanie oddanego głosu | Voting | ZALICZONY | - |
-| ST-VOTE-04 | Głosowanie po zamknięciu ankiety | Voting | NIEZALICZONY | Można oddać głos w zarchiwizowanym głosowaniu |
+| ST-VOTE-04 | Głosowanie po zamknięciu ankiety | Voting | ZALICZONY | - |
 | ST-PROF-02 | Edycja nicku/imienia | Profil | ZALICZONY | — |
 | ST-PROF-03 | Zmiana hasła z profilu | Profil | ZALICZONY | — |
 | ST-ADMIN-01 | Logowanie administratora | Admin | ZALICZONY | — |
@@ -1573,17 +1573,7 @@ Testy manualne obejmują scenariusze funkcjonalne wymagające weryfikacji z pers
 
 **Podsumowanie wynikow testow manualnych:**
 
-- Zaliczone: **26/31**
-- Niezaliczone: **5/31**
-- Najczesciej powtarzajace sie problemy: odswiezanie widoku po zmianach danych oraz obsluga akcji klawiszem Enter w modalach
-
-**Niezaliczone testy wymagające poprawy:**
-
-- `ST-FIN-03` - opóźniona aktualizacja części danych salda po usunięciu wydatku
-- `ST-FIN-04` - niespójny komunikat walidacji dla kwoty równej 0
-- `ST-PLAN-01` - brak zapisu dnia po zatwierdzeniu Enterem
-- `ST-PLAN-02` - brak zapisu aktywnosci po zatwierdzeniu Enterem
-- `ST-VOTE-04` - możliwosc oddania głosu po zamknięciu ankiety
+- Zaliczone: **31/31**
 
 ### 4.3.3 Testy jednostkowe
 
@@ -1654,5 +1644,4 @@ Pokrycie odzwierciedla stan po przejsciu wszystkich testow jednostkowych.
 ### 4.4. Wnioski
 
 <p>Przeprowadzone testy pozwoliły na dokładną weryfikację działania systemu ShareWay. Połączenie testów automatycznych i jednostkowych zagwarantowało stabilność kluczowych ścieżek, co ułatwiło wczesne wykrywanie błędów.</p>
-<p>Testy manualne wykazały kilka drobnych błędów w zachowaniu interfejsu (m.in. konieczność odświeżania strony po dodaniu wydatku w module finansów oraz usterki przy zatwierdzaniu formularzy klawiszem Enter w module planowania). Błędy te nie blokują jednak głównych funkcjonalności aplikacji, a system odpowiednio radzi sobie z danymi brzegowymi i walidacją po stronie serwera.</p>
-<p>W testach jednostkowych backendu wszystkie testy przeszly pomyslnie. Aktualny raport pokrycia (Statements 83.82%, Lines 84.29%, Branches 67.82%, Functions 73.64%) wskazuje na wysoki poziom zabezpieczenia logiki backendowej.</p>
+<p>Testy manualne oraz jednostkowe przeszły pomyślnie. Aktualny raport pokrycia (Statements 83.82%, Lines 84.29%, Branches 67.82%, Functions 73.64%) wskazuje na wysoki poziom zabezpieczenia logiki backendowej.</p>
